@@ -16,3 +16,4 @@
 - AI Copilot is a single shell-level sheet opened through the app store (openCopilot); screens never own their own copilot, and every AI entry point must have a manual path. Why: one consistent, screen-aware AI surface that can be disabled.
 - docs/veronyx-recognise-ui-flow-checklist.md is the product source of truth; resolve screen/UX doubts against it before inventing behaviour.
 - Route files that gain a child route must become pure layouts rendering <Outlet />; the old page body moves to a sibling *.index.tsx leaf. Why: a parent that renders its own page silently hides every child route.
+- Recognition insights AI answers only from deterministic tool results in src/lib/insights-evidence.ts and must cite evidence ids; model calls stay in the /api/insights server route. Why: answers must be traceable to real records, never invented.

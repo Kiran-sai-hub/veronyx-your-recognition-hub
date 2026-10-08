@@ -19,6 +19,7 @@ import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ConnectorsRouteImport } from './routes/connectors'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as FairnessRouteImport } from './routes/fairness'
+import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -26,6 +27,7 @@ import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ApiInsightsRouteImport } from './routes/api/insights'
 import { Route as BoardsIndexRouteImport } from './routes/boards.index'
 import { Route as BoardsIdRouteImport } from './routes/boards.$id'
 import { Route as ConnectorsIndexRouteImport } from './routes/connectors.index'
@@ -33,6 +35,8 @@ import { Route as ConnectorsMappingRouteImport } from './routes/connectors.mappi
 import { Route as DashboardHrRouteImport } from './routes/dashboard.hr'
 import { Route as DashboardManagerRouteImport } from './routes/dashboard.manager'
 import { Route as DashboardOwnerRouteImport } from './routes/dashboard.owner'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as InsightsThreadIdRouteImport } from './routes/insights.$threadId'
 import { Route as LoginOtpRouteImport } from './routes/login.otp'
 import { Route as MePreferencesRouteImport } from './routes/me.preferences'
 import { Route as MeRecognitionsRouteImport } from './routes/me.recognitions'
@@ -94,6 +98,11 @@ const FairnessRoute = FairnessRouteImport.update({
   path: '/fairness',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -127,6 +136,11 @@ const RewardsRoute = RewardsRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInsightsRoute = ApiInsightsRouteImport.update({
+  id: '/api/insights',
+  path: '/api/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BoardsIndexRoute = BoardsIndexRouteImport.update({
@@ -163,6 +177,16 @@ const DashboardOwnerRoute = DashboardOwnerRouteImport.update({
   id: '/dashboard/owner',
   path: '/dashboard/owner',
   getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
+} as any)
+const InsightsThreadIdRoute = InsightsThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => InsightsRoute,
 } as any)
 const LoginOtpRoute = LoginOtpRouteImport.update({
   id: '/otp',
@@ -226,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -233,11 +258,13 @@ export interface FileRoutesByFullPath {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -247,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/me/wallet': typeof MeWalletRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -268,11 +296,13 @@ export interface FileRoutesByTo {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -282,6 +312,7 @@ export interface FileRoutesByTo {
   '/me/wallet': typeof MeWalletRoute
   '/boards': typeof BoardsIndexRoute
   '/connectors': typeof ConnectorsIndexRoute
+  '/insights': typeof InsightsIndexRoute
   '/workflows': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id': typeof WorkflowsIdIndexRoute
@@ -298,6 +329,7 @@ export interface FileRoutesById {
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -305,11 +337,13 @@ export interface FileRoutesById {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -319,6 +353,7 @@ export interface FileRoutesById {
   '/me/wallet': typeof MeWalletRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -336,6 +371,7 @@ export interface FileRouteTypes {
     | '/connectors'
     | '/design-system'
     | '/fairness'
+    | '/insights'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -343,11 +379,13 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -357,6 +395,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards/'
     | '/connectors/'
+    | '/insights/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -378,11 +417,13 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -392,6 +433,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards'
     | '/connectors'
+    | '/insights'
     | '/workflows'
     | '/workflows/$id/runs'
     | '/workflows/$id'
@@ -407,6 +449,7 @@ export interface FileRouteTypes {
     | '/connectors'
     | '/design-system'
     | '/fairness'
+    | '/insights'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -414,11 +457,13 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -428,6 +473,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards/'
     | '/connectors/'
+    | '/insights/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -444,6 +490,7 @@ export interface RootRouteChildren {
   ConnectorsRoute: typeof ConnectorsRouteWithChildren
   DesignSystemRoute: typeof DesignSystemRoute
   FairnessRoute: typeof FairnessRoute
+  InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
@@ -451,6 +498,7 @@ export interface RootRouteChildren {
   PeopleRoute: typeof PeopleRoute
   RewardsRoute: typeof RewardsRoute
   SettingsRoute: typeof SettingsRoute
+  ApiInsightsRoute: typeof ApiInsightsRoute
   BoardsIdRoute: typeof BoardsIdRoute
   DashboardHrRoute: typeof DashboardHrRoute
   DashboardManagerRoute: typeof DashboardManagerRoute
@@ -533,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FairnessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -580,6 +635,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/insights': {
+      id: '/api/insights'
+      path: '/api/insights'
+      fullPath: '/api/insights'
+      preLoaderRoute: typeof ApiInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boards/': {
@@ -630,6 +692,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/owner'
       preLoaderRoute: typeof DashboardOwnerRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/insights/': {
+      id: '/insights/'
+      path: '/'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/insights/$threadId': {
+      id: '/insights/$threadId'
+      path: '/$threadId'
+      fullPath: '/insights/$threadId'
+      preLoaderRoute: typeof InsightsThreadIdRouteImport
+      parentRoute: typeof InsightsRoute
     }
     '/login/otp': {
       id: '/login/otp'
@@ -718,6 +794,20 @@ const ConnectorsRouteWithChildren = ConnectorsRoute._addFileChildren(
   ConnectorsRouteChildren,
 )
 
+interface InsightsRouteChildren {
+  InsightsThreadIdRoute: typeof InsightsThreadIdRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsThreadIdRoute: InsightsThreadIdRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
+
 interface LoginRouteChildren {
   LoginOtpRoute: typeof LoginOtpRoute
 }
@@ -759,6 +849,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnectorsRoute: ConnectorsRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
   FairnessRoute: FairnessRoute,
+  InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
@@ -766,6 +857,7 @@ const rootRouteChildren: RootRouteChildren = {
   PeopleRoute: PeopleRoute,
   RewardsRoute: RewardsRoute,
   SettingsRoute: SettingsRoute,
+  ApiInsightsRoute: ApiInsightsRoute,
   BoardsIdRoute: BoardsIdRoute,
   DashboardHrRoute: DashboardHrRoute,
   DashboardManagerRoute: DashboardManagerRoute,
