@@ -8,3 +8,4 @@
 - [ ] Review gate 2 — awaiting user review
 - [x] Phase 3 (screens; full-page AI copilot pending) — governance, compliance, fairness, campaigns, complete AI
 - [ ] Phase 4 — WhatsApp and kiosk
+- [x] Recognition insights (AI Q&A with evidence, owners/managers)
