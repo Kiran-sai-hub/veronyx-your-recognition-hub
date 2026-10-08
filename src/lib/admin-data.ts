@@ -233,7 +233,7 @@ export const departmentCoverage = [
 ];
 
 export const teamMembers = employees
-  .filter((employee) => employee.team === "Sales A" && employee.status === "active")
+  .filter((employee) => employee.department === "Sales" && employee.status === "active")
   .slice(0, 8)
   .map((employee, index) => ({
     ...employee,
