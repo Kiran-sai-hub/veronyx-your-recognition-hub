@@ -35,7 +35,7 @@ const toolLabels: Record<string, string> = {
 };
 
 const suggestions = [
-  `Why didn't ${decisionTrace.employee} get rewarded in the sales workflow?`,
+  `Why didn't ${decisionTrace.employee} (${decisionTrace.code}) get rewarded in the sales workflow?`,
   "Which teams are being missed by recognition?",
   "Is recognition spread fairly across shifts?",
 ];
