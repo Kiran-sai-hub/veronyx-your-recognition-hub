@@ -387,12 +387,12 @@ export const metricCatalog = [
 ];
 
 export const walletPools = [
-  { id: "Sales FY26-27", remaining: 120000 },
+  { id: "Sales A — Vikram", remaining: 18700 },
   { id: "Support FY26-27", remaining: 120000 },
-  { id: "Quality FY26-27", remaining: 42000 },
-  { id: "Manufacturing A", remaining: 31000 },
-  { id: "Manufacturing B", remaining: 0 },
-  { id: "Company recognition pool", remaining: 118400 },
+  { id: "Quality", remaining: 48800 },
+  { id: "Manufacturing A — Selvi", remaining: 21500 },
+  { id: "Manufacturing B — Karthik", remaining: 0 },
+  { id: "Radha Krishna Mills (organisation)", remaining: 218600 },
 ];
 
 const PROTECTED_RE = /\b(gender|religion|caste|age|marital\w*|pregnan\w*|disab\w*|health)\b/i;
@@ -682,7 +682,7 @@ export function applyAutoFix(d: WorkflowDraft, fix: AutoFix): WorkflowDraft {
       return { ...d, steps };
     }
     case "bind_wallet":
-      return { ...d, budget: { ...d.budget, wallet: "Company recognition pool" } };
+      return { ...d, budget: { ...d.budget, wallet: "Radha Krishna Mills (organisation)" } };
     case "set_amount":
       return {
         ...d,
@@ -1012,7 +1012,7 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify"),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Sales FY26-27" },
+        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Sales A — Vikram" },
       }),
   },
   {
@@ -1079,7 +1079,7 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify", { to: "whole team" }),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Manufacturing A" },
+        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Manufacturing A — Selvi" },
       }),
   },
   {
@@ -1104,7 +1104,7 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify"),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Company recognition pool" },
+        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Radha Krishna Mills (organisation)" },
       }),
   },
   {
@@ -1127,7 +1127,7 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify"),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Quality FY26-27" },
+        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Quality" },
       }),
   },
   {
@@ -1157,7 +1157,7 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify", { to: "whole team" }),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Company recognition pool" },
+        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Radha Krishna Mills (organisation)" },
       }),
   },
 ];

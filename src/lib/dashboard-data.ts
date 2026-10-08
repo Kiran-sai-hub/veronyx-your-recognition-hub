@@ -9,8 +9,8 @@ export const orgPulse = {
   activeEmployees: 199,
   pointsThisMonth: 34600,
   rupeesThisMonth: 34600,
-  budgetLeft: 118400,
-  budgetQuarter: 200000,
+  budgetLeft: 218600,
+  budgetYear: 500000,
   activeWorkflows: 3,
 };
 

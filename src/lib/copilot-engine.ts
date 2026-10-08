@@ -138,12 +138,12 @@ function buildProposal(q: string): Proposal {
         ? [
             "Using metric production.units (Production ERP webhook)",
             "Attendance from the attendance register sheet",
-            "Budget: Manufacturing A pool (₹ 31,000 remaining)",
+            "Budget: Manufacturing A — Selvi pool (₹ 21,500 remaining)",
           ]
         : [
             "Using metric sales.sales_vs_target (Zoho CRM)",
             "Target column comes from the monthly sales file",
-            "Budget: Sales FY26-27 pool (₹ 1,20,000 remaining)",
+            "Budget: Sales A — Vikram pool (₹ 18,700 remaining)",
           ],
     questions: isCsat
       ? [{ question: "Tie-break: use tickets resolved as the secondary metric?", default: true }]
@@ -152,7 +152,7 @@ function buildProposal(q: string): Proposal {
     repairs: ["First draft had no End step (V2) → added End → re-validated ✓"],
     budget: {
       pool,
-      remaining: pool === "Manufacturing A" ? 31000 : 120000,
+      remaining: pool === "Manufacturing A — Selvi" ? 21500 : pool === "Sales A — Vikram" ? 18700 : 120000,
       monthlyCost: isCsat ? 3000 : isFactory ? 1200 * 4 : 5500,
     },
     tax: isCsat

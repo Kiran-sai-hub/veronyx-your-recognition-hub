@@ -379,7 +379,7 @@ export function OwnerDashboard() {
         <StatCard
           label="Budget left"
           value={formatRupees(orgPulse.budgetLeft)}
-          detail={`Of ${formatRupees(orgPulse.budgetQuarter)} for Q3 (Oct–Dec)`}
+          detail={`Of ${formatRupees(orgPulse.budgetYear)} for FY 2026-27 (Apr–Mar)`}
           icon={WalletCards}
         />
         <StatCard

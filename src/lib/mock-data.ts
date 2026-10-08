@@ -93,7 +93,8 @@ export const employees: Employee[] = Array.from({ length: 200 }, (_, index) => {
     team: `${department} ${String.fromCharCode(65 + (Math.floor(index / 4) % 4))}`,
     location:
       ["Coimbatore", "Chennai", "Erode", "Tiruppur"][Math.floor(index / 2) % 4] ?? "Chennai",
-    points: 300 + ((index * 137) % 2400),
+    // Index 8 is the demo employee; their wallet starts at 1,850 points.
+    points: index === 8 ? 1850 : 300 + ((index * 137) % 2400),
     status: index === 199 ? "exited" : "active",
   };
 });

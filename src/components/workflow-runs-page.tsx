@@ -81,7 +81,7 @@ function stepLog(
     },
     {
       time: "18:30:16",
-      text: `Budget: ₹ ${(rewarded * 500).toLocaleString("en-IN")} reserved from Sales FY26-27`,
+      text: `Budget: ₹ ${(rewarded * 500).toLocaleString("en-IN")} reserved from Sales A — Vikram`,
       ok: true,
     },
     { time: "18:30:18", text: `Run ${runId} finished`, ok: true },
