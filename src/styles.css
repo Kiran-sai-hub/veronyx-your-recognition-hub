@@ -23,10 +23,11 @@
     "DM Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada",
     "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Malayalam", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  /* Checklist §10.4: sm 4px (inputs, small buttons), md 8px (cards, buttons), lg 12px (modals). */
   --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
@@ -82,27 +83,27 @@
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.546 0.245 262.881);
+  --primary: oklch(0.525 0.235 263); /* ≈ #2563EB, AA on white and on 10% tints */
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
+  --muted-foreground: oklch(0.5 0.046 257.4);
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.51 0.22 27.3);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.704 0.04 256.788);
-  --success: oklch(0.527 0.154 150.069);
+  --success: oklch(0.48 0.14 150);
   --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.555 0.163 48.998);
+  --warning: oklch(0.52 0.16 49);
   --warning-foreground: oklch(0.26 0.04 65);
-  --info: oklch(0.609 0.126 221.723);
-  --reward: oklch(0.609 0.126 75.22);
-  --reward-foreground: oklch(0.22 0.04 70);
-  --private: oklch(0.554 0.046 257.417);
+  --info: oklch(0.52 0.11 221.7);
+  --reward: oklch(0.5 0.11 70);
+  --reward-foreground: oklch(0.99 0 0);
+  --private: oklch(0.5 0.046 257.4);
   --private-surface: oklch(0.968 0.007 247.896);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -126,8 +127,8 @@
   --card-foreground: oklch(0.984 0.003 247.858);
   --popover: oklch(0.208 0.042 265.755);
   --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
+  --primary: oklch(0.71 0.15 255); /* checklist #3B82F6 lightened to pass AA on dark surfaces */
+  --primary-foreground: oklch(0.2 0.04 265);
   --secondary: oklch(0.279 0.041 260.031);
   --secondary-foreground: oklch(0.984 0.003 247.858);
   --muted: oklch(0.279 0.041 260.031);
@@ -186,6 +187,51 @@
   :focus-visible {
     outline: 2px solid var(--color-ring);
   }
+}
+
+/* High contrast (checklist §9.2): stronger text, borders and focus rings. */
+.hc {
+  --muted-foreground: oklch(0.38 0.04 260);
+  --border: oklch(0.55 0.03 260);
+  --input: oklch(0.45 0.03 260);
+  --ring: oklch(0.45 0.25 262);
+  --private: oklch(0.38 0.04 260);
+}
+.dark.hc {
+  --muted-foreground: oklch(0.9 0.01 250);
+  --border: oklch(1 0 0 / 55%);
+  --input: oklch(1 0 0 / 60%);
+  --ring: oklch(0.85 0.15 250);
+  --private: oklch(0.9 0.01 250);
+}
+.hc :focus-visible {
+  outline-width: 3px;
+}
+.hc a {
+  text-decoration-thickness: 2px;
+}
+
+/* Text size (checklist §9.2): everything is in rem, so the root size scales the whole UI. */
+html[data-text-size="lg"] {
+  font-size: 112.5%;
+}
+html[data-text-size="xl"] {
+  font-size: 125%;
+}
+
+/* Low-data mode (checklist §9.4): hide decorative illustrations and images. */
+.low-data [data-decorative] {
+  display: none !important;
+}
+
+/* Explicit reduced-motion setting, in addition to the OS preference. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

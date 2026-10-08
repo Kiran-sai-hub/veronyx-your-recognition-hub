@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { PeoplePage } from "@/components/people-page";
+import { useAppStore } from "@/store/app-store";
+import { useDemoStore } from "@/store/demo-store";
 
 export const Route = createFileRoute("/people")({
   head: () => ({
@@ -24,9 +26,11 @@ export const Route = createFileRoute("/people")({
 });
 
 function RoutePage() {
+  const persona = useAppStore((s) => s.persona);
+  const emptyOrg = useDemoStore((s) => s.emptyOrg);
   return (
     <AdminRoutePage pathname="/people">
-      <PeoplePage />
+      <PeoplePage teamOnly={persona === "manager"} emptyOrg={emptyOrg} />
     </AdminRoutePage>
   );
 }

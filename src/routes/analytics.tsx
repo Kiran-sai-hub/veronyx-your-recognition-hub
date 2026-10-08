@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { AnalyticsPage } from "@/components/analytics-page";
+import { useDemoStore } from "@/store/demo-store";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -26,9 +27,10 @@ export const Route = createFileRoute("/analytics")({
 });
 
 function RoutePage() {
+  const emptyOrg = useDemoStore((s) => s.emptyOrg);
   return (
     <AdminRoutePage pathname="/analytics">
-      <AnalyticsPage />
+      <AnalyticsPage emptyOrg={emptyOrg} />
     </AdminRoutePage>
   );
 }

@@ -20,13 +20,17 @@ export const Route = createFileRoute("/settings")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: string | undefined } => ({
+    tab: typeof search["tab"] === "string" ? search["tab"] : undefined,
+  }),
   component: RoutePage,
 });
 
 function RoutePage() {
+  const { tab } = Route.useSearch();
   return (
-    <AdminRoutePage pathname="/settings">
-      <SettingsPage />
+    <AdminRoutePage pathname={tab ? `/settings?tab=${tab}` : "/settings"}>
+      <SettingsPage tab={tab} />
     </AdminRoutePage>
   );
 }

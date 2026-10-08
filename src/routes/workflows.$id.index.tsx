@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { WorkflowBuilderPage } from "@/components/workflow-builder-page";
+import { useAppStore, useCopilotEnabled } from "@/store/app-store";
 
 export const Route = createFileRoute("/workflows/$id/")({
   head: () => ({
@@ -20,14 +21,32 @@ export const Route = createFileRoute("/workflows/$id/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { template?: string | undefined; from?: string | undefined } => ({
+    template: typeof search["template"] === "string" ? search["template"] : undefined,
+    from: typeof search["from"] === "string" ? search["from"] : undefined,
+  }),
   component: RoutePage,
 });
 
 function RoutePage() {
   const { id } = Route.useParams();
+  const { template, from } = Route.useSearch();
+  const persona = useAppStore((s) => s.persona);
+  const openCopilot = useAppStore((s) => s.openCopilot);
+  const aiEnabled = useCopilotEnabled();
   return (
     <AdminRoutePage pathname={`/workflows/${id}`}>
-      <WorkflowBuilderPage key={id} workflowId={id} />
+      <WorkflowBuilderPage
+        key={`${id}-${template ?? ""}-${from ?? ""}`}
+        workflowId={id}
+        templateId={template}
+        fromAi={from === "ai"}
+        readOnly={persona === "manager"}
+        aiEnabled={aiEnabled}
+        onAskAi={(prompt) => openCopilot(prompt)}
+      />
     </AdminRoutePage>
   );
 }

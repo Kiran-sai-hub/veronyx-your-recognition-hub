@@ -21,7 +21,8 @@ export function StatusBadge({ children, tone = "neutral" }: StatusBadgeProps) {
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
         tone === "success" && "border-success/30 bg-success/10 text-success",
-        tone === "warning" && "border-warning/30 bg-warning/10 text-warning-foreground",
+        tone === "warning" &&
+          "border-warning/30 bg-warning/10 text-warning-foreground dark:text-warning",
         tone === "error" && "border-destructive/30 bg-destructive/10 text-destructive",
         tone === "private" && "border-private/25 bg-private-surface text-private",
         tone === "reward" && "border-reward/30 bg-reward/10 text-reward",

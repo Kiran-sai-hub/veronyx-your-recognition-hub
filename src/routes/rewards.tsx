@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { AdminRewardsPage } from "@/components/admin-rewards-page";
+import { MANAGER_TEAM } from "@/lib/approvals-data";
+import { useAppStore } from "@/store/app-store";
+import { useDemoStore } from "@/store/demo-store";
 
 export const Route = createFileRoute("/rewards")({
   head: () => ({
@@ -21,9 +24,16 @@ export const Route = createFileRoute("/rewards")({
 });
 
 function RoutePage() {
+  const persona = useAppStore((s) => s.persona);
+  const emptyOrg = useDemoStore((s) => s.emptyOrg);
+  const manager = persona === "manager";
   return (
     <AdminRoutePage pathname="/rewards">
-      <AdminRewardsPage />
+      <AdminRewardsPage
+        readOnly={manager}
+        team={manager ? MANAGER_TEAM : undefined}
+        emptyOrg={emptyOrg}
+      />
     </AdminRoutePage>
   );
 }

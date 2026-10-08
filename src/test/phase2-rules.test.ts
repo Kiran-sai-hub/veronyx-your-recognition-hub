@@ -4,6 +4,10 @@ import {
   budgetPools,
   checkBudgetMove,
   findPayrollIssues,
+  forecastPool,
+  payrollFileName,
+  validatePayroll,
+  fiscalYearFor,
   payrollPreview,
   poolRemaining,
   toCsv,
@@ -69,5 +73,45 @@ describe("CSV export", () => {
         ],
       ),
     ).toBe("A,B\n1,2\n3,4");
+  });
+});
+
+describe("Budget forecasting", () => {
+  const salesA = budgetPools.find((pool) => pool.id === "pool-sales-a")!;
+  const mfgA = budgetPools.find((pool) => pool.id === "pool-mfg-a")!;
+
+  it("warns when a pool runs out before it expires", () => {
+    const forecast = forecastPool(salesA, 8500);
+    expect(forecast.runsOutEarly).toBe(true);
+    expect(forecast.unspentAtExpiry).toBe(0);
+  });
+
+  it("estimates money left unspent at expiry", () => {
+    const forecast = forecastPool(mfgA, 6400);
+    expect(forecast.runsOutEarly).toBe(false);
+    expect(forecast.unspentAtExpiry).toBeGreaterThan(0);
+  });
+
+  it("treats an empty pool as already run out", () => {
+    const mfgB = budgetPools.find((pool) => pool.id === "pool-mfg-b")!;
+    expect(forecastPool(mfgB, 6700).runsOutEarly).toBe(true);
+  });
+});
+
+describe("Payroll export checks (checklist 4.13)", () => {
+  it("finds missing codes, untagged rewards and threshold breaches", () => {
+    const kinds = validatePayroll(payrollPreview).map((check) => check.kind);
+    expect(kinds).toContain("missing_code");
+    expect(kinds).toContain("untagged");
+    expect(kinds).toContain("threshold");
+  });
+
+  it("names the file payroll_export_YYYY_MM.csv", () => {
+    expect(payrollFileName("October 2026")).toBe("payroll_export_2026_10.csv");
+  });
+
+  it("uses the April–March fiscal year", () => {
+    expect(fiscalYearFor("October 2026")).toBe("FY 2026-27");
+    expect(fiscalYearFor("February 2027")).toBe("FY 2026-27");
   });
 });

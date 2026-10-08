@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { ManagerDashboard } from "@/components/dashboards";
+import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/dashboard/manager")({
   head: () => ({
@@ -21,9 +22,10 @@ export const Route = createFileRoute("/dashboard/manager")({
 });
 
 function RoutePage() {
+  const persona = useAppStore((s) => s.persona);
   return (
     <AdminRoutePage pathname="/dashboard/manager">
-      <ManagerDashboard />
+      <ManagerDashboard viewer={persona} />
     </AdminRoutePage>
   );
 }

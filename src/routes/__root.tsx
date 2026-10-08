@@ -9,10 +9,14 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+import { applyPreferences, useAppStore } from "@/store/app-store";
 
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { setNavigator } from "../lib/navigate";
 
 function NotFoundComponent() {
   return (
@@ -77,7 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#2563EB" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Recognise" },
       { title: "Veronyx Recognise" },
       { name: "description", content: "Performance, recognition and rewards for Indian SMEs." },
       { name: "author", content: "Veronyx" },
@@ -97,6 +104,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Bengali:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/icons/icon.svg", type: "image/svg+xml" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -121,6 +131,48 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // Screens use plain <a href> and go() so they stay router-agnostic; the root turns
+  // same-app links into client-side moves so state and scroll feel instant.
+  useEffect(() => {
+    setNavigator((to, options) =>
+      options?.replace ? router.history.replace(to) : router.history.push(to),
+    );
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as HTMLElement | null)?.closest("a");
+      if (!anchor || anchor.target || anchor.hasAttribute("download")) return;
+      const href = anchor.getAttribute("href");
+      if (!href || !href.startsWith("/") || href.startsWith("//") || href.startsWith("/api/"))
+        return;
+      event.preventDefault();
+      router.history.push(href);
+      window.scrollTo({ top: 0 });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [router]);
+
+  // Theme and accessibility preferences apply to every surface (admin, employee, kiosk, bot).
+  const prefs = useAppStore(
+    useShallow((s) => ({
+      theme: s.theme,
+      highContrast: s.highContrast,
+      textSize: s.textSize,
+      reduceMotion: s.reduceMotion,
+      lowData: s.lowData,
+      language: s.language,
+    })),
+  );
+  useEffect(() => applyPreferences(prefs), [prefs]);
+
+  // PWA: register the offline shell in production builds only (dev uses Vite's live modules).
+  useEffect(() => {
+    if (import.meta.env.PROD && "serviceWorker" in navigator)
+      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

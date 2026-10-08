@@ -1,4 +1,4 @@
-import { Check, Minus } from "lucide-react";
+import { Check, Download, Minus, Pencil, Plus, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -17,22 +17,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { formatRupees, isValidGstin, isValidUdyam } from "@/lib/format";
 import {
   invoices,
-  notificationTemplates,
+  localeName,
+  notificationTemplates as initialTemplates,
   permissions as initialPermissions,
+  roleAssignments as initialAssignments,
+  roleDescriptions,
   roles,
-  whatsappTemplates,
+  templateLocales,
+  whatsappTemplates as initialWa,
+  type NotificationTemplate,
 } from "@/lib/phase3-data";
+import { useDemoStore } from "@/store/demo-store";
 
-export function SettingsPage() {
+export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
   const [legalName, setLegalName] = useState("Radha Krishna Mills Private Limited");
   const [gstin, setGstin] = useState("33AABCR1234F1Z5");
   const [udyam, setUdyam] = useState("UDYAM-TN-03-0012345");
   const [saved, setSaved] = useState(true);
   const [perms, setPerms] = useState(initialPermissions);
+  const [assignments, setAssignments] = useState(initialAssignments);
+  const [templates, setTemplates] = useState(initialTemplates);
+  const [editing, setEditing] = useState<NotificationTemplate | null>(null);
+  const [editLocale, setEditLocale] = useState<string>("en");
+  const [waTemplates, setWaTemplates] = useState(initialWa);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<string>("Manager");
+  const logAudit = useDemoStore((s) => s.logAudit);
   const gstinOk = isValidGstin(gstin);
   const udyamOk = isValidUdyam(udyam);
 
@@ -56,15 +78,16 @@ export function SettingsPage() {
       <PageHeading
         eyebrow="Settings"
         title="Organisation settings"
-        description="Company details, who can do what, message templates and your plan."
+        description="Org profile, roles and permissions, notification templates, integrations and your plan. Privacy & DPDP lives in the Compliance centre."
       />
 
-      <Tabs defaultValue="org">
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList className="flex h-auto flex-wrap justify-start">
-          <TabsTrigger value="org">Organisation</TabsTrigger>
-          <TabsTrigger value="roles">Roles & permissions</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="org">Org Profile</TabsTrigger>
+          <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
+          <TabsTrigger value="notifications">Notification Templates</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp templates</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="billing">Billing & plan</TabsTrigger>
         </TabsList>
 
@@ -111,12 +134,23 @@ export function SettingsPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>MSME category</Label>
-                <Input value="Small" readOnly />
+                <Label htmlFor="org-msme">MSME category</Label>
+                <Select defaultValue="Small">
+                  <SelectTrigger id="org-msme">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Micro", "Small", "Medium"].map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label>Time zone</Label>
-                <Input value="Asia/Kolkata (IST)" readOnly />
+                <Label htmlFor="org-tz">Time zone</Label>
+                <Input id="org-tz" value="Asia/Kolkata (IST)" readOnly />
               </div>
             </CardContent>
           </Card>
@@ -165,30 +199,338 @@ export function SettingsPage() {
             </CardContent>
           </Card>
           <div className="mt-4 flex justify-end">
-            <Button onClick={() => toast.success("Permissions saved and logged")}>
+            <Button
+              onClick={() => {
+                logAudit({
+                  actor: "Lakshmi Menon",
+                  action: "Saved permission matrix",
+                  target: "Roles & Permissions",
+                  type: "settings",
+                });
+                toast.success("Permissions saved and logged");
+              }}
+            >
               Save permissions
             </Button>
           </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_2fr]">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Roles</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {roles.map((r) => (
+                  <div key={r}>
+                    <p className="font-medium">
+                      {r}{" "}
+                      <span className="font-normal text-muted-foreground">
+                        ·{" "}
+                        {assignments.filter((a) => a.role === r).length ||
+                          (r === "Employee" ? 199 : 0)}{" "}
+                        people
+                      </span>
+                    </p>
+                    <p className="text-muted-foreground">{roleDescriptions[r]}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Assignments</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Everyone else has the Employee role. Changes take effect at the next sign-in and
+                  are logged.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="divide-y divide-border">
+                  {assignments.map((a, i) => (
+                    <li
+                      key={a.email}
+                      className="flex flex-col gap-2 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <span className="min-w-0">
+                        <span className="font-medium">{a.name}</span>
+                        <span className="block truncate text-muted-foreground">
+                          {a.email} · {a.scope}
+                        </span>
+                      </span>
+                      <Select
+                        value={a.role}
+                        disabled={a.role === "Owner"}
+                        onValueChange={(v) => {
+                          setAssignments((list) =>
+                            list.map((x, j) => (j === i ? { ...x, role: v as typeof a.role } : x)),
+                          );
+                          logAudit({
+                            actor: "Lakshmi Menon",
+                            action: "Changed role",
+                            target: `${a.name} · ${a.role} → ${v}`,
+                            type: "settings",
+                          });
+                          toast.success(`${a.name} is now ${v}.`);
+                        }}
+                      >
+                        <SelectTrigger className="w-full sm:w-36" aria-label={`Role for ${a.name}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roles.map((r) => (
+                            <SelectItem key={r} value={r} disabled={r === "Owner"}>
+                              {r}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </li>
+                  ))}
+                </ul>
+                <form
+                  className="flex flex-col gap-2 sm:flex-row"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!/^\S+@\S+\.\S+$/.test(inviteEmail)) {
+                      toast.error("Enter a valid email address.");
+                      return;
+                    }
+                    setAssignments((list) => [
+                      ...list,
+                      {
+                        name: inviteEmail.split("@")[0] ?? inviteEmail,
+                        email: inviteEmail,
+                        role: inviteRole as (typeof roles)[number],
+                        scope: "Invite sent",
+                      },
+                    ]);
+                    setInviteEmail("");
+                    toast.success(`Invite sent to ${inviteEmail}.`);
+                  }}
+                >
+                  <Input
+                    type="email"
+                    placeholder="name@rkmills.in"
+                    aria-label="Email to invite"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                  />
+                  <Select value={inviteRole} onValueChange={setInviteRole}>
+                    <SelectTrigger className="w-full sm:w-36" aria-label="Role to give">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles
+                        .filter((r) => r !== "Owner")
+                        .map((r) => (
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <Button type="submit">
+                    <Plus className="size-4" /> Invite
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="mt-6">
+        <TabsContent value="notifications" className="mt-6 space-y-3">
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="overflow-x-auto p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Template</TableHead>
                     <TableHead>Channel</TableHead>
                     <TableHead>Languages</TableHead>
+                    <TableHead>
+                      <span className="sr-only">Edit</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {notificationTemplates.map((t) => (
+                  {templates.map((t) => {
+                    const missing = templateLocales.filter((l) => !t.body[l]);
+                    return (
+                      <TableRow key={t.name}>
+                        <TableCell className="font-medium">{t.name}</TableCell>
+                        <TableCell>{t.channel}</TableCell>
+                        <TableCell>
+                          <span className="flex flex-wrap gap-1">
+                            {templateLocales.map((l) => (
+                              <span
+                                key={l}
+                                className={
+                                  t.body[l]
+                                    ? "rounded border border-border px-1.5 text-xs uppercase"
+                                    : "rounded border border-dashed border-warning px-1.5 text-xs uppercase text-muted-foreground line-through"
+                                }
+                                title={
+                                  t.body[l]
+                                    ? localeName[l]
+                                    : `${localeName[l]} missing — English is sent`
+                                }
+                              >
+                                {l}
+                              </span>
+                            ))}
+                          </span>
+                          {missing.length > 0 && (
+                            <span className="mt-1 flex items-center gap-1 text-xs text-warning-foreground dark:text-warning">
+                              <TriangleAlert className="size-3" /> {missing.length} missing — falls
+                              back to English
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setEditing(t);
+                              setEditLocale("en");
+                            }}
+                          >
+                            <Pencil className="size-4" /> Edit
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          {editing && (
+            <Card>
+              <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
+                <CardTitle className="text-base">
+                  {editing.name} · {editing.channel}
+                </CardTitle>
+                <div className="flex flex-wrap gap-1" role="group" aria-label="Language">
+                  {templateLocales.map((l) => (
+                    <Button
+                      key={l}
+                      size="sm"
+                      variant={editLocale === l ? "default" : "outline"}
+                      aria-pressed={editLocale === l}
+                      onClick={() => setEditLocale(l)}
+                    >
+                      {localeName[l]}
+                    </Button>
+                  ))}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {!editing.body[editLocale as (typeof templateLocales)[number]] && (
+                  <p className="rounded-md bg-warning/10 p-3 text-sm">
+                    No {localeName[editLocale]} version yet. People who chose{" "}
+                    {localeName[editLocale]} get the English text until you add one.
+                  </p>
+                )}
+                <Label htmlFor="template-body">Message ({localeName[editLocale]})</Label>
+                <Textarea
+                  id="template-body"
+                  rows={3}
+                  value={editing.body[editLocale as (typeof templateLocales)[number]] ?? ""}
+                  placeholder={editing.body.en}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      body: { ...editing.body, [editLocale]: e.target.value },
+                    })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Variables in double braces are filled in per person, e.g. {"{{name}}"}.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setEditing(null)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setTemplates((list) =>
+                        list.map((t) => (t.name === editing.name ? editing : t)),
+                      );
+                      setEditing(null);
+                      toast.success("Template saved.");
+                    }}
+                  >
+                    Save template
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="whatsapp" className="mt-6 space-y-3">
+          <Card>
+            <CardContent className="overflow-x-auto p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Template</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Languages</TableHead>
+                    <TableHead>Meta approval</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {waTemplates.map((t) => (
                     <TableRow key={t.name}>
-                      <TableCell className="font-medium">{t.name}</TableCell>
-                      <TableCell>{t.channel}</TableCell>
+                      <TableCell>
+                        <span className="font-mono text-sm">{t.name}</span>
+                        {t.note && (
+                          <span className="block max-w-sm text-xs text-muted-foreground">
+                            {t.note}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>{t.category}</TableCell>
                       <TableCell className="uppercase text-muted-foreground">
-                        {t.locales.join(" · ")}
+                        {t.languages.join(" · ")}
+                      </TableCell>
+                      <TableCell>
+                        <span className="flex flex-wrap items-center gap-2">
+                          <StatusBadge
+                            tone={
+                              t.status === "Approved"
+                                ? "success"
+                                : t.status === "Pending"
+                                  ? "warning"
+                                  : "error"
+                            }
+                          >
+                            {t.status}
+                          </StatusBadge>
+                          {t.status === "Rejected" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setWaTemplates((list) =>
+                                  list.map((x) =>
+                                    x.name === t.name
+                                      ? {
+                                          ...x,
+                                          status: "Pending",
+                                          note: "Resubmitted to Meta today.",
+                                        }
+                                      : x,
+                                  ),
+                                );
+                                toast.success(`${t.name} resubmitted for approval.`);
+                              }}
+                            >
+                              Fix & resubmit
+                            </Button>
+                          )}
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -196,44 +538,79 @@ export function SettingsPage() {
               </Table>
             </CardContent>
           </Card>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Missing a language? Employees get the English version automatically.
+          <p className="text-xs text-muted-foreground">
+            Utility templates carry recognition and voucher updates; Authentication is only for
+            OTPs; Marketing needs separate consent. Only approved templates can be sent.
           </p>
         </TabsContent>
 
-        <TabsContent value="whatsapp" className="mt-6">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Template</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Meta approval</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {whatsappTemplates.map((t) => (
-                    <TableRow key={t.name}>
-                      <TableCell className="font-mono text-sm">{t.name}</TableCell>
-                      <TableCell>{t.category}</TableCell>
-                      <TableCell>
-                        <StatusBadge
-                          tone={
-                            t.status === "Approved"
-                              ? "success"
-                              : t.status === "Pending"
-                                ? "warning"
-                                : "error"
-                          }
-                        >
-                          {t.status}
-                        </StatusBadge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        <TabsContent value="integrations" className="mt-6 grid gap-4 md:grid-cols-2">
+          {[
+            [
+              "Sign-in (SSO)",
+              "Google Workspace and Microsoft 365 sign-in for office staff.",
+              "Connected · Google",
+              true,
+            ],
+            [
+              "WhatsApp Business API",
+              "Sends recognition, OTPs and vouchers from +91 80470 12345.",
+              "Connected · quality rating High",
+              true,
+            ],
+            [
+              "Payroll",
+              "Monthly export format for Keka, greytHR, RazorpayX, Zoho Payroll or CSV.",
+              "Format: Keka",
+              true,
+            ],
+            [
+              "Voucher aggregator",
+              "Supplies Amazon, Flipkart, Swiggy and fuel vouchers.",
+              "Connected · wallet ₹ 85,000",
+              true,
+            ],
+            [
+              "Email (SMTP)",
+              "Sends weekly summaries from rewards@rkmills.in.",
+              "Not connected",
+              false,
+            ],
+          ].map(([name, detail, status, on]) => (
+            <Card key={name as string} className="rounded-lg">
+              <CardContent className="flex items-start justify-between gap-3 p-5">
+                <div>
+                  <p className="font-medium">{name as string}</p>
+                  <p className="text-sm text-muted-foreground">{detail as string}</p>
+                  <p
+                    className={
+                      on ? "mt-2 text-xs text-success" : "mt-2 text-xs text-muted-foreground"
+                    }
+                  >
+                    {status as string}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    toast.success(
+                      on ? `${name as string} settings opened` : `Connecting ${name as string}…`,
+                    )
+                  }
+                >
+                  {on ? "Manage" : "Connect"}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+          <Card className="rounded-lg border-dashed md:col-span-2">
+            <CardContent className="flex flex-wrap items-center justify-between gap-2 p-5 text-sm">
+              Performance data sources (CRM, sheets, helpdesk, webhooks) are managed in Connectors &
+              Data.
+              <Button size="sm" variant="ghost" asChild>
+                <a href="/connectors">Open Connectors & Data</a>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -268,11 +645,21 @@ export function SettingsPage() {
             <CardContent>
               <ul className="divide-y divide-border text-sm">
                 {invoices.map((inv) => (
-                  <li key={inv.id} className="flex justify-between py-2">
+                  <li key={inv.id} className="flex items-center justify-between gap-2 py-2">
                     <span>
-                      {inv.id} <span className="text-muted-foreground">· {inv.date}</span>
+                      {inv.id} <span className="text-muted-foreground">· {inv.date} · paid</span>
                     </span>
-                    <span>{formatRupees(inv.amount)}</span>
+                    <span className="flex items-center gap-1">
+                      {formatRupees(inv.amount)}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={`Download ${inv.id}`}
+                        onClick={() => toast.success(`${inv.id}.pdf downloaded (sample)`)}
+                      >
+                        <Download className="size-4" />
+                      </Button>
+                    </span>
                   </li>
                 ))}
               </ul>
