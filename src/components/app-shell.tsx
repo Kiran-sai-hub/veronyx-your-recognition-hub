@@ -28,16 +28,18 @@ import {
   WalletCards,
   Workflow,
   Eye,
-  TrendingUp,
+  Scale,
   TimerReset,
+  Zap,
   TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { AiCopilot } from "@/components/ai-copilot";
 import { Brand } from "@/components/brand";
+import { WhatsAppIcon } from "@/components/domain-icons";
 import {
   OfflineBanner,
   PageSkeleton,
@@ -83,23 +85,29 @@ import { type Persona, canUseCopilot, personaHome, useAppStore } from "@/store/a
 import { useDemoStore } from "@/store/demo-store";
 import { useStatusStore } from "@/store/status-store";
 
-const navIcons: Record<NavKey, LucideIcon> = {
+/** Icon component type shared by Lucide icons and the WhatsApp brand glyph. */
+type IconType = ComponentType<{ className?: string; fill?: string; fillOpacity?: number }>;
+
+/** Outline icons when inactive, filled when active (checklist §10.6). */
+const activeFill = (active: boolean) => (active ? { fill: "currentColor", fillOpacity: 0.18 } : {});
+
+const navIcons: Record<NavKey, IconType> = {
   dashboard: LayoutDashboard,
   boards: BarChart3,
-  workflows: Workflow,
+  workflows: Zap,
   approvals: CheckSquare,
   rewards: Gift,
   people: Users,
   connectors: Plug,
-  analytics: TrendingUp,
+  analytics: Scale,
   budget: IndianRupee,
   copilot: Bot,
   settings: Settings,
 };
 
-const surfaceIcons: Record<string, LucideIcon> = {
+const surfaceIcons: Record<string, IconType> = {
   "/me": Smartphone,
-  "/whatsapp": Smartphone,
+  "/whatsapp": WhatsAppIcon,
   "/kiosk": Monitor,
 };
 
@@ -297,7 +305,7 @@ function NavLink({
 }: {
   to: string;
   label: string;
-  icon?: LucideIcon | undefined;
+  icon?: IconType | undefined;
   active: boolean;
   badge?: number | undefined;
   sub?: boolean;
@@ -313,7 +321,7 @@ function NavLink({
         active && sub && "font-semibold text-primary",
       )}
     >
-      {Icon && <Icon className="size-5 shrink-0" />}
+      {Icon && <Icon className="size-5 shrink-0" {...activeFill(active)} />}
       <span className="flex-1">{label}</span>
       {badge !== undefined && badge > 0 && (
         <span
@@ -455,7 +463,7 @@ function MobileBottomNav({
             pathname === item.to && "font-semibold text-primary",
           )}
         >
-          <item.icon className="size-5" />
+          <item.icon className="size-5" {...activeFill(pathname === item.to)} />
           {item.label}
           {"badge" in item && item.badge ? (
             <span className="absolute right-[22%] top-2 grid min-w-5 place-items-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-white">

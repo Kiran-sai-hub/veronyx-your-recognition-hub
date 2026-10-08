@@ -1,6 +1,7 @@
 import { Bell, Gift, QrCode, Send } from "lucide-react";
 import { useState } from "react";
 
+import { WhatsAppIcon } from "@/components/domain-icons";
 import { PageHeading } from "@/components/page-heading";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -154,7 +155,9 @@ export function WhatsappSimulator() {
               RK
             </div>
             <div>
-              <p className="text-sm font-semibold">Radha Krishna Mills</p>
+              <p className="flex items-center gap-1.5 text-sm font-semibold">
+                Radha Krishna Mills <WhatsAppIcon className="size-3.5" />
+              </p>
               <p className="text-[11px] opacity-80">Business account · powered by Veronyx</p>
             </div>
           </div>
