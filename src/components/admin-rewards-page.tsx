@@ -27,6 +27,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker, formatDmy } from "@/components/library/date-picker";
 import { formatRupees } from "@/lib/format";
 import { employees, rewardCategories } from "@/lib/mock-data";
 import {
@@ -631,7 +632,7 @@ function OfflineDialog({
   const [what, setWhat] = useState("");
   const [value, setValue] = useState("");
   const [nature, setNature] = useState<TaxNature>("perquisite_noncash");
-  const [date, setDate] = useState("2026-10-08");
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 9, 8));
   const [reason, setReason] = useState("");
   const person = employees.find((e) => e.code === code.trim().toUpperCase());
   const valid = person && what.trim() && Number(value) > 0 && reason.trim().length >= 5 && date;
@@ -662,12 +663,12 @@ function OfflineDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="offline-date">Date given</Label>
-            <Input
+            <DatePicker
               id="offline-date"
-              type="date"
               value={date}
-              max="2026-10-08"
-              onChange={(e) => setDate(e.target.value)}
+              onChange={setDate}
+              max={new Date(2026, 9, 8)}
+              className="sm:w-full"
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -722,7 +723,6 @@ function OfflineDialog({
           <Button
             disabled={!valid}
             onClick={() => {
-              const [y = "", m = "", d = ""] = date.split("-");
               onSave({
                 id: `off-${Date.now()}`,
                 employee: person?.name ?? code.trim().toUpperCase(),
@@ -730,7 +730,7 @@ function OfflineDialog({
                 what: what.trim(),
                 value: Number(value),
                 taxNature: nature,
-                date: `${d}/${m}/${y}`,
+                date: formatDmy(date),
                 reason: reason.trim(),
                 by: "You",
               });

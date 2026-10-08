@@ -1,5 +1,6 @@
 import { Cake, CalendarHeart, Medal, PartyPopper, Plus } from "lucide-react";
 import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 import { PageHeading } from "@/components/page-heading";
@@ -23,6 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DateRangePicker, formatDmy } from "@/components/library/date-picker";
+import { SearchableSelect } from "@/components/library/multi-select";
 import { formatRupees } from "@/lib/format";
 import {
   campaignAudiences,
@@ -53,11 +56,6 @@ const typeIcon = {
 /** Organisation pool remaining — campaigns draw from it when scheduled. */
 const ORG_REMAINING = 218600;
 
-const toDmy = (iso: string) => {
-  const [y = "", m = "", d = ""] = iso.split("-");
-  return iso ? `${d}/${m}/${y}` : "";
-};
-
 /** H-06 Campaign Manager: festivals, birthdays, anniversaries and long-service awards. */
 export function CampaignsPage() {
   const [items, setItems] = useState<Campaign[]>(initialCampaigns);
@@ -65,14 +63,26 @@ export function CampaignsPage() {
   const [type, setType] = useState<CampaignType>("festival");
   const [festival, setFestival] = useState("Diwali");
   const [name, setName] = useState("");
-  const [start, setStart] = useState("2026-10-20");
-  const [end, setEnd] = useState("2026-10-27");
-  const [audience, setAudience] = useState("everyone");
+  const [range, setRange] = useState<DateRange | undefined>({
+    from: new Date(2026, 9, 20),
+    to: new Date(2026, 9, 27),
+  });
+  const [audience, setAudience] = useState<string[]>(["everyone"]);
   const [reward, setReward] = useState("300");
   const [template, setTemplate] = useState(campaignTemplates.festival[0] ?? "");
 
   const alwaysOn = type !== "festival";
-  const audienceRow = campaignAudiences.find((a) => a.id === audience) ?? campaignAudiences[0];
+  const chosen = campaignAudiences.filter((a) => audience.includes(a.id));
+  const audienceRow = audience.includes("everyone")
+    ? campaignAudiences[0]
+    : {
+        id: audience.join("+"),
+        label: chosen.map((a) => a.label).join(" + ") || "Nobody",
+        people: Math.min(
+          199,
+          chosen.reduce((sum, a) => sum + a.people, 0),
+        ),
+      };
   // Always-on campaigns are estimated for the next 12 months (about 1 in 12 people per month).
   const recipients = alwaysOn
     ? type === "long_service"
@@ -88,8 +98,8 @@ export function CampaignsPage() {
   const errors = [
     name.trim().length < 3 && "Give the campaign a name.",
     !(perPerson > 0) && "Enter a reward per person.",
-    !alwaysOn && (!start || !end) && "Choose start and end dates.",
-    !alwaysOn && start && end && end < start && "End date must be after the start date.",
+    !alwaysOn && (!range?.from || !range.to) && "Choose start and end dates.",
+    audience.length === 0 && "Choose who the campaign is for.",
     budget > remaining &&
       `Insufficient budget. Remaining: ${formatRupees(remaining)}. Required: ${formatRupees(budget)}.`,
   ].filter(Boolean) as string[];
@@ -118,8 +128,8 @@ export function CampaignsPage() {
         type,
         name: name.trim(),
         festival: type === "festival" ? festival : "—",
-        start: alwaysOn ? "Always on" : toDmy(start),
-        end: alwaysOn ? "" : toDmy(end),
+        start: alwaysOn ? "Always on" : formatDmy(range?.from),
+        end: alwaysOn ? "" : formatDmy(range?.to),
         rewardPerPerson: perPerson,
         recipients,
         budget,
@@ -320,27 +330,10 @@ export function CampaignsPage() {
               />
             </div>
             {type === "festival" ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="c-start">Start date</Label>
-                  <Input
-                    id="c-start"
-                    type="date"
-                    value={start}
-                    onChange={(e) => setStart(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="c-end">End date</Label>
-                  <Input
-                    id="c-end"
-                    type="date"
-                    value={end}
-                    min={start}
-                    onChange={(e) => setEnd(e.target.value)}
-                  />
-                </div>
-              </>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="c-range">Dates</Label>
+                <DateRangePicker id="c-range" value={range} onChange={setRange} />
+              </div>
             ) : (
               <p className="rounded-md bg-muted p-3 text-sm sm:col-span-2">
                 Always on — runs automatically on each person’s{" "}
@@ -354,18 +347,38 @@ export function CampaignsPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="c-audience">Audience</Label>
-              <Select value={audience} onValueChange={setAudience}>
-                <SelectTrigger id="c-audience">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaignAudiences.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.label} ({a.people})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                id="c-audience"
+                multiple
+                value={audience}
+                onChange={(v) =>
+                  setAudience(
+                    v.includes("everyone") && !audience.includes("everyone")
+                      ? ["everyone"]
+                      : v.filter((x) => x !== "everyone" || v.length === 1),
+                  )
+                }
+                groups={[
+                  {
+                    label: "Whole company",
+                    options: [{ value: "everyone", label: "Everyone (199)" }],
+                  },
+                  {
+                    label: "Departments",
+                    options: campaignAudiences
+                      .filter((a) =>
+                        ["manufacturing", "quality", "sales", "operations"].includes(a.id),
+                      )
+                      .map((a) => ({ value: a.id, label: `${a.label} (${a.people})` })),
+                  },
+                  {
+                    label: "Locations",
+                    options: campaignAudiences
+                      .filter((a) => a.id === "coimbatore")
+                      .map((a) => ({ value: a.id, label: `${a.label} (${a.people})` })),
+                  },
+                ]}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="c-reward">Reward per person (₹)</Label>

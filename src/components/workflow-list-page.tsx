@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeading } from "@/components/page-heading";
+import { Kanban } from "@/components/library/kanban";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -74,6 +75,8 @@ export function WorkflowListPage({
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | Status>("all");
+  const [view, setView] = useState<"list" | "pipeline">("list");
+  const [ready, setReady] = useState<string[]>([]);
   const { workflowStatus, setWorkflowStatus, savedWorkflows, emptyOrg } = useDemoStore();
 
   const rows: Row[] = emptyOrg
@@ -162,112 +165,188 @@ export function WorkflowListPage({
         </Card>
       ) : (
         <>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-              <TabsList>
-                <TabsTrigger value="all">All ({rows.length})</TabsTrigger>
-                <TabsTrigger value="live">Active</TabsTrigger>
-                <TabsTrigger value="draft">Draft</TabsTrigger>
-                <TabsTrigger value="paused">Paused</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search workflows"
-              aria-label="Search workflows"
-              className="sm:max-w-xs"
-            />
+          <div className="flex gap-1" role="group" aria-label="Layout">
+            {(["list", "pipeline"] as const).map((v) => (
+              <Button
+                key={v}
+                size="sm"
+                variant={view === v ? "default" : "outline"}
+                aria-pressed={view === v}
+                onClick={() => setView(v)}
+              >
+                {v === "list" ? "List" : "Pipeline (Kanban)"}
+              </Button>
+            ))}
           </div>
-          {visible.length === 0 ? (
-            <Card className="rounded-lg border-dashed">
-              <CardContent className="flex flex-col items-center gap-3 p-8 text-center text-sm">
-                <p className="font-semibold">No workflows match.</p>
-                {aiEnabled && !readOnly && query && (
-                  <Button
-                    variant="outline"
-                    onClick={() => onAskAi(`Create a workflow for ${query}`)}
-                  >
-                    <Sparkles /> Draft “{query}” with AI
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+          {view === "pipeline" ? (
+            <Kanban
+              columns={[
+                {
+                  id: "draft",
+                  title: "Draft",
+                  hint: "Being built. Validate and dry-run to move on.",
+                  items: rows.filter((r) => r.status === "draft" && !ready.includes(r.id)),
+                },
+                {
+                  id: "ready",
+                  title: "Ready to activate",
+                  hint: "Validation passed and dry-run done.",
+                  items: rows.filter((r) => r.status === "draft" && ready.includes(r.id)),
+                },
+                { id: "live", title: "Active", items: rows.filter((r) => r.status === "live") },
+                { id: "paused", title: "Paused", items: rows.filter((r) => r.status === "paused") },
+              ]}
+              canDrop={(id, to) => {
+                if (readOnly) return false;
+                const row = rows.find((r) => r.id === id);
+                if (!row) return false;
+                const from =
+                  row.status === "draft" ? (ready.includes(id) ? "ready" : "draft") : row.status;
+                if (from === to) return false;
+                if (to === "live") return from === "ready" || from === "paused";
+                if (to === "paused") return from === "live";
+                if (to === "ready") return from === "draft";
+                return false;
+              }}
+              onMove={(id, to) => {
+                const row = rows.find((r) => r.id === id);
+                if (!row) return;
+                if (to === "ready") {
+                  setReady((r) => [...r, id]);
+                  toast.success(`${row.name}: validation passed · 3-period dry-run OK.`);
+                } else if (to === "live") {
+                  setWorkflowStatus(id, "live");
+                  toast.success(`Workflow activated. First run scheduled for 01/11/2026.`);
+                } else if (to === "paused") {
+                  setWorkflowStatus(id, "paused");
+                  toast.success(`${row.name} paused. No new runs until you resume it.`);
+                }
+              }}
+              renderCard={(w) => (
+                <div className="space-y-1 text-sm">
+                  <a href={`/workflows/${w.id}`} className="font-medium hover:underline">
+                    {w.name}
+                  </a>
+                  <p className="text-xs text-muted-foreground">{w.trigger}</p>
+                  <p className="text-xs text-muted-foreground">
+                    v{w.version} · {w.owner}
+                    {w.fromAi && " · from AI"}
+                  </p>
+                </div>
+              )}
+            />
           ) : (
             <>
-              <Card className="hidden rounded-lg md:block">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Starts</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Last run</TableHead>
-                      <TableHead className="text-right">Rewards this month</TableHead>
-                      <TableHead className="w-12">
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+                  <TabsList>
+                    <TabsTrigger value="all">All ({rows.length})</TabsTrigger>
+                    <TabsTrigger value="live">Active</TabsTrigger>
+                    <TabsTrigger value="draft">Draft</TabsTrigger>
+                    <TabsTrigger value="paused">Paused</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search workflows"
+                  aria-label="Search workflows"
+                  className="sm:max-w-xs"
+                />
+              </div>
+              {visible.length === 0 ? (
+                <Card className="rounded-lg border-dashed">
+                  <CardContent className="flex flex-col items-center gap-3 p-8 text-center text-sm">
+                    <p className="font-semibold">No workflows match.</p>
+                    {aiEnabled && !readOnly && query && (
+                      <Button
+                        variant="outline"
+                        onClick={() => onAskAi(`Create a workflow for ${query}`)}
+                      >
+                        <Sparkles /> Draft “{query}” with AI
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <>
+                  <Card className="hidden rounded-lg md:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Starts</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Last run</TableHead>
+                          <TableHead className="text-right">Rewards this month</TableHead>
+                          <TableHead className="w-12">
+                            <span className="sr-only">Actions</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {visible.map((w) => (
+                          <TableRow key={w.id}>
+                            <TableCell>
+                              <a
+                                href={`/workflows/${w.id}`}
+                                className="font-medium text-primary hover:underline"
+                              >
+                                {w.name}
+                              </a>
+                              <p className="text-xs text-muted-foreground">
+                                v{w.version} · {w.owner}
+                                {w.fromAi && " · from AI proposal"}
+                              </p>
+                            </TableCell>
+                            <TableCell className="max-w-56 text-sm">{w.trigger}</TableCell>
+                            <TableCell>
+                              <StatusBadge tone={statusTone[w.status]}>
+                                {statusLabel[w.status]}
+                              </StatusBadge>
+                            </TableCell>
+                            <TableCell>
+                              <a href={`/workflows/${w.id}/runs`}>
+                                <StatusBadge tone={runTone[w.lastRunResult]}>
+                                  {runLabel[w.lastRunResult]}
+                                </StatusBadge>
+                              </a>
+                              <p className="mt-1 text-xs text-muted-foreground">{w.lastRun}</p>
+                            </TableCell>
+                            <TableCell className="text-right font-semibold">
+                              {w.rewardsThisMonth}
+                            </TableCell>
+                            <TableCell>
+                              {!readOnly && <RowMenu row={w} onToggle={() => toggle(w)} />}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                  <ul className="space-y-3 md:hidden">
                     {visible.map((w) => (
-                      <TableRow key={w.id}>
-                        <TableCell>
-                          <a
-                            href={`/workflows/${w.id}`}
-                            className="font-medium text-primary hover:underline"
-                          >
+                      <li key={w.id} className="rounded-lg border border-border bg-card p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <a href={`/workflows/${w.id}`} className="font-medium text-primary">
                             {w.name}
                           </a>
-                          <p className="text-xs text-muted-foreground">
-                            v{w.version} · {w.owner}
-                            {w.fromAi && " · from AI proposal"}
-                          </p>
-                        </TableCell>
-                        <TableCell className="max-w-56 text-sm">{w.trigger}</TableCell>
-                        <TableCell>
+                          {!readOnly && <RowMenu row={w} onToggle={() => toggle(w)} />}
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">{w.trigger}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
                           <StatusBadge tone={statusTone[w.status]}>
                             {statusLabel[w.status]}
                           </StatusBadge>
-                        </TableCell>
-                        <TableCell>
-                          <a href={`/workflows/${w.id}/runs`}>
-                            <StatusBadge tone={runTone[w.lastRunResult]}>
-                              {runLabel[w.lastRunResult]}
-                            </StatusBadge>
-                          </a>
-                          <p className="mt-1 text-xs text-muted-foreground">{w.lastRun}</p>
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {w.rewardsThisMonth}
-                        </TableCell>
-                        <TableCell>
-                          {!readOnly && <RowMenu row={w} onToggle={() => toggle(w)} />}
-                        </TableCell>
-                      </TableRow>
+                          <StatusBadge tone={runTone[w.lastRunResult]}>
+                            Last run: {runLabel[w.lastRunResult]}
+                          </StatusBadge>
+                        </div>
+                      </li>
                     ))}
-                  </TableBody>
-                </Table>
-              </Card>
-              <ul className="space-y-3 md:hidden">
-                {visible.map((w) => (
-                  <li key={w.id} className="rounded-lg border border-border bg-card p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <a href={`/workflows/${w.id}`} className="font-medium text-primary">
-                        {w.name}
-                      </a>
-                      {!readOnly && <RowMenu row={w} onToggle={() => toggle(w)} />}
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{w.trigger}</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <StatusBadge tone={statusTone[w.status]}>{statusLabel[w.status]}</StatusBadge>
-                      <StatusBadge tone={runTone[w.lastRunResult]}>
-                        Last run: {runLabel[w.lastRunResult]}
-                      </StatusBadge>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                  </ul>
+                </>
+              )}
             </>
           )}
         </>

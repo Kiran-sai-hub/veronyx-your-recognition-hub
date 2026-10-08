@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
+import { JsonViewer } from "@/components/library/json-viewer";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { DryRunReport, ValidationReport } from "@/components/workflow-reports";
 import { Progress } from "@/components/ui/progress";
@@ -1099,19 +1100,15 @@ function ProposalCard({
             </Button>
           </div>
           {json ? (
-            <pre className="max-h-64 overflow-auto rounded-md bg-muted p-3 font-mono text-[11px] leading-relaxed">
-              {JSON.stringify(
-                {
-                  name: draft.name,
-                  scope: draft.scope,
-                  triggers: draft.triggers,
-                  steps: draft.steps.map((s) => ({ kind: s.kind, ...s.config })),
-                  budget: draft.budget,
-                },
-                null,
-                2,
-              )}
-            </pre>
+            <JsonViewer
+              data={{
+                name: draft.name,
+                scope: draft.scope,
+                triggers: draft.triggers,
+                steps: draft.steps.map((s) => ({ kind: s.kind, ...s.config })),
+                budget: draft.budget,
+              }}
+            />
           ) : (
             <ol className="space-y-1 rounded-md border border-border p-3">
               {draft.triggers.map((t) => (

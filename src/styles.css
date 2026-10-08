@@ -23,10 +23,11 @@
     "DM Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada",
     "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Malayalam", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  /* Checklist §10.4: sm 4px (inputs, small buttons), md 8px (cards, buttons), lg 12px (modals). */
   --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
@@ -186,6 +187,51 @@
   :focus-visible {
     outline: 2px solid var(--color-ring);
   }
+}
+
+/* High contrast (checklist §9.2): stronger text, borders and focus rings. */
+.hc {
+  --muted-foreground: oklch(0.38 0.04 260);
+  --border: oklch(0.55 0.03 260);
+  --input: oklch(0.45 0.03 260);
+  --ring: oklch(0.45 0.25 262);
+  --private: oklch(0.38 0.04 260);
+}
+.dark.hc {
+  --muted-foreground: oklch(0.9 0.01 250);
+  --border: oklch(1 0 0 / 55%);
+  --input: oklch(1 0 0 / 60%);
+  --ring: oklch(0.85 0.15 250);
+  --private: oklch(0.9 0.01 250);
+}
+.hc :focus-visible {
+  outline-width: 3px;
+}
+.hc a {
+  text-decoration-thickness: 2px;
+}
+
+/* Text size (checklist §9.2): everything is in rem, so the root size scales the whole UI. */
+html[data-text-size="lg"] {
+  font-size: 112.5%;
+}
+html[data-text-size="xl"] {
+  font-size: 125%;
+}
+
+/* Low-data mode (checklist §9.4): hide decorative illustrations and images. */
+.low-data [data-decorative] {
+  display: none !important;
+}
+
+/* Explicit reduced-motion setting, in addition to the OS preference. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

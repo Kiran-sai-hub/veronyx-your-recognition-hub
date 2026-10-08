@@ -3,18 +3,27 @@ import { persist } from "zustand/middleware";
 
 export type Persona = "owner" | "hr" | "manager" | "employee";
 export type Theme = "light" | "dark";
+export type TextSize = "md" | "lg" | "xl";
 
 type AppState = {
   persona: Persona;
   theme: Theme;
   language: string;
   aiAvailable: boolean;
+  /** Accessibility preferences (checklist §9.2, §9.4). */
+  highContrast: boolean;
+  textSize: TextSize;
+  reduceMotion: boolean;
+  lowData: boolean;
   copilotOpen: boolean;
   copilotPrompt: string | null;
   setPersona: (persona: Persona) => void;
   setTheme: (theme: Theme) => void;
   setLanguage: (language: string) => void;
   setAiAvailable: (available: boolean) => void;
+  setAccessibility: (
+    patch: Partial<Pick<AppState, "highContrast" | "textSize" | "reduceMotion" | "lowData">>,
+  ) => void;
   openCopilot: (prompt?: string) => void;
   closeCopilot: () => void;
 };
@@ -45,12 +54,17 @@ export const useAppStore = create<AppState>()(
       theme: "light",
       language: "en",
       aiAvailable: true,
+      highContrast: false,
+      textSize: "md",
+      reduceMotion: false,
+      lowData: false,
       copilotOpen: false,
       copilotPrompt: null,
       setPersona: (persona) => set({ persona }),
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
       setAiAvailable: (aiAvailable) => set({ aiAvailable }),
+      setAccessibility: (patch) => set(patch),
       openCopilot: (prompt) => set({ copilotOpen: true, copilotPrompt: prompt ?? null }),
       closeCopilot: () => set({ copilotOpen: false, copilotPrompt: null }),
     }),
@@ -61,7 +75,27 @@ export const useAppStore = create<AppState>()(
         theme: state.theme,
         language: state.language,
         aiAvailable: state.aiAvailable,
+        highContrast: state.highContrast,
+        textSize: state.textSize,
+        reduceMotion: state.reduceMotion,
+        lowData: state.lowData,
       }),
     },
   ),
 );
+
+/** Applies theme and accessibility preferences to <html> on every surface. */
+export function applyPreferences(
+  state: Pick<
+    AppState,
+    "theme" | "highContrast" | "textSize" | "reduceMotion" | "lowData" | "language"
+  >,
+) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", state.theme === "dark");
+  root.classList.toggle("hc", state.highContrast);
+  root.classList.toggle("reduce-motion", state.reduceMotion);
+  root.classList.toggle("low-data", state.lowData);
+  root.dataset["textSize"] = state.textSize;
+  root.lang = state.language === "en" ? "en-IN" : state.language;
+}

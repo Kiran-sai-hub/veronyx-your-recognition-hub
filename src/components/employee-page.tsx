@@ -1,5 +1,6 @@
 import {
   Camera,
+  Eye,
   CheckCircle2,
   ChevronRight,
   Clock3,
@@ -1150,7 +1151,8 @@ function ShoutoutPage() {
 
 function PreferencesPage() {
   const t = useT();
-  const { language, setLanguage } = useAppStore();
+  const { language, setLanguage, highContrast, textSize, reduceMotion, lowData, setAccessibility } =
+    useAppStore();
   const [whatsapp, setWhatsapp] = useState(true);
   const [email, setEmail] = useState(false);
   const [quiet, setQuiet] = useState(true);
@@ -1253,6 +1255,59 @@ function PreferencesPage() {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+        <Card className="rounded-lg lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="size-5" /> Display & accessibility
+            </CardTitle>
+            <CardDescription>
+              Make the app easier to read and lighter on mobile data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Text size</Label>
+              <div className="flex gap-2" role="radiogroup" aria-label="Text size">
+                {(
+                  [
+                    ["md", "Normal", "text-sm"],
+                    ["lg", "Large", "text-base"],
+                    ["xl", "Extra large", "text-lg"],
+                  ] as const
+                ).map(([value, label, cls]) => (
+                  <Button
+                    key={value}
+                    role="radio"
+                    aria-checked={textSize === value}
+                    variant={textSize === value ? "default" : "outline"}
+                    className={cn("min-h-11", cls)}
+                    onClick={() => setAccessibility({ textSize: value })}
+                  >
+                    A · {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <ToggleRow
+              title="High contrast"
+              description="Darker text, stronger borders and focus outlines"
+              checked={highContrast}
+              onChange={(v) => setAccessibility({ highContrast: v })}
+            />
+            <ToggleRow
+              title="Reduce motion"
+              description="Turn off animations (also follows your phone's setting)"
+              checked={reduceMotion}
+              onChange={(v) => setAccessibility({ reduceMotion: v })}
+            />
+            <ToggleRow
+              title="Low-data mode"
+              description="Hide pictures and illustrations to save mobile data"
+              checked={lowData}
+              onChange={(v) => setAccessibility({ lowData: v })}
+            />
           </CardContent>
         </Card>
         <Card className="rounded-lg lg:col-span-2">

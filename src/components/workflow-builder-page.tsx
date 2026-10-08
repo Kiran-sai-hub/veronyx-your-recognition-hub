@@ -58,6 +58,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { FormulaEditor } from "@/components/library/formula-editor";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -190,6 +191,16 @@ export function WorkflowBuilderPage({
   const [edited, setEdited] = useState(false);
   const [conflict, setConflict] = useState(workflowId === "wf-sales");
   const [dragKind, setDragKind] = useState<StepKind | null>(null);
+  const [dragStep, setDragStep] = useState<string | null>(null);
+  const moveTo = (id: string, target: number) =>
+    update((d) => {
+      const steps = [...d.steps];
+      const from = steps.findIndex((s) => s.id === id);
+      if (from < 0) return d;
+      const [item] = steps.splice(from, 1);
+      if (item) steps.splice(target > from ? target - 1 : target, 0, item);
+      return { ...d, steps };
+    });
 
   const checks = validateDraft(draft);
   const blocking = hasErrors(checks);
@@ -571,10 +582,12 @@ export function WorkflowBuilderPage({
             {draft.steps.map((step, index) => (
               <li key={step.id}>
                 <DropZone
-                  active={dragKind !== null}
+                  active={dragKind !== null || (dragStep !== null && dragStep !== step.id)}
                   onDrop={() => {
                     if (dragKind) insertStep(dragKind, index);
+                    if (dragStep) moveTo(dragStep, index);
                     setDragKind(null);
+                    setDragStep(null);
                   }}
                 />
                 <StepNode
@@ -583,23 +596,29 @@ export function WorkflowBuilderPage({
                   total={draft.steps.length}
                   selected={selection.type === "step" && selection.id === step.id}
                   error={
-                    (step.kind === "reward" && !(Number(step.config["amount"]) > 0)) ||
+                    (step.kind === "reward" &&
+                      step.config["amount_mode"] !== "formula" &&
+                      !(Number(step.config["amount"]) > 0)) ||
                     (step.kind === "end" && index !== draft.steps.length - 1)
                   }
                   readOnly={readOnly}
                   onSelect={() => setSelection({ type: "step", id: step.id })}
                   onMove={(delta) => move(index, delta)}
                   onRemove={() => remove(step.id)}
+                  onDragStart={() => setDragStep(step.id)}
+                  onDragEnd={() => setDragStep(null)}
                 />
                 {index < draft.steps.length - 1 && <Connector />}
               </li>
             ))}
             <li>
               <DropZone
-                active={dragKind !== null}
+                active={dragKind !== null || dragStep !== null}
                 onDrop={() => {
                   if (dragKind) insertStep(dragKind);
+                  if (dragStep) moveTo(dragStep, draft.steps.length);
                   setDragKind(null);
+                  setDragStep(null);
                 }}
                 last
               />
@@ -892,6 +911,8 @@ function StepNode({
   onSelect,
   onMove,
   onRemove,
+  onDragStart,
+  onDragEnd,
 }: {
   step: Step;
   index: number;
@@ -902,12 +923,18 @@ function StepNode({
   onSelect: () => void;
   onMove: (delta: number) => void;
   onRemove: () => void;
+  onDragStart: () => void;
+  onDragEnd: () => void;
 }) {
   const Icon = stepIcons[step.kind];
   return (
     <div
       role="button"
       tabIndex={0}
+      draggable={!readOnly}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      title={readOnly ? undefined : "Drag to reorder, or use the arrows"}
       onClick={onSelect}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
       aria-pressed={selected}
@@ -1158,6 +1185,18 @@ function StepPanel({
         </Row>
       );
     }
+    if (f.type === "formula")
+      return step.config["amount_mode"] === "formula" ? (
+        <Row key={f.key} label={f.label} htmlFor={`f-${f.key}`}>
+          <FormulaEditor
+            id={`f-${f.key}`}
+            value={String(v ?? "")}
+            onChange={(x) => setValue(f.key, x)}
+          />
+        </Row>
+      ) : null;
+    if (f.key === "amount" && step.kind === "reward" && step.config["amount_mode"] === "formula")
+      return null;
     if (f.type === "number")
       return (
         <Row

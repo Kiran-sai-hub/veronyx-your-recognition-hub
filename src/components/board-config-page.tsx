@@ -50,6 +50,7 @@ import {
   teamAverage,
 } from "@/lib/board-data";
 import { go } from "@/lib/navigate";
+import { CircularProgress } from "@/components/library/circular-progress";
 import { cn } from "@/lib/utils";
 import { useDemoStore } from "@/store/demo-store";
 
@@ -426,17 +427,26 @@ export function BoardConfigPage({
           <TabsContent value="scorecard" className="mt-6">
             <Card className="rounded-lg">
               <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
-                <div>
-                  <CardTitle className="text-base">Scorecard</CardTitle>
-                  <p
-                    className={cn(
-                      "text-sm",
-                      weightsOk ? "text-muted-foreground" : "text-destructive",
-                    )}
-                    role={weightsOk ? undefined : "alert"}
-                  >
-                    Weights total {weightTotal}% {weightsOk ? "✓" : "— must add up to 100%"}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <CircularProgress
+                    value={Math.min(weightTotal, 100)}
+                    size={56}
+                    stroke={6}
+                    label="Scorecard weights total"
+                    tone={weightsOk ? "success" : "warning"}
+                  />
+                  <div>
+                    <CardTitle className="text-base">Scorecard</CardTitle>
+                    <p
+                      className={cn(
+                        "text-sm",
+                        weightsOk ? "text-muted-foreground" : "text-destructive",
+                      )}
+                      role={weightsOk ? undefined : "alert"}
+                    >
+                      Weights total {weightTotal}% {weightsOk ? "✓" : "— must add up to 100%"}
+                    </p>
+                  </div>
                 </div>
                 <Button
                   size="sm"

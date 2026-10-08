@@ -9,6 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { Stepper } from "@/components/library/stepper";
 import { PageHeading } from "@/components/page-heading";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -177,37 +178,7 @@ export function PayrollPage() {
         description="Send taxable reward amounts to payroll each month: pick the period, check the rows, fix problems, then download the file for your payroll system."
       />
 
-      <ol
-        className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm"
-        aria-label="Export progress"
-      >
-        {steps.map((label, index) => (
-          <li key={label} className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => index < step && setStep(index)}
-              disabled={index > step}
-              aria-current={index === step ? "step" : undefined}
-              className="flex items-center gap-2 disabled:cursor-default"
-            >
-              <span
-                className={cn(
-                  "grid size-6 place-items-center rounded-full text-xs font-semibold",
-                  index === step && "bg-primary text-primary-foreground",
-                  index < step && "bg-success text-success-foreground",
-                  index > step && "bg-muted text-muted-foreground",
-                )}
-              >
-                {index < step ? "✓" : index + 1}
-              </span>
-              <span className={index === step ? "font-medium" : "text-muted-foreground"}>
-                {label}
-              </span>
-            </button>
-            {index < steps.length - 1 && <span className="text-muted-foreground">→</span>}
-          </li>
-        ))}
-      </ol>
+      <Stepper steps={steps.map((label) => ({ label }))} current={step} onStepClick={setStep} />
 
       {step === 0 && (
         <Card className="max-w-xl rounded-lg shadow-sm">

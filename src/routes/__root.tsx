@@ -9,6 +9,9 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+import { applyPreferences, useAppStore } from "@/store/app-store";
 
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
@@ -145,6 +148,19 @@ function RootComponent() {
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, [router]);
+
+  // Theme and accessibility preferences apply to every surface (admin, employee, kiosk, bot).
+  const prefs = useAppStore(
+    useShallow((s) => ({
+      theme: s.theme,
+      highContrast: s.highContrast,
+      textSize: s.textSize,
+      reduceMotion: s.reduceMotion,
+      lowData: s.lowData,
+      language: s.language,
+    })),
+  );
+  useEffect(() => applyPreferences(prefs), [prefs]);
 
   return (
     <QueryClientProvider client={queryClient}>

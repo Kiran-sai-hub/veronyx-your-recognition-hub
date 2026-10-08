@@ -103,6 +103,22 @@ export const workflowVersions = [
   },
 ];
 
+/** Readable definition of each version, used by the version diff (checklist §7.1 Diff Viewer). */
+const v4 = [
+  "trigger: sales_file.imported (monthly)",
+  "scope: department = Sales, status = active",
+  "rule: sales.sales_vs_target >= 100%",
+  "reward: 300 points each",
+  "cap: 1 reward per person per month",
+  "budget: Sales A — Vikram",
+];
+const v5 = [...v4.slice(0, 4), "approval: manager (Vikram Rao), 48 h SLA", ...v4.slice(4)];
+const v6 = [...v5, "message: WhatsApp ranked_on_board (en, ta, hi)"];
+const v7 = v6.map((line) =>
+  line === "reward: 300 points each" ? "reward: 500 points each" : line,
+);
+export const versionDefinitions: Record<number, string[]> = { 4: v4, 5: v5, 6: v6, 7: v7 };
+
 export type WorkflowRun = {
   id: string;
   started: string;

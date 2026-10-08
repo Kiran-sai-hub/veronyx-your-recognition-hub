@@ -3,6 +3,8 @@
  * dry-run simulator (§4.7). Pure data + functions so a real engine can replace them.
  */
 
+import { checkFormula } from "@/lib/formula";
+
 export type StepKind =
   | "filter"
   | "aggregate"
@@ -22,6 +24,7 @@ export type FieldDef =
   | { key: string; label: string; type: "text"; placeholder?: string }
   | { key: string; label: string; type: "number"; suffix?: string }
   | { key: string; label: string; type: "select"; options: string[] }
+  | { key: string; label: string; type: "formula" }
   | { key: string; label: string; type: "toggle" };
 
 export type StepValue = string | number | boolean;
@@ -205,7 +208,9 @@ export const stepCatalog: Record<
         type: "select",
         options: ["everyone who reached this step", "rank 1 only", "top N"],
       },
+      { key: "amount_mode", label: "Amount type", type: "select", options: ["fixed", "formula"] },
       { key: "amount", label: "Amount", type: "number" },
+      { key: "formula", label: "Amount formula", type: "formula" },
       { key: "currency", label: "Currency", type: "select", options: ["COINS", "INR"] },
       {
         key: "reward_kind",
@@ -216,7 +221,9 @@ export const stepCatalog: Record<
     ],
     defaults: {
       recipients: "everyone who reached this step",
+      amount_mode: "fixed",
       amount: 0,
+      formula: "base * metric / target",
       currency: "COINS",
       reward_kind: "points",
     },
@@ -547,7 +554,11 @@ export function validateDraft(d: WorkflowDraft): Check[] {
     c(
       "V6",
       "Reward amount set",
-      rewards.every((r) => Number(r.config["amount"]) > 0),
+      rewards.every((r) =>
+        r.config["amount_mode"] === "formula"
+          ? checkFormula(String(r.config["formula"] ?? "")).ok
+          : Number(r.config["amount"]) > 0,
+      ),
       {
         status: "error",
         detail: "A Reward step has no amount.",
@@ -721,7 +732,13 @@ export function hasErrors(checks: Check[]) {
 }
 
 function rewardAmounts(d: WorkflowDraft): number[] {
-  return d.steps.filter((s) => s.kind === "reward").map((s) => Number(s.config["amount"]) || 0);
+  return d.steps
+    .filter((s) => s.kind === "reward")
+    .map((s) => {
+      if (s.config["amount_mode"] !== "formula") return Number(s.config["amount"]) || 0;
+      const result = checkFormula(String(s.config["formula"] ?? ""));
+      return result.ok ? result.example : 0;
+    });
 }
 
 export function estimatedCostPerRun(d: WorkflowDraft): number {

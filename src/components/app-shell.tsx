@@ -129,10 +129,6 @@ export function AppShell({ children, pathname }: AppShellProps) {
     return () => window.clearTimeout(t);
   }, [pathname]);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
   const changePersona = (next: Persona) => {
     setPersona(next);
     go(personaHome[next]);

@@ -32,7 +32,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { decisionTrace, workflowRuns, workflowVersions, workflows } from "@/lib/admin-data";
+import { DiffViewer } from "@/components/library/diff-viewer";
+import { JsonViewer } from "@/components/library/json-viewer";
+import {
+  decisionTrace,
+  versionDefinitions,
+  workflowRuns,
+  workflowVersions,
+  workflows,
+} from "@/lib/admin-data";
 import { explainOutcome } from "@/lib/insights-evidence";
 import { employees } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
@@ -92,6 +100,7 @@ function stepLog(
 export function WorkflowRunsPage({ workflowId }: { workflowId: string }) {
   const workflow = workflows.find((w) => w.id === workflowId) ?? workflows[1];
   const [restore, setRestore] = useState<number | null>(null);
+  const [compare, setCompare] = useState<number | null>(6);
   const [traceOpen, setTraceOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [code, setCode] = useState(decisionTrace.code);
@@ -318,12 +327,58 @@ export function WorkflowRunsPage({ workflowId }: { workflowId: string }) {
                     </p>
                   </div>
                   {!v.current && (
-                    <Button size="sm" variant="outline" onClick={() => setRestore(v.version)}>
-                      Restore
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={compare === v.version ? "default" : "ghost"}
+                        aria-pressed={compare === v.version}
+                        onClick={() => setCompare(v.version)}
+                      >
+                        Compare with live
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setRestore(v.version)}>
+                        Restore
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))}
+            </CardContent>
+          </Card>
+          {compare !== null && (
+            <Card className="mt-4 rounded-lg">
+              <CardContent className="space-y-3 p-4">
+                <p className="font-medium">Version {compare} → version 7 (live)</p>
+                <DiffViewer
+                  before={versionDefinitions[compare] ?? []}
+                  after={versionDefinitions[7] ?? []}
+                  beforeLabel={`Version ${compare}`}
+                  afterLabel="Version 7 (live)"
+                />
+              </CardContent>
+            </Card>
+          )}
+          <Card className="mt-4 rounded-lg">
+            <CardContent className="space-y-2 p-4">
+              <p className="font-medium">Live definition (version 7)</p>
+              <JsonViewer
+                data={{
+                  id: workflow?.id,
+                  name: workflow?.name,
+                  version: 7,
+                  trigger: { type: "event", event: "sales_file.imported", cadence: "monthly" },
+                  scope: { department: "Sales", status: "active" },
+                  steps: [
+                    { kind: "filter", field: "employee.status", op: "eq", value: "active" },
+                    { kind: "threshold", metric: "sales.sales_vs_target", op: "gte", value: 100 },
+                    { kind: "approval", approver: "manager", sla_hours: 48 },
+                    { kind: "reward", type: "points", amount: 500 },
+                    { kind: "message", channel: "whatsapp", template: "ranked_on_board" },
+                  ],
+                  budget: { wallet: "Sales A — Vikram", hard_stop: true },
+                  policies: { per_employee_cap: { count: 1, period: "month" } },
+                }}
+              />
             </CardContent>
           </Card>
         </TabsContent>

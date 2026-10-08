@@ -6,7 +6,9 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
+import { format } from "date-fns";
 import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 import { PageHeading } from "@/components/page-heading";
@@ -41,6 +43,9 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { DataTable } from "@/components/library/data-table";
+import { DateRangePicker } from "@/components/library/date-picker";
+import { Timeline } from "@/components/library/timeline";
 import { formatRupees } from "@/lib/format";
 import { personaUser } from "@/lib/navigation";
 import { exportHistory, toCsv } from "@/lib/phase2-data";
@@ -115,10 +120,10 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
   const [published, setPublished] = useState(false);
   const [consentPurpose, setConsentPurpose] = useState("all");
   const [consentState, setConsentState] = useState("all");
-  const [auditQuery, setAuditQuery] = useState("");
   const [auditType, setAuditType] = useState("all");
-  const [auditFrom, setAuditFrom] = useState("");
-  const [auditTo, setAuditTo] = useState("");
+  const [auditRange, setAuditRange] = useState<DateRange | undefined>(undefined);
+  const auditFrom = auditRange?.from ? format(auditRange.from, "yyyy-MM-dd") : "";
+  const auditTo = auditRange?.to ? format(auditRange.to, "yyyy-MM-dd") : auditFrom;
   const [campaignOpen, setCampaignOpen] = useState(false);
   const [campaignAudience, setCampaignAudience] = useState("not-opted");
   const [campaign, setCampaign] = useState<{ sent: number; joined: number } | null>(null);
@@ -166,7 +171,6 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
   const filteredAudit = allAudit.filter((a) => {
     const iso = toIso(a.at);
     return (
-      `${a.actor} ${a.action} ${a.target}`.toLowerCase().includes(auditQuery.toLowerCase()) &&
       (auditType === "all" || a.type === auditType) &&
       (!auditFrom || iso >= auditFrom) &&
       (!auditTo || iso <= auditTo)
@@ -711,13 +715,15 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
                   </ol>
                   <details className="text-xs text-muted-foreground">
                     <summary className="cursor-pointer">Step log ({r.log.length})</summary>
-                    <ul className="mt-2 space-y-1">
-                      {r.log.map((entry) => (
-                        <li key={entry.stage + entry.at}>
-                          {entry.at} · {entry.stage} · {entry.by}
-                        </li>
-                      ))}
-                    </ul>
+                    <Timeline
+                      className="mt-3"
+                      items={r.log.map((entry) => ({
+                        id: entry.stage + entry.at,
+                        title: entry.stage,
+                        time: `${entry.at} · ${entry.by}`,
+                        tone: entry.stage === "Closed" ? "success" : "default",
+                      }))}
+                    />
                   </details>
                 </CardContent>
               </Card>
@@ -822,15 +828,6 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
 
         <TabsContent value="audit" className="mt-6 space-y-3">
           <div className="flex flex-wrap items-end gap-3">
-            <div className="w-full space-y-1 sm:w-64">
-              <Label htmlFor="audit-search">Search</Label>
-              <Input
-                id="audit-search"
-                placeholder="Person, action or record"
-                value={auditQuery}
-                onChange={(e) => setAuditQuery(e.target.value)}
-              />
-            </div>
             <div className="w-full space-y-1 sm:w-52">
               <Label htmlFor="audit-type">Type</Label>
               <Select value={auditType} onValueChange={setAuditType}>
@@ -848,22 +845,8 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
               </Select>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="audit-from">From</Label>
-              <Input
-                id="audit-from"
-                type="date"
-                value={auditFrom}
-                onChange={(e) => setAuditFrom(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="audit-to">To</Label>
-              <Input
-                id="audit-to"
-                type="date"
-                value={auditTo}
-                onChange={(e) => setAuditTo(e.target.value)}
-              />
+              <Label htmlFor="audit-range">Date range</Label>
+              <DateRangePicker id="audit-range" value={auditRange} onChange={setAuditRange} />
             </div>
             <Button
               variant="outline"
@@ -889,44 +872,55 @@ export function CompliancePage({ tab = "overview" }: { tab?: string | undefined 
               <Download className="size-4" /> Export CSV
             </Button>
           </div>
-          <Card>
-            <CardContent className="overflow-x-auto p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>When</TableHead>
-                    <TableHead>Who</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Target</TableHead>
-                    <TableHead>Chain hash</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAudit.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-muted-foreground">
-                        No entries match these filters.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {filteredAudit.map((a) => (
-                    <TableRow key={a.id}>
-                      <TableCell className="whitespace-nowrap">{a.at}</TableCell>
-                      <TableCell>{a.actor}</TableCell>
-                      <TableCell>
-                        {a.action}
-                        <span className="block text-xs text-muted-foreground">
-                          {auditTypeLabel[a.type] ?? a.type}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{a.target}</TableCell>
-                      <TableCell className="font-mono text-xs">{a.hash}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <DataTable
+            caption="Audit log"
+            filterPlaceholder="Search person, action or record"
+            pageSize={10}
+            rows={filteredAudit}
+            columns={[
+              {
+                key: "at",
+                header: "When",
+                cell: (a) => <span className="whitespace-nowrap">{a.at}</span>,
+                value: (a) => toIso(a.at) + a.at.slice(11),
+              },
+              { key: "actor", header: "Who", cell: (a) => a.actor, value: (a) => a.actor },
+              {
+                key: "action",
+                header: "Action",
+                cell: (a) => (
+                  <>
+                    {a.action}
+                    <span className="block text-xs text-muted-foreground">
+                      {auditTypeLabel[a.type] ?? a.type}
+                    </span>
+                  </>
+                ),
+                value: (a) => `${a.action} ${a.target}`,
+              },
+              {
+                key: "target",
+                header: "Target",
+                cell: (a) => <span className="text-muted-foreground">{a.target}</span>,
+                hideBelow: "md",
+              },
+            ]}
+            expand={(a) => (
+              <dl className="grid gap-1 text-xs sm:grid-cols-[8rem_1fr]">
+                <dt className="text-muted-foreground">Entry</dt>
+                <dd className="font-mono">{a.id}</dd>
+                <dt className="text-muted-foreground">Target</dt>
+                <dd>{a.target}</dd>
+                <dt className="text-muted-foreground">Chain hash</dt>
+                <dd className="font-mono">{a.hash}</dd>
+                <dt className="text-muted-foreground">Actor type</dt>
+                <dd>
+                  {a.actor === "System" ? "system" : "user"}
+                  {a.type === "ai" ? " · AI interaction" : ""}
+                </dd>
+              </dl>
+            )}
+          />
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <ShieldCheck className="size-3.5" /> Hash chain verified — no entries changed.
           </p>
