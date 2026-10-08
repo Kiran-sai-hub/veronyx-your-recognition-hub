@@ -26,6 +26,7 @@ import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ApiInsightsRouteImport } from './routes/api/insights'
 import { Route as BoardsIndexRouteImport } from './routes/boards.index'
 import { Route as BoardsIdRouteImport } from './routes/boards.$id'
 import { Route as ConnectorsIndexRouteImport } from './routes/connectors.index'
@@ -127,6 +128,11 @@ const RewardsRoute = RewardsRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInsightsRoute = ApiInsightsRouteImport.update({
+  id: '/api/insights',
+  path: '/api/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BoardsIndexRoute = BoardsIndexRouteImport.update({
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -414,6 +425,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -451,6 +463,7 @@ export interface RootRouteChildren {
   PeopleRoute: typeof PeopleRoute
   RewardsRoute: typeof RewardsRoute
   SettingsRoute: typeof SettingsRoute
+  ApiInsightsRoute: typeof ApiInsightsRoute
   BoardsIdRoute: typeof BoardsIdRoute
   DashboardHrRoute: typeof DashboardHrRoute
   DashboardManagerRoute: typeof DashboardManagerRoute
@@ -580,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/insights': {
+      id: '/api/insights'
+      path: '/api/insights'
+      fullPath: '/api/insights'
+      preLoaderRoute: typeof ApiInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boards/': {
@@ -766,6 +786,7 @@ const rootRouteChildren: RootRouteChildren = {
   PeopleRoute: PeopleRoute,
   RewardsRoute: RewardsRoute,
   SettingsRoute: SettingsRoute,
+  ApiInsightsRoute: ApiInsightsRoute,
   BoardsIdRoute: BoardsIdRoute,
   DashboardHrRoute: DashboardHrRoute,
   DashboardManagerRoute: DashboardManagerRoute,
