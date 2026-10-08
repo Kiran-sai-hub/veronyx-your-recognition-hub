@@ -15,23 +15,26 @@ import {
 /** One cited fact. Every AI answer may only reference these ids. */
 export type Evidence = { id: string; label: string; detail: string; source: string };
 
-export type InsightsPersona = "owner" | "manager";
+export type InsightsPersona = "owner" | "hr";
 
 export const PROTECTED_TERMS = [
   "gender",
   "caste",
   "religion",
+  "religious",
   "health",
-  "pregnan",
+  "pregnant",
+  "pregnancy",
   "disability",
-  "age ",
+  "disabled",
+  "age",
   "marital",
 ];
 
-/** True when a question asks to analyse a protected attribute. */
+/** True when a question asks to analyse a protected attribute (whole words only: "agents" is fine). */
 export function mentionsProtectedAttribute(text: string): boolean {
   const lower = text.toLowerCase();
-  return PROTECTED_TERMS.some((t) => new RegExp(`\\b${t.trim()}`).test(lower));
+  return PROTECTED_TERMS.some((t) => new RegExp(`\\b${t}\\b`).test(lower));
 }
 
 function hash(value: string): number {

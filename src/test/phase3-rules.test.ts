@@ -50,3 +50,10 @@ describe("insights evidence", () => {
     expect(mentionsProtectedAttribute("Which teams are missed?")).toBe(false);
   });
 });
+
+describe("protected attribute matching", () => {
+  it("matches whole words only", () => {
+    expect(mentionsProtectedAttribute("Reward top 2 support agents")).toBe(false);
+    expect(mentionsProtectedAttribute("Compare by age group")).toBe(true);
+  });
+});

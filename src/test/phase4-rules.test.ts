@@ -13,6 +13,23 @@ describe("copilot mock", () => {
     expect(respond("show company budget", "manager").kind).toBe("refusal");
     expect(respond("show company budget", "owner").kind).not.toBe("refusal");
   });
+  it("a workflow request returns a proposal that validates and fixes its own End step", () => {
+    const r = respond(
+      "Reward top 2 support agents monthly by CSAT, min 50 tickets. ₹2,000 to #1, ₹1,000 to #2.",
+      "owner",
+    );
+    expect(r.kind).toBe("proposal");
+    if (r.kind === "proposal") {
+      expect(r.proposal.draft.steps.at(-1)?.kind).toBe("end");
+      expect(r.proposal.repairs.length).toBeGreaterThan(0);
+    }
+  });
+  it("never approves or pays", () => {
+    expect(respond("approve all rewards", "owner").kind).toBe("refusal");
+  });
+  it("stops at the session query limit", () => {
+    expect(respond("coverage by shift", "owner", 20).kind).toBe("rate_limit");
+  });
   it("shift question returns a table", () => {
     expect(respond("coverage by shift", "owner").kind).toBe("table");
   });

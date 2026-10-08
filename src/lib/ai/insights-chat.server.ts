@@ -25,7 +25,7 @@ const bodySchema = z.object({
   messages: z.array(z.unknown()).min(1).max(60),
 });
 
-const INSTRUCTIONS = `You are the Recognition insights assistant for Radha Krishna Mills, used by owners and managers.
+const INSTRUCTIONS = `You are the Recognition insights assistant for Radha Krishna Mills, used by owners and HR admins.
 Answer questions about recognition, rewards, workflow outcomes and fairness.
 
 Rules:
@@ -55,9 +55,9 @@ export async function handleInsightsChat(request: Request): Promise<Response> {
   } catch {
     return jsonError(400, "That request could not be read.");
   }
-  // Prototype access rule: only owners and managers may use insights.
-  if (parsed.persona !== "owner" && parsed.persona !== "manager") {
-    return jsonError(403, "Recognition insights are available to owners and managers only.");
+  // Checklist §1.3: AI Copilot (which includes insights) is for Owner and HR Admin only.
+  if (parsed.persona !== "owner" && parsed.persona !== "hr") {
+    return jsonError(403, "Recognition insights are available to owners and HR admins only.");
   }
 
   const messages = parsed.messages as UIMessage[];
