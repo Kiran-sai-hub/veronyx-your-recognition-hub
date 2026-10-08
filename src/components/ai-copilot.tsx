@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { aiSuggestionsByScreen, departmentCoverage, teamMembers } from "@/lib/admin-data";
@@ -37,7 +43,10 @@ function answerFor(question: string): Omit<Message, "id" | "role"> {
     const rows = teamMembers.filter((member) => member.monthPoints === 0);
     return {
       text: `${rows.length} people have no recognition in the last 30 days.`,
-      table: { headers: ["Name", "Last recognised"], rows: rows.map((r) => [r.name, r.lastRecognised]) },
+      table: {
+        headers: ["Name", "Last recognised"],
+        rows: rows.map((r) => [r.name, r.lastRecognised]),
+      },
     };
   }
   if (q.includes("fail")) {
@@ -46,7 +55,9 @@ function answerFor(question: string): Omit<Message, "id" | "role"> {
     };
   }
   if (q.includes("tax") || q.includes("15,000")) {
-    return { text: "1 pending approval would take an employee past the ₹15,000 yearly gift limit. It is marked on the approvals screen." };
+    return {
+      text: "1 pending approval would take an employee past the ₹15,000 yearly gift limit. It is marked on the approvals screen.",
+    };
   }
   return {
     text: "I can only answer from the data in Veronyx Recognise. Try one of the suggestions, or open the screen you want to work on.",
@@ -80,10 +91,16 @@ export function AiCopilot({ screen }: { screen: string }) {
     progressSteps.forEach((_, index) => {
       window.setTimeout(() => setProgress(index + 1), 450 * (index + 1));
     });
-    window.setTimeout(() => {
-      setProgress(null);
-      setMessages((current) => [...current, { id: Date.now() + 1, role: "ai", ...answerFor(question) }]);
-    }, 450 * (progressSteps.length + 1));
+    window.setTimeout(
+      () => {
+        setProgress(null);
+        setMessages((current) => [
+          ...current,
+          { id: Date.now() + 1, role: "ai", ...answerFor(question) },
+        ]);
+      },
+      450 * (progressSteps.length + 1),
+    );
   };
 
   useEffect(() => {
@@ -114,7 +131,8 @@ export function AiCopilot({ screen }: { screen: string }) {
             <WifiOff className="size-8 text-muted-foreground" />
             <p className="font-semibold">AI is unavailable right now</p>
             <p className="text-sm text-muted-foreground">
-              Everything still works by hand. Use the menu to open workflows, approvals or dashboards.
+              Everything still works by hand. Use the menu to open workflows, approvals or
+              dashboards.
             </p>
           </div>
         ) : (
@@ -136,7 +154,10 @@ export function AiCopilot({ screen }: { screen: string }) {
                 </div>
               )}
               {messages.map((message) => (
-                <div key={message.id} className={message.role === "user" ? "flex justify-end" : "flex gap-2"}>
+                <div
+                  key={message.id}
+                  className={message.role === "user" ? "flex justify-end" : "flex gap-2"}
+                >
                   {message.role === "ai" && <Bot className="mt-1 size-5 shrink-0 text-primary" />}
                   <div
                     className={
@@ -152,7 +173,12 @@ export function AiCopilot({ screen }: { screen: string }) {
                           <thead>
                             <tr>
                               {message.table.headers.map((h) => (
-                                <th key={h} className="py-1 text-left font-medium text-muted-foreground">{h}</th>
+                                <th
+                                  key={h}
+                                  className="py-1 text-left font-medium text-muted-foreground"
+                                >
+                                  {h}
+                                </th>
                               ))}
                             </tr>
                           </thead>
@@ -160,13 +186,19 @@ export function AiCopilot({ screen }: { screen: string }) {
                             {message.table.rows.map((row) => (
                               <tr key={row.join()} className="border-t border-border">
                                 {row.map((cell) => (
-                                  <td key={cell} className="py-1">{cell}</td>
+                                  <td key={cell} className="py-1">
+                                    {cell}
+                                  </td>
                                 ))}
                               </tr>
                             ))}
                           </tbody>
                         </table>
-                        <Button size="sm" variant="outline" onClick={() => message.table && downloadCsv(message.table)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => message.table && downloadCsv(message.table)}
+                        >
                           <Download /> Export CSV
                         </Button>
                       </>
@@ -177,8 +209,15 @@ export function AiCopilot({ screen }: { screen: string }) {
               {progress !== null && (
                 <ol className="space-y-1 rounded-lg border border-border p-3 text-sm">
                   {progressSteps.map((step, index) => (
-                    <li key={step} className={index < progress ? "text-foreground" : "text-muted-foreground"}>
-                      {index === progress ? <Loader2 className="mr-2 inline size-3.5 animate-spin" /> : "• "}
+                    <li
+                      key={step}
+                      className={index < progress ? "text-foreground" : "text-muted-foreground"}
+                    >
+                      {index === progress ? (
+                        <Loader2 className="mr-2 inline size-3.5 animate-spin" />
+                      ) : (
+                        "• "
+                      )}
                       {step}
                     </li>
                   ))}
@@ -192,7 +231,12 @@ export function AiCopilot({ screen }: { screen: string }) {
                 ask(draft);
               }}
             >
-              <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Ask about your programme" aria-label="Ask AI Copilot" />
+              <Input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Ask about your programme"
+                aria-label="Ask AI Copilot"
+              />
               <Button type="submit" size="icon" aria-label="Send question">
                 <Send />
               </Button>

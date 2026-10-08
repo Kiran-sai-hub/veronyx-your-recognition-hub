@@ -9,7 +9,10 @@ export const Route = createFileRoute("/workflows/$id/runs")({
       { title: "Workflow runs and versions — Veronyx Recognise" },
       { name: "description", content: "Run history, versions and step-by-step decision traces." },
       { property: "og:title", content: "Workflow runs and versions — Veronyx Recognise" },
-      { property: "og:description", content: "Run history, versions and step-by-step decision traces." },
+      {
+        property: "og:description",
+        content: "Run history, versions and step-by-step decision traces.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -19,5 +22,9 @@ export const Route = createFileRoute("/workflows/$id/runs")({
 
 function RoutePage() {
   const { id } = Route.useParams();
-  return <AdminRoutePage pathname={`/workflows/${id}/runs`}><WorkflowRunsPage workflowId={id} /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname={`/workflows/${id}/runs`}>
+      <WorkflowRunsPage workflowId={id} />
+    </AdminRoutePage>
+  );
 }

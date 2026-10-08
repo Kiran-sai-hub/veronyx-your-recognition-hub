@@ -7,9 +7,15 @@ export const Route = createFileRoute("/dashboard/hr")({
   head: () => ({
     meta: [
       { title: "HR dashboard — Veronyx Recognise" },
-      { name: "description", content: "Programme health, data health and compliance alerts for HR." },
+      {
+        name: "description",
+        content: "Programme health, data health and compliance alerts for HR.",
+      },
       { property: "og:title", content: "HR dashboard — Veronyx Recognise" },
-      { property: "og:description", content: "Programme health, data health and compliance alerts for HR." },
+      {
+        property: "og:description",
+        content: "Programme health, data health and compliance alerts for HR.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,5 +24,9 @@ export const Route = createFileRoute("/dashboard/hr")({
 });
 
 function RoutePage() {
-  return <AdminRoutePage pathname="/dashboard/hr"><HrDashboard /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname="/dashboard/hr">
+      <HrDashboard />
+    </AdminRoutePage>
+  );
 }

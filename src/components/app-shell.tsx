@@ -67,7 +67,8 @@ export function AppShell({ children, pathname }: AppShellProps) {
   const { persona, setPersona, theme, setTheme, openCopilot } = useAppStore();
   const isEmployee = pathname.startsWith("/me");
   const navigation = isEmployee ? employeeNavigation : adminNavigation(persona);
-  const isActive = (to: string) => (to === "/me" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`));
+  const isActive = (to: string) =>
+    to === "/me" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
   const mobileNavigation = isEmployee
     ? employeeNavigation.filter((item) => ["/me", "/me/wallet", "/me/redeem"].includes(item.to))
     : [
@@ -166,7 +167,12 @@ export function AppShell({ children, pathname }: AppShellProps) {
               {!isEmployee && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label="Open AI Copilot" onClick={() => openCopilot()}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Open AI Copilot"
+                      onClick={() => openCopilot()}
+                    >
                       <Sparkles />
                     </Button>
                   </TooltipTrigger>
@@ -210,18 +216,18 @@ export function AppShell({ children, pathname }: AppShellProps) {
         aria-label="Mobile navigation"
       >
         {mobileNavigation.map((item) => (
-            <a
-              key={item.to}
-              href={item.to}
-              className={cn(
-                "flex min-h-16 flex-col items-center justify-center gap-1 text-xs text-muted-foreground",
-                isActive(item.to) && "text-primary",
-              )}
-            >
-              <item.icon className="size-5" />
-              {item.label}
-            </a>
-          ))}
+          <a
+            key={item.to}
+            href={item.to}
+            className={cn(
+              "flex min-h-16 flex-col items-center justify-center gap-1 text-xs text-muted-foreground",
+              isActive(item.to) && "text-primary",
+            )}
+          >
+            <item.icon className="size-5" />
+            {item.label}
+          </a>
+        ))}
         <a
           href="/me/preferences"
           className={cn(

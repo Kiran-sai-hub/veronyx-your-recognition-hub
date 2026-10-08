@@ -96,7 +96,12 @@ export const initialSteps: WorkflowStep[] = [
   { id: "s3", kind: "condition", title: "Check a rule", summary: "Sales ≥ 100% of target" },
   { id: "s4", kind: "approval", title: "Ask for approval", summary: "Reporting manager" },
   { id: "s5", kind: "reward", title: "Give points", summary: "" },
-  { id: "s6", kind: "notify", title: "Send message", summary: "App + WhatsApp, Tamil fallback English" },
+  {
+    id: "s6",
+    kind: "notify",
+    title: "Send message",
+    summary: "App + WhatsApp, Tamil fallback English",
+  },
 ];
 
 export type ValidationIssue = {
@@ -112,22 +117,64 @@ export function validateWorkflow(steps: WorkflowStep[]): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const has = (kind: StepKind) => steps.some((step) => step.kind === kind);
   if (!has("trigger"))
-    issues.push({ code: "V1", stepId: null, severity: "error", message: "The workflow has no start step.", fix: "Add a “Start when” step at the top." });
+    issues.push({
+      code: "V1",
+      stepId: null,
+      severity: "error",
+      message: "The workflow has no start step.",
+      fix: "Add a “Start when” step at the top.",
+    });
   if (steps[0] && steps[0].kind !== "trigger")
-    issues.push({ code: "V2", stepId: steps[0].id, severity: "error", message: "The first step must be “Start when”.", fix: "Move the start step to the top." });
+    issues.push({
+      code: "V2",
+      stepId: steps[0].id,
+      severity: "error",
+      message: "The first step must be “Start when”.",
+      fix: "Move the start step to the top.",
+    });
   if (!has("reward"))
-    issues.push({ code: "V3", stepId: null, severity: "error", message: "Nobody gets a reward yet.", fix: "Add a “Give points” step." });
+    issues.push({
+      code: "V3",
+      stepId: null,
+      severity: "error",
+      message: "Nobody gets a reward yet.",
+      fix: "Add a “Give points” step.",
+    });
   steps
     .filter((step) => step.kind === "reward" && step.summary.trim() === "")
     .forEach((step) =>
-      issues.push({ code: "V5", stepId: step.id, severity: "error", message: "Points amount is missing.", fix: "Enter how many points each person gets." }),
+      issues.push({
+        code: "V5",
+        stepId: step.id,
+        severity: "error",
+        message: "Points amount is missing.",
+        fix: "Enter how many points each person gets.",
+      }),
     );
   if (!has("approval"))
-    issues.push({ code: "V8", stepId: null, severity: "warning", message: "Rewards will go out without a person checking.", fix: "Add an “Ask for approval” step before rewards." });
+    issues.push({
+      code: "V8",
+      stepId: null,
+      severity: "warning",
+      message: "Rewards will go out without a person checking.",
+      fix: "Add an “Ask for approval” step before rewards.",
+    });
   if (!has("filter"))
-    issues.push({ code: "V10", stepId: null, severity: "warning", message: "This applies to everyone in the company.", fix: "Add a “Choose people” step to narrow it down." });
+    issues.push({
+      code: "V10",
+      stepId: null,
+      severity: "warning",
+      message: "This applies to everyone in the company.",
+      fix: "Add a “Choose people” step to narrow it down.",
+    });
   if (!has("notify"))
-    issues.push({ code: "V14", stepId: null, severity: "warning", message: "Winners will not be told.", fix: "Add a “Send message” step." });
+    issues.push({
+      code: "V14",
+      stepId: null,
+      severity: "warning",
+      message: "Winners will not be told.",
+      fix: "Add a “Send message” step.",
+    });
   return issues;
 }
 
@@ -149,10 +196,34 @@ export const dryRunReport = {
 };
 
 export const workflowVersions = [
-  { version: 7, date: "05/10/2026", author: "Vikram Rao", note: "Raised reward to 500 points", current: true },
-  { version: 6, date: "12/09/2026", author: "Vikram Rao", note: "Added WhatsApp message", current: false },
-  { version: 5, date: "02/08/2026", author: "Lakshmi Menon", note: "Added manager approval", current: false },
-  { version: 4, date: "15/07/2026", author: "Vikram Rao", note: "Target changed to 100%", current: false },
+  {
+    version: 7,
+    date: "05/10/2026",
+    author: "Vikram Rao",
+    note: "Raised reward to 500 points",
+    current: true,
+  },
+  {
+    version: 6,
+    date: "12/09/2026",
+    author: "Vikram Rao",
+    note: "Added WhatsApp message",
+    current: false,
+  },
+  {
+    version: 5,
+    date: "02/08/2026",
+    author: "Lakshmi Menon",
+    note: "Added manager approval",
+    current: false,
+  },
+  {
+    version: 4,
+    date: "15/07/2026",
+    author: "Vikram Rao",
+    note: "Target changed to 100%",
+    current: false,
+  },
 ];
 
 export type WorkflowRun = {
@@ -166,10 +237,39 @@ export type WorkflowRun = {
 };
 
 export const workflowRuns: WorkflowRun[] = [
-  { id: "run-118", started: "07/10/2026 18:30", duration: "42s", result: "failed", evaluated: 48, rewarded: 0, error: "The sales file is missing the “Target” column, so nobody could be checked." },
-  { id: "run-117", started: "07/09/2026 18:30", duration: "38s", result: "success", evaluated: 47, rewarded: 12 },
-  { id: "run-116", started: "07/08/2026 18:30", duration: "35s", result: "success", evaluated: 46, rewarded: 9 },
-  { id: "run-115", started: "07/07/2026 18:30", duration: "41s", result: "success", evaluated: 46, rewarded: 14 },
+  {
+    id: "run-118",
+    started: "07/10/2026 18:30",
+    duration: "42s",
+    result: "failed",
+    evaluated: 48,
+    rewarded: 0,
+    error: "The sales file is missing the “Target” column, so nobody could be checked.",
+  },
+  {
+    id: "run-117",
+    started: "07/09/2026 18:30",
+    duration: "38s",
+    result: "success",
+    evaluated: 47,
+    rewarded: 12,
+  },
+  {
+    id: "run-116",
+    started: "07/08/2026 18:30",
+    duration: "35s",
+    result: "success",
+    evaluated: 46,
+    rewarded: 9,
+  },
+  {
+    id: "run-115",
+    started: "07/07/2026 18:30",
+    duration: "41s",
+    result: "success",
+    evaluated: 46,
+    rewarded: 14,
+  },
 ];
 
 export const decisionTrace = {
@@ -200,12 +300,84 @@ export type Approval = {
 };
 
 export const approvals: Approval[] = [
-  { id: "ap-1", employee: employees[1]?.name ?? "", code: employees[1]?.code ?? "", department: "Quality", reason: "Zero defects across 4 Friday shifts", source: "Zero-defect shift", points: 400, rupees: 400, submitted: "08/10/2026", evidence: true, flags: [] },
-  { id: "ap-2", employee: employees[6]?.name ?? "", code: employees[6]?.code ?? "", department: "Sales", reason: "Sales 128% of September target", source: "Sales target achievers", points: 1200, rupees: 1200, submitted: "08/10/2026", evidence: true, flags: ["Crosses ₹15,000 yearly gift limit — tax will apply"] },
-  { id: "ap-3", employee: employees[3]?.name ?? "", code: employees[3]?.code ?? "", department: "Operations", reason: "Handled the boiler shutdown on night shift", source: "Manager nomination", points: 300, rupees: 300, submitted: "07/10/2026", evidence: false, flags: [] },
-  { id: "ap-4", employee: employees[8]?.name ?? "", code: employees[8]?.code ?? "", department: "Manufacturing", reason: "Perfect attendance in September", source: "Perfect attendance bonus", points: 250, rupees: 250, submitted: "07/10/2026", evidence: true, flags: ["Manufacturing B pool is used up"] },
-  { id: "ap-5", employee: employees[10]?.name ?? "", code: employees[10]?.code ?? "", department: "Sales", reason: "Brought in a new distributor in Salem", source: "Manager nomination", points: 500, rupees: 500, submitted: "06/10/2026", evidence: true, flags: [] },
-  { id: "ap-6", employee: employees[13]?.name ?? "", code: employees[13]?.code ?? "", department: "Quality", reason: "Found the root cause for yarn breakage", source: "Peer shout-out", points: 200, rupees: 200, submitted: "06/10/2026", evidence: false, flags: [] },
+  {
+    id: "ap-1",
+    employee: employees[1]?.name ?? "",
+    code: employees[1]?.code ?? "",
+    department: "Quality",
+    reason: "Zero defects across 4 Friday shifts",
+    source: "Zero-defect shift",
+    points: 400,
+    rupees: 400,
+    submitted: "08/10/2026",
+    evidence: true,
+    flags: [],
+  },
+  {
+    id: "ap-2",
+    employee: employees[6]?.name ?? "",
+    code: employees[6]?.code ?? "",
+    department: "Sales",
+    reason: "Sales 128% of September target",
+    source: "Sales target achievers",
+    points: 1200,
+    rupees: 1200,
+    submitted: "08/10/2026",
+    evidence: true,
+    flags: ["Crosses ₹15,000 yearly gift limit — tax will apply"],
+  },
+  {
+    id: "ap-3",
+    employee: employees[3]?.name ?? "",
+    code: employees[3]?.code ?? "",
+    department: "Operations",
+    reason: "Handled the boiler shutdown on night shift",
+    source: "Manager nomination",
+    points: 300,
+    rupees: 300,
+    submitted: "07/10/2026",
+    evidence: false,
+    flags: [],
+  },
+  {
+    id: "ap-4",
+    employee: employees[8]?.name ?? "",
+    code: employees[8]?.code ?? "",
+    department: "Manufacturing",
+    reason: "Perfect attendance in September",
+    source: "Perfect attendance bonus",
+    points: 250,
+    rupees: 250,
+    submitted: "07/10/2026",
+    evidence: true,
+    flags: ["Manufacturing B pool is used up"],
+  },
+  {
+    id: "ap-5",
+    employee: employees[10]?.name ?? "",
+    code: employees[10]?.code ?? "",
+    department: "Sales",
+    reason: "Brought in a new distributor in Salem",
+    source: "Manager nomination",
+    points: 500,
+    rupees: 500,
+    submitted: "06/10/2026",
+    evidence: true,
+    flags: [],
+  },
+  {
+    id: "ap-6",
+    employee: employees[13]?.name ?? "",
+    code: employees[13]?.code ?? "",
+    department: "Quality",
+    reason: "Found the root cause for yarn breakage",
+    source: "Peer shout-out",
+    points: 200,
+    rupees: 200,
+    submitted: "06/10/2026",
+    evidence: false,
+    flags: [],
+  },
 ];
 
 export const rejectReasons = [
@@ -238,15 +410,49 @@ export const teamMembers = employees
   .map((employee, index) => ({
     ...employee,
     monthPoints: [1450, 1200, 980, 760, 0, 520, 0, 340][index] ?? 0,
-    lastRecognised: ["2 days ago", "5 days ago", "1 week ago", "2 weeks ago", "41 days ago", "3 weeks ago", "52 days ago", "4 weeks ago"][index] ?? "",
+    lastRecognised:
+      [
+        "2 days ago",
+        "5 days ago",
+        "1 week ago",
+        "2 weeks ago",
+        "41 days ago",
+        "3 weeks ago",
+        "52 days ago",
+        "4 weeks ago",
+      ][index] ?? "",
   }));
 
 export const aiSuggestionsByScreen: Record<string, string[]> = {
-  owner: ["Which department had the lowest recognition last month?", "How much budget is left this quarter?", "Who has not been recognised in 30 days?"],
-  hr: ["Which data sources failed this week?", "Show employees near the ₹15,000 gift limit", "List approvals waiting more than 3 days"],
-  manager: ["Who in my team has not been recognised recently?", "How much is left in my wallet?", "Draft a thank-you note for Sales A"],
-  workflows: ["Why did the last sales run fail?", "Which workflows gave the most points?", "Suggest a workflow for safety suggestions"],
-  builder: ["Fix the validation problems", "Add a manager approval step", "Explain what this workflow does"],
-  approvals: ["Summarise today's approvals", "Which approvals cross the tax limit?", "Which items are queued for budget?"],
+  owner: [
+    "Which department had the lowest recognition last month?",
+    "How much budget is left this quarter?",
+    "Who has not been recognised in 30 days?",
+  ],
+  hr: [
+    "Which data sources failed this week?",
+    "Show employees near the ₹15,000 gift limit",
+    "List approvals waiting more than 3 days",
+  ],
+  manager: [
+    "Who in my team has not been recognised recently?",
+    "How much is left in my wallet?",
+    "Draft a thank-you note for Sales A",
+  ],
+  workflows: [
+    "Why did the last sales run fail?",
+    "Which workflows gave the most points?",
+    "Suggest a workflow for safety suggestions",
+  ],
+  builder: [
+    "Fix the validation problems",
+    "Add a manager approval step",
+    "Explain what this workflow does",
+  ],
+  approvals: [
+    "Summarise today's approvals",
+    "Which approvals cross the tax limit?",
+    "Which items are queued for budget?",
+  ],
   default: ["What needs my attention today?", "How do I create a workflow?"],
 };

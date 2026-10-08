@@ -9,7 +9,10 @@ export const Route = createFileRoute("/workflows/")({
       { title: "Workflows — Veronyx Recognise" },
       { name: "description", content: "All reward workflows with their status and latest runs." },
       { property: "og:title", content: "Workflows — Veronyx Recognise" },
-      { property: "og:description", content: "All reward workflows with their status and latest runs." },
+      {
+        property: "og:description",
+        content: "All reward workflows with their status and latest runs.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,5 +21,9 @@ export const Route = createFileRoute("/workflows/")({
 });
 
 function RoutePage() {
-  return <AdminRoutePage pathname="/workflows"><WorkflowListPage /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname="/workflows">
+      <WorkflowListPage />
+    </AdminRoutePage>
+  );
 }

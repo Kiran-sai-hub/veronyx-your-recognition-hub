@@ -9,7 +9,10 @@ export const Route = createFileRoute("/dashboard/manager")({
       { title: "Manager dashboard — Veronyx Recognise" },
       { name: "description", content: "Team leaderboard, wallet and people to recognise next." },
       { property: "og:title", content: "Manager dashboard — Veronyx Recognise" },
-      { property: "og:description", content: "Team leaderboard, wallet and people to recognise next." },
+      {
+        property: "og:description",
+        content: "Team leaderboard, wallet and people to recognise next.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,5 +21,9 @@ export const Route = createFileRoute("/dashboard/manager")({
 });
 
 function RoutePage() {
-  return <AdminRoutePage pathname="/dashboard/manager"><ManagerDashboard /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname="/dashboard/manager">
+      <ManagerDashboard />
+    </AdminRoutePage>
+  );
 }

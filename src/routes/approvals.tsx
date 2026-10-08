@@ -9,7 +9,10 @@ export const Route = createFileRoute("/approvals")({
       { title: "Approvals — Veronyx Recognise" },
       { name: "description", content: "Approve, modify, reject or escalate pending rewards." },
       { property: "og:title", content: "Approvals — Veronyx Recognise" },
-      { property: "og:description", content: "Approve, modify, reject or escalate pending rewards." },
+      {
+        property: "og:description",
+        content: "Approve, modify, reject or escalate pending rewards.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,5 +21,9 @@ export const Route = createFileRoute("/approvals")({
 });
 
 function RoutePage() {
-  return <AdminRoutePage pathname="/approvals"><ApprovalsPage /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname="/approvals">
+      <ApprovalsPage />
+    </AdminRoutePage>
+  );
 }

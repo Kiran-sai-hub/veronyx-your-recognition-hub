@@ -9,7 +9,9 @@ describe("approval and workflow rules", () => {
     expect(isBudgetExhausted(approvals.find((a) => a.id === "ap-1")!)).toBe(false);
   });
   it("blocks a workflow whose reward step has no amount (V5)", () => {
-    expect(validateWorkflow(initialSteps).some((i) => i.code === "V5" && i.severity === "error")).toBe(true);
+    expect(
+      validateWorkflow(initialSteps).some((i) => i.code === "V5" && i.severity === "error"),
+    ).toBe(true);
   });
   it("requires a start step (V1)", () => {
     expect(validateWorkflow(initialSteps.slice(1)).some((i) => i.code === "V1")).toBe(true);

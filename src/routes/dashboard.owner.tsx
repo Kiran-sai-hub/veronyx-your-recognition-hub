@@ -7,9 +7,15 @@ export const Route = createFileRoute("/dashboard/owner")({
   head: () => ({
     meta: [
       { title: "Owner dashboard — Veronyx Recognise" },
-      { name: "description", content: "Company-wide recognition, budget and approvals at a glance." },
+      {
+        name: "description",
+        content: "Company-wide recognition, budget and approvals at a glance.",
+      },
       { property: "og:title", content: "Owner dashboard — Veronyx Recognise" },
-      { property: "og:description", content: "Company-wide recognition, budget and approvals at a glance." },
+      {
+        property: "og:description",
+        content: "Company-wide recognition, budget and approvals at a glance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,5 +24,9 @@ export const Route = createFileRoute("/dashboard/owner")({
 });
 
 function RoutePage() {
-  return <AdminRoutePage pathname="/dashboard/owner"><OwnerDashboard /></AdminRoutePage>;
+  return (
+    <AdminRoutePage pathname="/dashboard/owner">
+      <OwnerDashboard />
+    </AdminRoutePage>
+  );
 }
