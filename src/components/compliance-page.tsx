@@ -82,7 +82,7 @@ export function CompliancePage({ tab = "tax" }: { tab?: string | undefined }) {
   return (
     <div className="space-y-8">
       <PageHeading
-        eyebrow="Compliance"
+        eyebrow="Settings · Privacy & DPDP"
         title="Compliance centre"
         description="Privacy notices, consent, data requests, retention, tax and the audit trail in one place."
       />

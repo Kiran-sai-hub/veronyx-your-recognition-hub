@@ -17,6 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatRupees, isValidGstin, isValidUdyam } from "@/lib/format";
 import {
@@ -56,15 +63,16 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
       <PageHeading
         eyebrow="Settings"
         title="Organisation settings"
-        description="Company details, who can do what, message templates and your plan."
+        description="Org profile, roles and permissions, notification templates, integrations and your plan. Privacy & DPDP lives in the Compliance centre."
       />
 
       <Tabs key={tab} defaultValue={tab}>
         <TabsList className="flex h-auto flex-wrap justify-start">
-          <TabsTrigger value="org">Organisation</TabsTrigger>
-          <TabsTrigger value="roles">Roles & permissions</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="org">Org Profile</TabsTrigger>
+          <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
+          <TabsTrigger value="notifications">Notification Templates</TabsTrigger>
           <TabsTrigger value="whatsapp">WhatsApp templates</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="billing">Billing & plan</TabsTrigger>
         </TabsList>
 
@@ -112,7 +120,18 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
               </div>
               <div className="space-y-2">
                 <Label>MSME category</Label>
-                <Input value="Small" readOnly />
+                <Select defaultValue="Small">
+                  <SelectTrigger aria-label="MSME category">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Micro", "Small", "Medium"].map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Time zone</Label>
@@ -234,6 +253,77 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="integrations" className="mt-6 grid gap-4 md:grid-cols-2">
+          {[
+            [
+              "Sign-in (SSO)",
+              "Google Workspace and Microsoft 365 sign-in for office staff.",
+              "Connected · Google",
+              true,
+            ],
+            [
+              "WhatsApp Business API",
+              "Sends recognition, OTPs and vouchers from +91 80470 12345.",
+              "Connected · quality rating High",
+              true,
+            ],
+            [
+              "Payroll",
+              "Monthly export format for Keka, greytHR, RazorpayX, Zoho Payroll or CSV.",
+              "Format: Zoho Payroll",
+              true,
+            ],
+            [
+              "Voucher aggregator",
+              "Supplies Amazon, Flipkart, Swiggy and fuel vouchers.",
+              "Connected · wallet ₹ 85,000",
+              true,
+            ],
+            [
+              "Email (SMTP)",
+              "Sends weekly summaries from rewards@rkmills.in.",
+              "Not connected",
+              false,
+            ],
+          ].map(([name, detail, status, on]) => (
+            <Card key={name as string} className="rounded-lg">
+              <CardContent className="flex items-start justify-between gap-3 p-5">
+                <div>
+                  <p className="font-medium">{name as string}</p>
+                  <p className="text-sm text-muted-foreground">{detail as string}</p>
+                  <p
+                    className={
+                      on ? "mt-2 text-xs text-success" : "mt-2 text-xs text-muted-foreground"
+                    }
+                  >
+                    {status as string}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    toast.success(
+                      on ? `${name as string} settings opened` : `Connecting ${name as string}…`,
+                    )
+                  }
+                >
+                  {on ? "Manage" : "Connect"}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+          <Card className="rounded-lg border-dashed md:col-span-2">
+            <CardContent className="flex flex-wrap items-center justify-between gap-2 p-5 text-sm">
+              Performance data sources (CRM, sheets, helpdesk, webhooks) are managed in Connectors &
+              Data.
+              <Button size="sm" variant="ghost" asChild>
+                <a href="/connectors">Open Connectors & Data</a>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
