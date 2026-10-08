@@ -72,12 +72,19 @@ export function SettingsPage() {
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0">
               <CardTitle className="text-base">Company details</CardTitle>
-              <span className="text-xs text-muted-foreground">{saved ? "All changes saved" : "Saving…"}</span>
+              <span className="text-xs text-muted-foreground">
+                {saved ? "All changes saved" : "Saving…"}
+              </span>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="legal">Legal name</Label>
-                <Input id="legal" value={legalName} maxLength={120} onChange={(e) => setLegalName(e.target.value)} />
+                <Input
+                  id="legal"
+                  value={legalName}
+                  maxLength={120}
+                  onChange={(e) => setLegalName(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="gstin">GSTIN</Label>
@@ -87,7 +94,9 @@ export function SettingsPage() {
                   aria-invalid={!gstinOk}
                   onChange={(e) => setGstin(e.target.value.toUpperCase())}
                 />
-                {!gstinOk && <p className="text-xs text-destructive">15 characters, like 33AABCR1234F1Z5</p>}
+                {!gstinOk && (
+                  <p className="text-xs text-destructive">15 characters, like 33AABCR1234F1Z5</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="udyam">Udyam number</Label>
@@ -97,7 +106,9 @@ export function SettingsPage() {
                   aria-invalid={!udyamOk}
                   onChange={(e) => setUdyam(e.target.value.toUpperCase())}
                 />
-                {!udyamOk && <p className="text-xs text-destructive">Format: UDYAM-TN-03-0012345</p>}
+                {!udyamOk && (
+                  <p className="text-xs text-destructive">Format: UDYAM-TN-03-0012345</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>MSME category</Label>
@@ -154,7 +165,9 @@ export function SettingsPage() {
             </CardContent>
           </Card>
           <div className="mt-4 flex justify-end">
-            <Button onClick={() => toast.success("Permissions saved and logged")}>Save permissions</Button>
+            <Button onClick={() => toast.success("Permissions saved and logged")}>
+              Save permissions
+            </Button>
           </div>
         </TabsContent>
 
@@ -174,7 +187,9 @@ export function SettingsPage() {
                     <TableRow key={t.name}>
                       <TableCell className="font-medium">{t.name}</TableCell>
                       <TableCell>{t.channel}</TableCell>
-                      <TableCell className="uppercase text-muted-foreground">{t.locales.join(" · ")}</TableCell>
+                      <TableCell className="uppercase text-muted-foreground">
+                        {t.locales.join(" · ")}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -204,7 +219,13 @@ export function SettingsPage() {
                       <TableCell>{t.category}</TableCell>
                       <TableCell>
                         <StatusBadge
-                          tone={t.status === "Approved" ? "success" : t.status === "Pending" ? "warning" : "error"}
+                          tone={
+                            t.status === "Approved"
+                              ? "success"
+                              : t.status === "Pending"
+                                ? "warning"
+                                : "error"
+                          }
                         >
                           {t.status}
                         </StatusBadge>

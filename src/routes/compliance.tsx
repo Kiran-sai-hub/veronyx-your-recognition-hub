@@ -7,9 +7,15 @@ export const Route = createFileRoute("/compliance")({
   head: () => ({
     meta: [
       { title: "Compliance centre — Veronyx Recognise" },
-      { name: "description", content: "Privacy notices, consent, data requests, retention, tax tracker and audit log." },
+      {
+        name: "description",
+        content: "Privacy notices, consent, data requests, retention, tax tracker and audit log.",
+      },
       { property: "og:title", content: "Compliance centre — Veronyx Recognise" },
-      { property: "og:description", content: "Privacy notices, consent, data requests, retention, tax tracker and audit log." },
+      {
+        property: "og:description",
+        content: "Privacy notices, consent, data requests, retention, tax tracker and audit log.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,7 +24,6 @@ export const Route = createFileRoute("/compliance")({
 });
 
 function RoutePage() {
-  
   return (
     <AdminRoutePage pathname="/compliance">
       <CompliancePage />

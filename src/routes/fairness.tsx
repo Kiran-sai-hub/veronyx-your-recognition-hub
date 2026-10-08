@@ -8,9 +8,15 @@ export const Route = createFileRoute("/fairness")({
   head: () => ({
     meta: [
       { title: "Fairness & coverage — Veronyx Recognise" },
-      { name: "description", content: "Equity cuts, manager spread, who is missed and unusual activity alerts." },
+      {
+        name: "description",
+        content: "Equity cuts, manager spread, who is missed and unusual activity alerts.",
+      },
       { property: "og:title", content: "Fairness & coverage — Veronyx Recognise" },
-      { property: "og:description", content: "Equity cuts, manager spread, who is missed and unusual activity alerts." },
+      {
+        property: "og:description",
+        content: "Equity cuts, manager spread, who is missed and unusual activity alerts.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

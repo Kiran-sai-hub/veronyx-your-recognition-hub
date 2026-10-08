@@ -167,7 +167,10 @@ export function FairnessPage({ canSeePrivate }: FairnessPageProps) {
                   </li>
                 ))}
               </ul>
-              <Button className="mt-4" onClick={() => toast.success("Nudge sent to their managers")}>
+              <Button
+                className="mt-4"
+                onClick={() => toast.success("Nudge sent to their managers")}
+              >
                 Nudge their managers
               </Button>
             </CardContent>
@@ -221,9 +224,19 @@ export function FairnessPage({ canSeePrivate }: FairnessPageProps) {
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{a.kind}</p>
                     <StatusBadge
-                      tone={a.status === "open" ? "warning" : a.status === "held" ? "neutral" : "success"}
+                      tone={
+                        a.status === "open"
+                          ? "warning"
+                          : a.status === "held"
+                            ? "neutral"
+                            : "success"
+                      }
                     >
-                      {a.status === "open" ? "Needs review" : a.status === "held" ? "On hold" : "Cleared"}
+                      {a.status === "open"
+                        ? "Needs review"
+                        : a.status === "held"
+                          ? "On hold"
+                          : "Cleared"}
                     </StatusBadge>
                   </div>
                   <p className="mt-1 text-sm">{a.detail}</p>

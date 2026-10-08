@@ -499,7 +499,11 @@ export const aiSuggestionsByScreen: Record<string, string[]> = {
     "Who crossed the ₹15,000 gift limit this year?",
     "Explain the taxable column",
   ],
-  fairness: ["Which teams are being missed?", "Explain the spread score", "Why is night shift lower?"],
+  fairness: [
+    "Which teams are being missed?",
+    "Explain the spread score",
+    "Why is night shift lower?",
+  ],
   campaigns: ["Draft a Diwali campaign", "How much did Onam spend?"],
   compliance: ["Which data requests are overdue?", "Who is near the ₹15,000 limit?"],
   settings: ["Who can move budget?", "Which WhatsApp templates were rejected?"],

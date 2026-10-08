@@ -126,7 +126,12 @@ export function CampaignsPage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="c-name">Name</Label>
-              <Input id="c-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
+              <Input
+                id="c-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={80}
+              />
             </div>
             <div className="space-y-2">
               <Label>Festival or theme</Label>

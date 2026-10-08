@@ -41,7 +41,13 @@ import {
   type DprRequest,
 } from "@/lib/phase3-data";
 
-const stages: DprRequest["stage"][] = ["Received", "Acknowledged", "Processing", "Responded", "Closed"];
+const stages: DprRequest["stage"][] = [
+  "Received",
+  "Acknowledged",
+  "Processing",
+  "Responded",
+  "Closed",
+];
 const noticeLanguages = ["English", "தமிழ்", "हिन्दी", "తెలుగు"];
 
 function downloadCsv(name: string, csv: string) {
@@ -170,8 +176,14 @@ export function CompliancePage() {
                 </TableBody>
               </Table>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Version 2 acknowledged by 162 of 199</p>
-                <Button onClick={() => toast.success("Version 3 published. Employees will be asked to acknowledge.")}>
+                <p className="text-sm text-muted-foreground">
+                  Version 2 acknowledged by 162 of 199
+                </p>
+                <Button
+                  onClick={() =>
+                    toast.success("Version 3 published. Employees will be asked to acknowledge.")
+                  }
+                >
                   <FileText className="size-4" /> Publish version
                 </Button>
               </div>
@@ -235,7 +247,9 @@ export function CompliancePage() {
                       {stages.map((s, i) => (
                         <span
                           key={s}
-                          className={i <= stages.indexOf(r.stage) ? "font-medium" : "text-muted-foreground"}
+                          className={
+                            i <= stages.indexOf(r.stage) ? "font-medium" : "text-muted-foreground"
+                          }
                         >
                           {s}
                           {i < stages.length - 1 ? " → " : ""}
