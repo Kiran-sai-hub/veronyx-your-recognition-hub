@@ -813,66 +813,265 @@ export function toCsv(headers: string[], rows: string[][]): string {
 // Payroll export
 // ---------------------------------------------------------------------------
 
-export const payrollSystems = ["CSV (generic)", "Zoho Payroll", "greytHR", "Keka"] as const;
+export const payrollSystems = [
+  "Keka",
+  "greytHR",
+  "RazorpayX Payroll",
+  "Zoho Payroll",
+  "Custom CSV",
+] as const;
 
 export const payrollPeriods = ["October 2026", "September 2026", "August 2026"] as const;
 
+/** Indian fiscal year (April–March) that a "Month YYYY" period falls in. */
+export function fiscalYearFor(period: string): string {
+  const [month = "", yearText = ""] = period.split(" ");
+  const year = Number(yearText);
+  const index = new Date(`${month} 1, 2000`).getMonth();
+  const start = index >= 3 ? year : year - 1;
+  return `FY ${start}-${String(start + 1).slice(2)}`;
+}
+
+/** payroll_export_YYYY_MM.csv (checklist §4.13 step 4). */
+export function payrollFileName(period: string): string {
+  const [month = "", year = ""] = period.split(" ");
+  const index = new Date(`${month} 1, 2000`).getMonth() + 1;
+  return `payroll_export_${year}_${String(index).padStart(2, "0")}.csv`;
+}
+
+export type TaxNature = "perquisite_noncash" | "cash_taxable" | "meal_voucher";
+export const taxNatures: TaxNature[] = ["perquisite_noncash", "cash_taxable", "meal_voucher"];
+export const taxNatureLabel: Record<TaxNature, string> = {
+  perquisite_noncash: "Non-cash perquisite",
+  cash_taxable: "Cash (taxable)",
+  meal_voucher: "Meal voucher",
+};
+
+/** Yearly tax-free limit for non-cash gifts used across the prototype. */
+export const GIFT_LIMIT = 15000;
+
 export type PayrollRow = {
+  /** Empty when the employee record has no payroll code yet. */
   code: string;
   name: string;
-  points: number;
+  department: string;
+  componentCode: string;
   amount: number;
-  taxable: boolean;
+  /** null = the reward was never tagged with a tax nature. */
+  taxNature: TaxNature | null;
+  /** Workflow run that produced the reward. */
+  reference: string;
+  /** Non-cash gifts already given this fiscal year, before this period. */
+  yearToDate: number;
+  /** Problem recorded on the employee record itself. */
   issue?: string;
 };
+
+const person = (index: number) => employees[index];
 
 export const payrollPreview: PayrollRow[] = [
   {
     code: "RKM0007",
-    name: employees[6]?.name ?? "",
-    points: 1200,
+    name: person(6)?.name ?? "",
+    department: person(6)?.department ?? "Sales",
+    componentCode: "RNR_GIFT",
     amount: 1200,
-    taxable: true,
+    taxNature: "perquisite_noncash",
+    reference: "run_sales_monthly_2610_7f3a",
+    yearToDate: 14300,
     issue: "Crosses the ₹15,000 yearly gift limit — taxable part must go to payroll.",
   },
-  { code: "RKM0002", name: employees[1]?.name ?? "", points: 400, amount: 400, taxable: false },
-  { code: "RKM0009", name: employees[8]?.name ?? "", points: 250, amount: 250, taxable: false },
+  {
+    code: "RKM0002",
+    name: person(1)?.name ?? "",
+    department: person(1)?.department ?? "Manufacturing",
+    componentCode: "RNR_GIFT",
+    amount: 400,
+    taxNature: "perquisite_noncash",
+    reference: "run_line_star_2610_a91c",
+    yearToDate: 3200,
+  },
+  {
+    code: "RKM0009",
+    name: person(8)?.name ?? "",
+    department: person(8)?.department ?? "Quality",
+    componentCode: "RNR_MEAL",
+    amount: 250,
+    taxNature: "meal_voucher",
+    reference: "run_zero_defect_2610_c204",
+    yearToDate: 1500,
+  },
   {
     code: "RKM0004",
-    name: employees[3]?.name ?? "",
-    points: 300,
+    name: person(3)?.name ?? "",
+    department: person(3)?.department ?? "Operations",
+    componentCode: "RNR_CASH",
     amount: 300,
-    taxable: false,
+    taxNature: "cash_taxable",
+    reference: "run_attendance_2610_11e8",
+    yearToDate: 900,
     issue: "Bank account number is missing in the employee record.",
   },
-  { code: "RKM0014", name: employees[13]?.name ?? "", points: 200, amount: 200, taxable: false },
+  {
+    code: "RKM0014",
+    name: person(13)?.name ?? "",
+    department: person(13)?.department ?? "Sales",
+    componentCode: "RNR_GIFT",
+    amount: 200,
+    taxNature: "perquisite_noncash",
+    reference: "run_sales_monthly_2610_7f3a",
+    yearToDate: 2400,
+  },
+  {
+    code: "RKM0021",
+    name: person(20)?.name ?? "",
+    department: person(20)?.department ?? "Manufacturing",
+    componentCode: "RNR_CASH",
+    amount: 2000,
+    taxNature: "cash_taxable",
+    reference: "run_line_star_2610_a91c",
+    yearToDate: 0,
+  },
+  {
+    code: "RKM0033",
+    name: person(32)?.name ?? "",
+    department: person(32)?.department ?? "Quality",
+    componentCode: "RNR_MEAL",
+    amount: 500,
+    taxNature: "meal_voucher",
+    reference: "run_zero_defect_2610_c204",
+    yearToDate: 2000,
+  },
+  {
+    code: "",
+    name: person(41)?.name ?? "",
+    department: person(41)?.department ?? "Operations",
+    componentCode: "RNR_GIFT",
+    amount: 500,
+    taxNature: "perquisite_noncash",
+    reference: "run_anniversary_2610_5d70",
+    yearToDate: 0,
+  },
+  {
+    code: "RKM0058",
+    name: person(57)?.name ?? "",
+    department: person(57)?.department ?? "Sales",
+    componentCode: "RNR_GIFT",
+    amount: 750,
+    taxNature: null,
+    reference: "manual_award_2610_0042",
+    yearToDate: 4100,
+  },
 ];
 
 export type PayrollIssue = { code: string; name: string; issue: string };
 
-/** Rows with a known problem must be fixed or excluded before export. */
+/** Rows with a known problem on the employee record must be fixed or excluded before export. */
 export function findPayrollIssues(rows: PayrollRow[]): PayrollIssue[] {
   return rows
     .filter((row) => row.issue)
     .map((row) => ({ code: row.code, name: row.name, issue: row.issue ?? "" }));
 }
 
-export const exportHistory = [
+/** Non-cash value this row pushes over the yearly limit (0 when within it). */
+export function overLimit(row: PayrollRow): number {
+  if (row.taxNature !== "perquisite_noncash") return 0;
+  return Math.max(0, row.yearToDate + row.amount - GIFT_LIMIT);
+}
+
+export type PayrollCheck = {
+  kind: "missing_code" | "untagged" | "threshold" | "record";
+  severity: "error" | "warning";
+  name: string;
+  reference: string;
+  message: string;
+};
+
+/** Step 3 checks: missing employee codes, untagged rewards, threshold breaches (§4.13). */
+export function validatePayroll(rows: PayrollRow[]): PayrollCheck[] {
+  const checks: PayrollCheck[] = [];
+  for (const row of rows) {
+    if (!row.code)
+      checks.push({
+        kind: "missing_code",
+        severity: "error",
+        name: row.name,
+        reference: row.reference,
+        message: "No employee code — payroll cannot match this row. Add the code in People.",
+      });
+    if (!row.taxNature)
+      checks.push({
+        kind: "untagged",
+        severity: "error",
+        name: row.name,
+        reference: row.reference,
+        message: "Reward has no tax nature. Tag it before exporting.",
+      });
+    const over = overLimit(row);
+    if (over > 0)
+      checks.push({
+        kind: "threshold",
+        severity: "warning",
+        name: row.name,
+        reference: row.reference,
+        message: `Crosses the ₹15,000 yearly gift limit by ₹${over.toLocaleString("en-IN")} — that part is taxed as salary.`,
+      });
+    if (row.issue && over === 0)
+      checks.push({
+        kind: "record",
+        severity: "warning",
+        name: row.name,
+        reference: row.reference,
+        message: row.issue,
+      });
+  }
+  return checks;
+}
+
+export function payrollSummary(rows: PayrollRow[]) {
+  return {
+    employees: new Set(rows.map((row) => row.name)).size,
+    nonCash: rows
+      .filter((row) => row.taxNature === "perquisite_noncash" || row.taxNature === "meal_voucher")
+      .reduce((sum, row) => sum + row.amount, 0),
+    cash: rows
+      .filter((row) => row.taxNature === "cash_taxable")
+      .reduce((sum, row) => sum + row.amount, 0),
+    breaches: rows.filter((row) => overLimit(row) > 0).length,
+  };
+}
+
+export type PayrollExport = {
+  id: string;
+  period: string;
+  system: string;
+  rows: number;
+  date: string;
+  by: string;
+  file: string;
+  sent: boolean;
+};
+
+export const exportHistory: PayrollExport[] = [
   {
     id: "exp-9",
     period: "September 2026",
-    system: "CSV (generic)",
+    system: "Keka",
     rows: 42,
     date: "01/10/2026",
     by: "Lakshmi Menon",
+    file: "payroll_export_2026_09.csv",
+    sent: true,
   },
   {
     id: "exp-8",
     period: "August 2026",
-    system: "CSV (generic)",
+    system: "Keka",
     rows: 38,
     date: "01/09/2026",
     by: "Lakshmi Menon",
+    file: "payroll_export_2026_08.csv",
+    sent: true,
   },
   {
     id: "exp-7",
@@ -881,5 +1080,7 @@ export const exportHistory = [
     rows: 35,
     date: "01/08/2026",
     by: "Lakshmi Menon",
+    file: "payroll_export_2026_07.csv",
+    sent: true,
   },
 ];

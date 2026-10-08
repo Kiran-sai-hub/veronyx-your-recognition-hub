@@ -41,6 +41,28 @@ export type Redemption = {
   rating?: number;
 };
 
+/** Audit entries created during the demo; shown on top of the seeded audit log. */
+export type AuditEvent = {
+  id: string;
+  at: number;
+  actor: string;
+  action: string;
+  target: string;
+  type: "payroll" | "ai" | "consent" | "budget" | "reward" | "privacy" | "settings";
+};
+
+export type PayrollExportRecord = {
+  id: string;
+  period: string;
+  system: string;
+  rows: number;
+  date: string;
+  by: string;
+  file: string;
+  sent: boolean;
+  csv: string;
+};
+
 type DemoState = {
   /** Shows every screen as a brand-new organisation so empty states can be demoed (§6.1). */
   emptyOrg: boolean;
@@ -53,6 +75,13 @@ type DemoState = {
   redemptions: Redemption[];
   /** Boards created or edited in the demo (full definitions). */
   savedBoards: { id: string; name: string; status: "draft" | "active"; board: unknown }[];
+  auditEvents: AuditEvent[];
+  payrollExports: PayrollExportRecord[];
+  /** Overrides for the seeded export history's "Sent to payroll" toggle. */
+  payrollSent: Record<string, boolean>;
+  logAudit: (event: Omit<AuditEvent, "id" | "at">) => void;
+  addPayrollExport: (record: PayrollExportRecord) => void;
+  setPayrollSent: (id: string, sent: boolean) => void;
   saveBoard: (b: { id: string; name: string; status: "draft" | "active"; board: unknown }) => void;
   setEmptyOrg: (value: boolean) => void;
   finishOnboarding: () => void;
@@ -76,6 +105,9 @@ const initial = {
   employeePoints: 1850,
   redemptions: [],
   savedBoards: [],
+  auditEvents: [] as AuditEvent[],
+  payrollExports: [] as PayrollExportRecord[],
+  payrollSent: {} as Record<string, boolean>,
 };
 
 export const useDemoStore = create<DemoState>()(
@@ -83,6 +115,15 @@ export const useDemoStore = create<DemoState>()(
     (set) => ({
       ...initial,
       setEmptyOrg: (emptyOrg) => set({ emptyOrg }),
+      logAudit: (event) =>
+        set((s) => ({
+          auditEvents: [
+            { ...event, id: `AU-D${s.auditEvents.length + 1}`, at: Date.now() },
+            ...s.auditEvents,
+          ].slice(0, 200),
+        })),
+      addPayrollExport: (record) => set((s) => ({ payrollExports: [record, ...s.payrollExports] })),
+      setPayrollSent: (id, sent) => set((s) => ({ payrollSent: { ...s.payrollSent, [id]: sent } })),
       saveBoard: (b) =>
         set((s) => ({ savedBoards: [b, ...s.savedBoards.filter((x) => x.id !== b.id)] })),
       finishOnboarding: () => set({ onboarded: true, emptyOrg: true }),
