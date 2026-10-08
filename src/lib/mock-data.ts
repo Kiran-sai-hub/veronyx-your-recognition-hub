@@ -15,10 +15,24 @@ export type Reward = {
   title: string;
   points: number;
   value: number;
-  category: "Shopping" | "Food" | "Fuel" | "Experience" | "Donation";
+  category: "Ecommerce" | "Food" | "Fuel" | "Experience" | "Donation" | "Merchandise";
   taxNature: "Non-cash gift" | "Cash equivalent" | "Meal voucher";
   accent: string;
+  delivery: "Code" | "Link" | "Physical" | "UPI" | "Payroll";
+  popularity: number;
+  isNew?: boolean;
+  validityMonths: number;
+  terms: string[];
 };
+
+export const rewardCategories = [
+  "Ecommerce",
+  "Food",
+  "Fuel",
+  "Experience",
+  "Donation",
+  "Merchandise",
+] as const;
 
 const departments = ["Manufacturing", "Quality", "Sales", "Operations"] as const;
 const firstNames = [
@@ -86,16 +100,40 @@ export const employees: Employee[] = Array.from({ length: 200 }, (_, index) => {
 
 export const currentEmployee = employees[8] ?? employees[0];
 
+const standardTerms = [
+  "Cannot be exchanged for cash or returned once the code is revealed.",
+  "Use before the expiry date shown on the code.",
+  "Lost codes can be re-sent from your redemption history.",
+];
+
 export const rewards: Reward[] = [
   {
     id: "amazon-500",
     brand: "Amazon",
-    title: "Amazon shopping voucher",
+    title: "Amazon Pay e-gift card",
     points: 500,
     value: 500,
-    category: "Shopping",
+    category: "Ecommerce",
     taxNature: "Non-cash gift",
     accent: "A",
+    delivery: "Code",
+    popularity: 98,
+    validityMonths: 12,
+    terms: standardTerms,
+  },
+  {
+    id: "flipkart-1000",
+    brand: "Flipkart",
+    title: "Flipkart gift voucher",
+    points: 1000,
+    value: 1000,
+    category: "Ecommerce",
+    taxNature: "Non-cash gift",
+    accent: "F",
+    delivery: "Code",
+    popularity: 90,
+    validityMonths: 12,
+    terms: standardTerms,
   },
   {
     id: "swiggy-300",
@@ -106,6 +144,10 @@ export const rewards: Reward[] = [
     category: "Food",
     taxNature: "Meal voucher",
     accent: "S",
+    delivery: "Link",
+    popularity: 95,
+    validityMonths: 6,
+    terms: ["Valid on food orders only.", ...standardTerms],
   },
   {
     id: "fuel-1000",
@@ -116,6 +158,10 @@ export const rewards: Reward[] = [
     category: "Fuel",
     taxNature: "Non-cash gift",
     accent: "IO",
+    delivery: "Code",
+    popularity: 80,
+    validityMonths: 12,
+    terms: ["Valid at participating IndianOil outlets.", ...standardTerms],
   },
   {
     id: "bookmyshow-500",
@@ -126,26 +172,60 @@ export const rewards: Reward[] = [
     category: "Experience",
     taxNature: "Non-cash gift",
     accent: "B",
+    delivery: "Link",
+    popularity: 70,
+    isNew: true,
+    validityMonths: 3,
+    terms: ["Two tickets, any show before the expiry date.", ...standardTerms],
   },
   {
     id: "akshaya-250",
     brand: "Akshaya Patra",
-    title: "Sponsor school meals",
+    title: "Donate 25 school meals",
     points: 250,
     value: 250,
     category: "Donation",
     taxNature: "Non-cash gift",
     accent: "AP",
+    delivery: "Link",
+    popularity: 55,
+    validityMonths: 0,
+    terms: [
+      "A thank-you certificate is sent to you on WhatsApp.",
+      "80G receipt available on request.",
+    ],
+  },
+  {
+    id: "rkm-tshirt",
+    brand: "Radha Krishna Mills",
+    title: "Company cotton T-shirt",
+    points: 400,
+    value: 400,
+    category: "Merchandise",
+    taxNature: "Non-cash gift",
+    accent: "RK",
+    delivery: "Physical",
+    popularity: 60,
+    isNew: true,
+    validityMonths: 0,
+    terms: ["Collect from HR at your location within 7 days.", "Sizes S to XXL."],
   },
   {
     id: "upi-1000",
-    brand: "UPI",
-    title: "UPI cash reward",
+    brand: "UPI cash-out",
+    title: "₹ 1,000 to your UPI",
     points: 1100,
     value: 1000,
-    category: "Shopping",
+    category: "Ecommerce",
     taxNature: "Cash equivalent",
     accent: "₹",
+    delivery: "UPI",
+    popularity: 85,
+    validityMonths: 0,
+    terms: [
+      "Cash rewards are fully taxable and shown in your payslip.",
+      "Paid to your registered UPI ID within 2 working days.",
+    ],
   },
 ];
 
