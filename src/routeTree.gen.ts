@@ -10,33 +10,173 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MeRouteImport } from './routes/me'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginOtpRouteImport } from './routes/login.otp'
+import { Route as MePreferencesRouteImport } from './routes/me.preferences'
+import { Route as MeRecognitionsRouteImport } from './routes/me.recognitions'
+import { Route as MeRedeemRouteImport } from './routes/me.redeem'
+import { Route as MeShoutoutRouteImport } from './routes/me.shoutout'
+import { Route as MeTrackingRouteImport } from './routes/me.tracking'
+import { Route as MeWalletRouteImport } from './routes/me.wallet'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DesignSystemRoute = DesignSystemRouteImport.update({
+  id: '/design-system',
+  path: '/design-system',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginOtpRoute = LoginOtpRouteImport.update({
+  id: '/otp',
+  path: '/otp',
+  getParentRoute: () => LoginRoute,
+} as any)
+const MePreferencesRoute = MePreferencesRouteImport.update({
+  id: '/preferences',
+  path: '/preferences',
+  getParentRoute: () => MeRoute,
+} as any)
+const MeRecognitionsRoute = MeRecognitionsRouteImport.update({
+  id: '/recognitions',
+  path: '/recognitions',
+  getParentRoute: () => MeRoute,
+} as any)
+const MeRedeemRoute = MeRedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => MeRoute,
+} as any)
+const MeShoutoutRoute = MeShoutoutRouteImport.update({
+  id: '/shoutout',
+  path: '/shoutout',
+  getParentRoute: () => MeRoute,
+} as any)
+const MeTrackingRoute = MeTrackingRouteImport.update({
+  id: '/tracking',
+  path: '/tracking',
+  getParentRoute: () => MeRoute,
+} as any)
+const MeWalletRoute = MeWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => MeRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/design-system': typeof DesignSystemRoute
+  '/login': typeof LoginRouteWithChildren
+  '/me': typeof MeRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/login/otp': typeof LoginOtpRoute
+  '/me/preferences': typeof MePreferencesRoute
+  '/me/recognitions': typeof MeRecognitionsRoute
+  '/me/redeem': typeof MeRedeemRoute
+  '/me/shoutout': typeof MeShoutoutRoute
+  '/me/tracking': typeof MeTrackingRoute
+  '/me/wallet': typeof MeWalletRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/design-system': typeof DesignSystemRoute
+  '/login': typeof LoginRouteWithChildren
+  '/me': typeof MeRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/login/otp': typeof LoginOtpRoute
+  '/me/preferences': typeof MePreferencesRoute
+  '/me/recognitions': typeof MeRecognitionsRoute
+  '/me/redeem': typeof MeRedeemRoute
+  '/me/shoutout': typeof MeShoutoutRoute
+  '/me/tracking': typeof MeTrackingRoute
+  '/me/wallet': typeof MeWalletRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/design-system': typeof DesignSystemRoute
+  '/login': typeof LoginRouteWithChildren
+  '/me': typeof MeRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/login/otp': typeof LoginOtpRoute
+  '/me/preferences': typeof MePreferencesRoute
+  '/me/recognitions': typeof MeRecognitionsRoute
+  '/me/redeem': typeof MeRedeemRoute
+  '/me/shoutout': typeof MeShoutoutRoute
+  '/me/tracking': typeof MeTrackingRoute
+  '/me/wallet': typeof MeWalletRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/design-system'
+    | '/login'
+    | '/me'
+    | '/onboarding'
+    | '/login/otp'
+    | '/me/preferences'
+    | '/me/recognitions'
+    | '/me/redeem'
+    | '/me/shoutout'
+    | '/me/tracking'
+    | '/me/wallet'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/design-system'
+    | '/login'
+    | '/me'
+    | '/onboarding'
+    | '/login/otp'
+    | '/me/preferences'
+    | '/me/recognitions'
+    | '/me/redeem'
+    | '/me/shoutout'
+    | '/me/tracking'
+    | '/me/wallet'
+  id:
+    | '__root__'
+    | '/'
+    | '/design-system'
+    | '/login'
+    | '/me'
+    | '/onboarding'
+    | '/login/otp'
+    | '/me/preferences'
+    | '/me/recognitions'
+    | '/me/redeem'
+    | '/me/shoutout'
+    | '/me/tracking'
+    | '/me/wallet'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DesignSystemRoute: typeof DesignSystemRoute
+  LoginRoute: typeof LoginRouteWithChildren
+  MeRoute: typeof MeRouteWithChildren
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +188,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/design-system': {
+      id: '/design-system'
+      path: '/design-system'
+      fullPath: '/design-system'
+      preLoaderRoute: typeof DesignSystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/otp': {
+      id: '/login/otp'
+      path: '/otp'
+      fullPath: '/login/otp'
+      preLoaderRoute: typeof LoginOtpRouteImport
+      parentRoute: typeof LoginRoute
+    }
+    '/me/preferences': {
+      id: '/me/preferences'
+      path: '/preferences'
+      fullPath: '/me/preferences'
+      preLoaderRoute: typeof MePreferencesRouteImport
+      parentRoute: typeof MeRoute
+    }
+    '/me/recognitions': {
+      id: '/me/recognitions'
+      path: '/recognitions'
+      fullPath: '/me/recognitions'
+      preLoaderRoute: typeof MeRecognitionsRouteImport
+      parentRoute: typeof MeRoute
+    }
+    '/me/redeem': {
+      id: '/me/redeem'
+      path: '/redeem'
+      fullPath: '/me/redeem'
+      preLoaderRoute: typeof MeRedeemRouteImport
+      parentRoute: typeof MeRoute
+    }
+    '/me/shoutout': {
+      id: '/me/shoutout'
+      path: '/shoutout'
+      fullPath: '/me/shoutout'
+      preLoaderRoute: typeof MeShoutoutRouteImport
+      parentRoute: typeof MeRoute
+    }
+    '/me/tracking': {
+      id: '/me/tracking'
+      path: '/tracking'
+      fullPath: '/me/tracking'
+      preLoaderRoute: typeof MeTrackingRouteImport
+      parentRoute: typeof MeRoute
+    }
+    '/me/wallet': {
+      id: '/me/wallet'
+      path: '/wallet'
+      fullPath: '/me/wallet'
+      preLoaderRoute: typeof MeWalletRouteImport
+      parentRoute: typeof MeRoute
+    }
   }
 }
 
+interface LoginRouteChildren {
+  LoginOtpRoute: typeof LoginOtpRoute
+}
+
+const LoginRouteChildren: LoginRouteChildren = {
+  LoginOtpRoute: LoginOtpRoute,
+}
+
+const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
+
+interface MeRouteChildren {
+  MePreferencesRoute: typeof MePreferencesRoute
+  MeRecognitionsRoute: typeof MeRecognitionsRoute
+  MeRedeemRoute: typeof MeRedeemRoute
+  MeShoutoutRoute: typeof MeShoutoutRoute
+  MeTrackingRoute: typeof MeTrackingRoute
+  MeWalletRoute: typeof MeWalletRoute
+}
+
+const MeRouteChildren: MeRouteChildren = {
+  MePreferencesRoute: MePreferencesRoute,
+  MeRecognitionsRoute: MeRecognitionsRoute,
+  MeRedeemRoute: MeRedeemRoute,
+  MeShoutoutRoute: MeShoutoutRoute,
+  MeTrackingRoute: MeTrackingRoute,
+  MeWalletRoute: MeWalletRoute,
+}
+
+const MeRouteWithChildren = MeRoute._addFileChildren(MeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DesignSystemRoute: DesignSystemRoute,
+  LoginRoute: LoginRouteWithChildren,
+  MeRoute: MeRouteWithChildren,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
