@@ -302,7 +302,7 @@ export const auditLog = Array.from({ length: 18 }, (_, i) => {
     ["HR Admin", "Moved budget", "₹20,000 Quality → Sales"],
     ["System", "Consent withdrawn", "WhatsApp messages · EMP-0031"],
   ] as const;
-  const [actor, action, target] = actions[i % actions.length];
+  const [actor, action, target] = actions[i % actions.length] ?? (["System", "Event", ""] as const);
   return {
     id: `AU-${9100 - i}`,
     at: `${String(8 - Math.floor(i / 6)).padStart(2, "0")}/10/2026 ${String(17 - (i % 6)).padStart(2, "0")}:${String((i * 7) % 60).padStart(2, "0")}`,

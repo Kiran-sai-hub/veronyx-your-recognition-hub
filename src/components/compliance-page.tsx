@@ -72,7 +72,7 @@ export function CompliancePage() {
     setRequests((list) =>
       list.map((r) => {
         if (r.id !== id) return r;
-        const next = stages[Math.min(stages.indexOf(r.stage) + 1, stages.length - 1)];
+        const next = stages[Math.min(stages.indexOf(r.stage) + 1, stages.length - 1)] ?? r.stage;
         return { ...r, stage: next };
       }),
     );
