@@ -182,6 +182,13 @@ export const stepCatalog: Record<
         type: "select",
         options: ["Reporting manager", "Department head", "HR Admin", "Owner"],
       },
+      {
+        key: "chain",
+        label: "Approval levels",
+        type: "select",
+        options: ["Single level", "Then HR Admin", "Then HR Admin, then Owner"],
+      },
+      { key: "chain_above", label: "Extra levels only above", type: "number", suffix: "₹" },
       { key: "timeout_hours", label: "Timeout", type: "number", suffix: "hours" },
       {
         key: "on_timeout",
@@ -193,6 +200,8 @@ export const stepCatalog: Record<
     ],
     defaults: {
       approvers: "Reporting manager",
+      chain: "Single level",
+      chain_above: 2500,
       timeout_hours: 48,
       on_timeout: "escalate to HR",
       allow_modify: true,
@@ -1270,9 +1279,15 @@ export function describeStep(s: Step): string {
       return `${metric("metric")} ${c["operator"]} ${c["value"]}`;
     case "branch":
       return `If ${c["condition"]} → ${c["then"]}; else → ${c["else"]}`;
-    case "approval":
-      return `${c["approvers"]} · ${c["timeout_hours"]}h, then ${c["on_timeout"]}`;
+    case "approval": {
+      const chain =
+        c["chain"] && c["chain"] !== "Single level"
+          ? ` · ${String(c["chain"]).toLowerCase()} above ₹${Number(c["chain_above"] ?? 0).toLocaleString("en-IN")}`
+          : "";
+      return `${c["approvers"]}${chain} · ${c["timeout_hours"]}h, then ${c["on_timeout"]}`;
+    }
     case "reward":
+      if (c["amount_mode"] === "formula") return `Formula: ${String(c["formula"])}`;
       return Number(c["amount"]) > 0
         ? `${Number(c["amount"]).toLocaleString("en-IN")} ${c["currency"]} · ${String(c["reward_kind"]).replace(/_/g, " ")}`
         : "Amount missing";

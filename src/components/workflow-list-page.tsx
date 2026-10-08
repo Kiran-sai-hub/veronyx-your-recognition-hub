@@ -360,6 +360,13 @@ export function WorkflowListPage({
           <h2 id="templates" className="flex items-center gap-2 text-lg font-semibold">
             <LayoutTemplate className="size-5 text-primary" /> Template library
           </h2>
+          <p className="text-sm text-muted-foreground">
+            More by industry, from partners and other businesses, in the{" "}
+            <a href="/workflows/templates" className="text-primary underline">
+              template marketplace
+            </a>
+            .
+          </p>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {workflowTemplates.map((t) => (
               <Card key={t.id} className="rounded-lg">

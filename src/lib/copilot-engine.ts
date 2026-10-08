@@ -444,7 +444,7 @@ export function respond(question: string, persona: string, queriesUsed = 0): Cop
   if (q.includes("approval")) {
     return {
       kind: "text",
-      text: "6 approvals are waiting. 2 are close to or past their 48-hour SLA (Deepa Patel's nomination passed it 4 hours ago). 1 would take Pooja Kumar past the ₹ 15,000 yearly gift limit, and 1 is queued because the Manufacturing B pool is used up.",
+      text: "7 approvals are waiting (one is a 3-level long-service approval at level 2). 2 are close to or past their 48-hour SLA (Deepa Patel's nomination passed it 4 hours ago). 1 would take Pooja Kumar past the ₹ 15,000 yearly gift limit, and 1 is queued because the Manufacturing B pool is used up.",
       sources: ["Approvals queue · live"],
       confidence: "high",
     };

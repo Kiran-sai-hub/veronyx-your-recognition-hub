@@ -42,6 +42,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Skeleton } from "@/components/ui/skeleton";
 import { PullToRefresh } from "@/components/library/pull-to-refresh";
 import { SegmentedControl } from "@/components/library/segmented-control";
+import { Timeline } from "@/components/library/timeline";
 import { Textarea } from "@/components/ui/textarea";
 import {
   type Approval,
@@ -251,8 +252,11 @@ export function ApprovalsPage({
     } else if (queuedCount) {
       toast.warning("Budget exhausted. This approval will be queued.", { action: undo });
     } else {
+      const next = single?.chain?.find((c) => c.state === "waiting");
       const copy = {
-        approve: "Approved. Reward will be processed.",
+        approve: next
+          ? `Approved at your level. Sent to ${next.name} (${next.level}) for the next approval.`
+          : "Approved. Reward will be processed.",
         modify: "Modified and approved. Reward will be processed.",
         reject: "Rejected. The requester has been told why.",
         escalate: `Escalated to ${target}.`,
@@ -843,6 +847,32 @@ function ApprovalDetail({
               </li>
             ))}
           </ul>
+          {item.chain && (
+            <div className="rounded-md border border-border p-3 text-sm">
+              <p className="mb-3 font-medium">
+                Approval chain · level {item.chain.findIndex((c) => c.state === "pending") + 1} of{" "}
+                {item.chain.length}
+              </p>
+              <Timeline
+                items={item.chain.map((c) => ({
+                  id: c.level,
+                  title: `${c.level} · ${c.name}`,
+                  time:
+                    c.state === "approved"
+                      ? `Approved ${c.at ?? ""}`
+                      : c.state === "pending"
+                        ? "Deciding now"
+                        : "Waits for the level before",
+                  tone:
+                    c.state === "approved"
+                      ? "success"
+                      : c.state === "pending"
+                        ? "warning"
+                        : "default",
+                }))}
+              />
+            </div>
+          )}
           <div className="rounded-md bg-muted p-3 text-sm">
             <p className="font-medium">Decision trace</p>
             <p className="text-muted-foreground">“{item.trace}”</p>

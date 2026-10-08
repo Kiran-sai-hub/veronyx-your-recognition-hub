@@ -46,6 +46,8 @@ export type Approval = {
   budget: { pool: string; remaining: number };
   tax: { cumulative: number; nature: "Non-cash gift" | "Cash equivalent" | "Meal voucher" };
   flags: string[];
+  /** Multi-step approval (P3): each level signs off in turn. */
+  chain?: { level: string; name: string; state: "approved" | "pending" | "waiting"; at?: string }[];
 };
 
 const person = (index: number) => {
@@ -361,6 +363,52 @@ export const approvals: Approval[] = [
     budget: { pool: "Sales A — Vikram", remaining: 18700 },
     tax: { cumulative: 5400, nature: "Non-cash gift" },
     flags: [],
+  },
+  {
+    id: "ap-8",
+    ...person(71),
+    workflow: "Long service awards",
+    workflowId: null,
+    recognitionType: "10 years of service",
+    reason: "Completes 10 years with Radha Krishna Mills on 21/10/2026",
+    source: "Campaign · Long service awards",
+    points: 5000,
+    rupees: 5000,
+    currency: "INR",
+    rewardKind: "voucher_direct",
+    maxPoints: 5000,
+    hoursAgo: 20,
+    slaHours: 72,
+    status: "pending",
+    submitted: "07/10/2026",
+    evidence: true,
+    metrics: [
+      { label: "Date of joining", value: "21/10/2016", source: "Employee import · HRMS" },
+      { label: "Milestone reward", value: "₹ 5,000 for 10 years", source: "Campaign rules" },
+    ],
+    trace: "Rewards above ₹ 2,500 need three levels: department head, HR Admin, then the Owner.",
+    traceSteps: [
+      { title: "Event", detail: "10-year work anniversary on 21/10/2026", passed: true },
+      { title: "Level 1 · Department head", detail: "Approved by Farhan Qureshi", passed: true },
+      { title: "Level 2 · HR Admin", detail: "Waiting for Lakshmi Menon", passed: null },
+      { title: "Level 3 · Owner", detail: "Waiting for level 2", passed: null },
+    ],
+    sourceRecords: [
+      { id: "HRMS-EMP-0072", source: "Employee import", summary: "Joined 21/10/2016 · Operations" },
+    ],
+    budget: { pool: "Operations", remaining: 47800 },
+    tax: { cumulative: 2100, nature: "Non-cash gift" },
+    flags: ["Multi-step approval · level 2 of 3"],
+    chain: [
+      {
+        level: "Department head",
+        name: "Farhan Qureshi",
+        state: "approved",
+        at: "07/10/2026 16:05",
+      },
+      { level: "HR Admin", name: "Lakshmi Menon", state: "pending" },
+      { level: "Owner", name: "Ramesh Krishnan", state: "waiting" },
+    ],
   },
 ];
 

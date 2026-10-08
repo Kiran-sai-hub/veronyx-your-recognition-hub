@@ -1,4 +1,4 @@
-import { Bell, Gift, QrCode, Send } from "lucide-react";
+import { Bell, Gift, Mic, QrCode, Send } from "lucide-react";
 import { useState } from "react";
 
 import { WhatsAppIcon } from "@/components/domain-icons";
@@ -20,7 +20,7 @@ type Bubble = { id: number; from: "me" | "bot"; text: string; time: string };
 type LogRow = {
   time: string;
   template: string;
-  status: "delivered" | "suppressed_no_optin" | "consent";
+  status: "delivered" | "received" | "suppressed_no_optin" | "consent";
   detail: string;
 };
 
@@ -84,6 +84,31 @@ export function WhatsappSimulator() {
       { from: "bot", text: result.reply },
     ]);
     setInput("");
+  };
+
+  /** Voice note (checklist §9.4): transcribed on the server, then handled like typed text. */
+  const voiceNote = () => {
+    const transcript =
+      state.language === "ta"
+        ? "THANKS @Priya இரவு ஷிஃப்டில் லூம் சரிசெய்ததற்கு"
+        : state.language === "hi"
+          ? "THANKS @Priya रात की शिफ्ट में लूम ठीक करने के लिए"
+          : "THANKS @Priya for fixing the loom on the night shift";
+    const result = botReply(transcript, state);
+    setState(result.state);
+    setLog((l) => [
+      {
+        time: now(),
+        template: "voice_note_inbound",
+        status: "received",
+        detail: `Voice note 0:05 transcribed (${state.language}) · audio deleted after transcription`,
+      },
+      ...l,
+    ]);
+    push([
+      { from: "me", text: `🎤 Voice note · 0:05\n“${transcript}”` },
+      { from: "bot", text: result.reply },
+    ]);
   };
 
   const notify = () => {
@@ -181,7 +206,7 @@ export function WhatsappSimulator() {
               <div
                 key={b.id}
                 className={cn(
-                  "max-w-[85%] rounded-lg px-3 py-2 text-[15px] leading-snug text-black shadow-sm dark:text-foreground",
+                  "max-w-[85%] whitespace-pre-line rounded-lg px-3 py-2 text-[15px] leading-snug text-black shadow-sm dark:text-foreground",
                   b.from === "me"
                     ? "ml-auto bg-[#dcf8c6] dark:bg-success/20"
                     : "bg-white dark:bg-card",
@@ -220,6 +245,16 @@ export function WhatsappSimulator() {
               aria-label="Message"
               maxLength={200}
             />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="Send a voice note"
+              title="Hold to record a voice note"
+              onClick={voiceNote}
+            >
+              <Mic className="size-4" />
+            </Button>
             <Button type="submit" size="icon" aria-label="Send">
               <Send className="size-4" />
             </Button>
@@ -253,6 +288,10 @@ export function WhatsappSimulator() {
                 <li>
                   <b>STOP</b> — all messages suppressed immediately.
                 </li>
+                <li>
+                  <b>🎤 Voice note</b> — say the command instead of typing; it is transcribed in the
+                  worker’s language.
+                </li>
               </ul>
               <p className="mt-3 text-muted-foreground">
                 Status:{" "}
@@ -285,7 +324,7 @@ export function WhatsappSimulator() {
                       </span>
                       <StatusBadge
                         tone={
-                          row.status === "delivered"
+                          row.status === "delivered" || row.status === "received"
                             ? "success"
                             : row.status === "consent"
                               ? "neutral"

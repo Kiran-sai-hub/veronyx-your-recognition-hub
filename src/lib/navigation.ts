@@ -63,6 +63,10 @@ export const navItems: NavItem[] = [
     matches: ["/workflows"],
     access: { ...ownerHr, manager: "view", employee: "none" },
     viewNote: "You can view workflows that cover your team. Ask HR to change one.",
+    children: [
+      { to: "/workflows", label: "All workflows" },
+      { to: "/workflows/templates", label: "Template marketplace" },
+    ],
   },
   {
     key: "approvals",

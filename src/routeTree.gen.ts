@@ -50,6 +50,7 @@ import { Route as MeShoutoutRouteImport } from './routes/me.shoutout'
 import { Route as MeTrackingRouteImport } from './routes/me.tracking'
 import { Route as MeWalletRouteImport } from './routes/me.wallet'
 import { Route as WorkflowsIndexRouteImport } from './routes/workflows.index'
+import { Route as WorkflowsTemplatesRouteImport } from './routes/workflows.templates'
 import { Route as WorkflowsIdIndexRouteImport } from './routes/workflows.$id.index'
 import { Route as WorkflowsIdRunsRouteImport } from './routes/workflows.$id.runs'
 
@@ -258,6 +259,11 @@ const WorkflowsIndexRoute = WorkflowsIndexRouteImport.update({
   path: '/workflows/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkflowsTemplatesRoute = WorkflowsTemplatesRouteImport.update({
+  id: '/workflows/templates',
+  path: '/workflows/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorkflowsIdIndexRoute = WorkflowsIdIndexRouteImport.update({
   id: '/workflows/$id/',
   path: '/workflows/$id/',
@@ -305,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows/templates': typeof WorkflowsTemplatesRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByTo {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows/templates': typeof WorkflowsTemplatesRoute
   '/boards': typeof BoardsIndexRoute
   '/connectors': typeof ConnectorsIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows/templates': typeof WorkflowsTemplatesRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -439,6 +448,7 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows/templates'
     | '/boards/'
     | '/connectors/'
     | '/insights/'
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows/templates'
     | '/boards'
     | '/connectors'
     | '/insights'
@@ -525,6 +536,7 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows/templates'
     | '/boards/'
     | '/connectors/'
     | '/insights/'
@@ -562,6 +574,7 @@ export interface RootRouteChildren {
   DashboardHrRoute: typeof DashboardHrRoute
   DashboardManagerRoute: typeof DashboardManagerRoute
   DashboardOwnerRoute: typeof DashboardOwnerRoute
+  WorkflowsTemplatesRoute: typeof WorkflowsTemplatesRoute
   BoardsIndexRoute: typeof BoardsIndexRoute
   WorkflowsIndexRoute: typeof WorkflowsIndexRoute
   WorkflowsIdRunsRoute: typeof WorkflowsIdRunsRoute
@@ -857,6 +870,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkflowsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workflows/templates': {
+      id: '/workflows/templates'
+      path: '/workflows/templates'
+      fullPath: '/workflows/templates'
+      preLoaderRoute: typeof WorkflowsTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/workflows/$id/': {
       id: '/workflows/$id/'
       path: '/workflows/$id'
@@ -963,6 +983,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardHrRoute: DashboardHrRoute,
   DashboardManagerRoute: DashboardManagerRoute,
   DashboardOwnerRoute: DashboardOwnerRoute,
+  WorkflowsTemplatesRoute: WorkflowsTemplatesRoute,
   BoardsIndexRoute: BoardsIndexRoute,
   WorkflowsIndexRoute: WorkflowsIndexRoute,
   WorkflowsIdRunsRoute: WorkflowsIdRunsRoute,
