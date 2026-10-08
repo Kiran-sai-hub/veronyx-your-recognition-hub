@@ -51,6 +51,9 @@ type DemoState = {
   savedWorkflows: SavedWorkflow[];
   employeePoints: number;
   redemptions: Redemption[];
+  /** Boards created or edited in the demo (full definitions). */
+  savedBoards: { id: string; name: string; status: "draft" | "active"; board: unknown }[];
+  saveBoard: (b: { id: string; name: string; status: "draft" | "active"; board: unknown }) => void;
   setEmptyOrg: (value: boolean) => void;
   finishOnboarding: () => void;
   decide: (id: string, decision: Decision) => void;
@@ -72,6 +75,7 @@ const initial = {
   savedWorkflows: [],
   employeePoints: 1850,
   redemptions: [],
+  savedBoards: [],
 };
 
 export const useDemoStore = create<DemoState>()(
@@ -79,6 +83,7 @@ export const useDemoStore = create<DemoState>()(
     (set) => ({
       ...initial,
       setEmptyOrg: (emptyOrg) => set({ emptyOrg }),
+      saveBoard: (b) => set((s) => ({ savedBoards: [b, ...s.savedBoards.filter((x) => x.id !== b.id)] })),
       finishOnboarding: () => set({ onboarded: true, emptyOrg: true }),
       decide: (id, decision) => set((s) => ({ decisions: { ...s.decisions, [id]: decision } })),
       undoDecision: (id) =>

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { BoardsPage } from "@/components/boards-page";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, useCopilotEnabled } from "@/store/app-store";
 
 export const Route = createFileRoute("/boards/")({
   head: () => ({
@@ -27,11 +27,17 @@ export const Route = createFileRoute("/boards/")({
 function RoutePage() {
   const navigate = useNavigate();
   const openCopilot = useAppStore((state) => state.openCopilot);
+  const persona = useAppStore((state) => state.persona);
+  const aiEnabled = useCopilotEnabled();
   return (
     <AdminRoutePage pathname="/boards">
       <BoardsPage
-        onOpenBoard={(id) => navigate({ to: "/boards/$id", params: { id } })}
+        onOpenBoard={(id, search) =>
+          navigate({ to: "/boards/$id", params: { id }, search: search ?? {} })
+        }
         onAskAi={(prompt) => openCopilot(prompt)}
+        aiEnabled={aiEnabled}
+        readOnly={persona === "manager"}
       />
     </AdminRoutePage>
   );

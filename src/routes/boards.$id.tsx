@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { BoardConfigPage } from "@/components/board-config-page";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, useCopilotEnabled } from "@/store/app-store";
 
 export const Route = createFileRoute("/boards/$id")({
   head: () => ({
@@ -23,15 +23,33 @@ export const Route = createFileRoute("/boards/$id")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { industry?: string | undefined; role?: string | undefined; blank?: string | undefined } => ({
+    industry: typeof search["industry"] === "string" ? search["industry"] : undefined,
+    role: typeof search["role"] === "string" ? search["role"] : undefined,
+    blank: typeof search["blank"] === "string" ? search["blank"] : undefined,
+  }),
   component: RoutePage,
 });
 
 function RoutePage() {
   const { id } = Route.useParams();
+  const { industry, role, blank } = Route.useSearch();
   const openCopilot = useAppStore((state) => state.openCopilot);
+  const persona = useAppStore((state) => state.persona);
+  const aiEnabled = useCopilotEnabled();
   return (
     <AdminRoutePage pathname={`/boards/${id}`}>
-      <BoardConfigPage boardId={id} onAskAi={(prompt) => openCopilot(prompt)} />
+      <BoardConfigPage
+        key={`${id}-${industry ?? ""}-${role ?? ""}-${blank ?? ""}`}
+        boardId={id}
+        industry={industry}
+        role={role}
+        readOnly={persona === "manager"}
+        aiEnabled={aiEnabled}
+        onAskAi={(prompt) => openCopilot(prompt)}
+      />
     </AdminRoutePage>
   );
 }
