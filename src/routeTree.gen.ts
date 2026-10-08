@@ -17,9 +17,11 @@ import { Route as CampaignsRouteImport } from './routes/campaigns'
 import { Route as CaptureRouteImport } from './routes/capture'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ConnectorsRouteImport } from './routes/connectors'
+import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as FairnessRouteImport } from './routes/fairness'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as KioskRouteImport } from './routes/kiosk'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -27,6 +29,7 @@ import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as WhatsappRouteImport } from './routes/whatsapp'
 import { Route as ApiInsightsRouteImport } from './routes/api/insights'
 import { Route as BoardsIndexRouteImport } from './routes/boards.index'
 import { Route as BoardsIdRouteImport } from './routes/boards.$id'
@@ -88,6 +91,11 @@ const ConnectorsRoute = ConnectorsRouteImport.update({
   path: '/connectors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CopilotRoute = CopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
   id: '/design-system',
   path: '/design-system',
@@ -101,6 +109,11 @@ const FairnessRoute = FairnessRouteImport.update({
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KioskRoute = KioskRouteImport.update({
+  id: '/kiosk',
+  path: '/kiosk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -136,6 +149,11 @@ const RewardsRoute = RewardsRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhatsappRoute = WhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiInsightsRoute = ApiInsightsRouteImport.update({
@@ -248,9 +266,11 @@ export interface FileRoutesByFullPath {
   '/capture': typeof CaptureRoute
   '/compliance': typeof ComplianceRoute
   '/connectors': typeof ConnectorsRouteWithChildren
+  '/copilot': typeof CopilotRoute
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/kiosk': typeof KioskRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -258,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/whatsapp': typeof WhatsappRoute
   '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
@@ -287,8 +308,10 @@ export interface FileRoutesByTo {
   '/campaigns': typeof CampaignsRoute
   '/capture': typeof CaptureRoute
   '/compliance': typeof ComplianceRoute
+  '/copilot': typeof CopilotRoute
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
+  '/kiosk': typeof KioskRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -296,6 +319,7 @@ export interface FileRoutesByTo {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/whatsapp': typeof WhatsappRoute
   '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
@@ -327,9 +351,11 @@ export interface FileRoutesById {
   '/capture': typeof CaptureRoute
   '/compliance': typeof ComplianceRoute
   '/connectors': typeof ConnectorsRouteWithChildren
+  '/copilot': typeof CopilotRoute
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/kiosk': typeof KioskRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -337,6 +363,7 @@ export interface FileRoutesById {
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
   '/settings': typeof SettingsRoute
+  '/whatsapp': typeof WhatsappRoute
   '/api/insights': typeof ApiInsightsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
@@ -369,9 +396,11 @@ export interface FileRouteTypes {
     | '/capture'
     | '/compliance'
     | '/connectors'
+    | '/copilot'
     | '/design-system'
     | '/fairness'
     | '/insights'
+    | '/kiosk'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -379,6 +408,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/whatsapp'
     | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
@@ -408,8 +438,10 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/capture'
     | '/compliance'
+    | '/copilot'
     | '/design-system'
     | '/fairness'
+    | '/kiosk'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -417,6 +449,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/whatsapp'
     | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
@@ -447,9 +480,11 @@ export interface FileRouteTypes {
     | '/capture'
     | '/compliance'
     | '/connectors'
+    | '/copilot'
     | '/design-system'
     | '/fairness'
     | '/insights'
+    | '/kiosk'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -457,6 +492,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/rewards'
     | '/settings'
+    | '/whatsapp'
     | '/api/insights'
     | '/boards/$id'
     | '/connectors/mapping'
@@ -488,9 +524,11 @@ export interface RootRouteChildren {
   CaptureRoute: typeof CaptureRoute
   ComplianceRoute: typeof ComplianceRoute
   ConnectorsRoute: typeof ConnectorsRouteWithChildren
+  CopilotRoute: typeof CopilotRoute
   DesignSystemRoute: typeof DesignSystemRoute
   FairnessRoute: typeof FairnessRoute
   InsightsRoute: typeof InsightsRouteWithChildren
+  KioskRoute: typeof KioskRoute
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
@@ -498,6 +536,7 @@ export interface RootRouteChildren {
   PeopleRoute: typeof PeopleRoute
   RewardsRoute: typeof RewardsRoute
   SettingsRoute: typeof SettingsRoute
+  WhatsappRoute: typeof WhatsappRoute
   ApiInsightsRoute: typeof ApiInsightsRoute
   BoardsIdRoute: typeof BoardsIdRoute
   DashboardHrRoute: typeof DashboardHrRoute
@@ -567,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/copilot': {
+      id: '/copilot'
+      path: '/copilot'
+      fullPath: '/copilot'
+      preLoaderRoute: typeof CopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/design-system': {
       id: '/design-system'
       path: '/design-system'
@@ -586,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kiosk': {
+      id: '/kiosk'
+      path: '/kiosk'
+      fullPath: '/kiosk'
+      preLoaderRoute: typeof KioskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -635,6 +688,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whatsapp': {
+      id: '/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/whatsapp'
+      preLoaderRoute: typeof WhatsappRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/insights': {
@@ -847,9 +907,11 @@ const rootRouteChildren: RootRouteChildren = {
   CaptureRoute: CaptureRoute,
   ComplianceRoute: ComplianceRoute,
   ConnectorsRoute: ConnectorsRouteWithChildren,
+  CopilotRoute: CopilotRoute,
   DesignSystemRoute: DesignSystemRoute,
   FairnessRoute: FairnessRoute,
   InsightsRoute: InsightsRouteWithChildren,
+  KioskRoute: KioskRoute,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
@@ -857,6 +919,7 @@ const rootRouteChildren: RootRouteChildren = {
   PeopleRoute: PeopleRoute,
   RewardsRoute: RewardsRoute,
   SettingsRoute: SettingsRoute,
+  WhatsappRoute: WhatsappRoute,
   ApiInsightsRoute: ApiInsightsRoute,
   BoardsIdRoute: BoardsIdRoute,
   DashboardHrRoute: DashboardHrRoute,
