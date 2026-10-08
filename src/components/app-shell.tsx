@@ -65,7 +65,7 @@ type AppShellProps = { children: React.ReactNode; pathname: string };
 
 export function AppShell({ children, pathname }: AppShellProps) {
   const { persona, setPersona, theme, setTheme, openCopilot } = useAppStore();
-  const isEmployee = persona === "employee";
+  const isEmployee = pathname.startsWith("/me");
   const navigation = isEmployee ? employeeNavigation : adminNavigation(persona);
   const isActive = (to: string) => (to === "/me" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`));
   const mobileNavigation = isEmployee
