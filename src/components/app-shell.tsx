@@ -1,5 +1,8 @@
 import {
   BarChart3,
+  Bot,
+  Monitor,
+  Smartphone,
   CalendarHeart,
   Scale,
   ShieldCheck,
@@ -65,6 +68,9 @@ function adminNavigation(persona: Persona) {
     { to: "/campaigns", label: "Campaigns", icon: CalendarHeart },
     { to: "/compliance", label: "Compliance", icon: ShieldCheck },
     { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/copilot", label: "Copilot (full page)", icon: Bot },
+    { to: "/whatsapp", label: "WhatsApp simulator", icon: Smartphone },
+    { to: "/kiosk", label: "Kiosk display", icon: Monitor },
   ];
 }
 
@@ -85,6 +91,8 @@ function screenFor(pathname: string, persona: Persona): string {
   if (pathname.startsWith("/campaigns")) return "campaigns";
   if (pathname.startsWith("/compliance")) return "compliance";
   if (pathname.startsWith("/settings")) return "settings";
+  if (pathname.startsWith("/copilot")) return "copilot";
+  if (pathname.startsWith("/whatsapp")) return "whatsapp";
   if (pathname.startsWith("/dashboard")) return persona;
   return "default";
 }

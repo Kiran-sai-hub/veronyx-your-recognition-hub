@@ -1,4 +1,16 @@
-import { BarChart3, Check, Download, Eye, LockKeyhole, Minus, Plus, RotateCcw, Send, Table2, X } from "lucide-react";
+import {
+  BarChart3,
+  Check,
+  Download,
+  Eye,
+  LockKeyhole,
+  Minus,
+  Plus,
+  RotateCcw,
+  Send,
+  Table2,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
@@ -42,17 +54,32 @@ function TableAnswer({ reply }: { reply: Extract<CopilotReply, { kind: "table" }
   return (
     <div className="mt-3 space-y-3">
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={view === "chart" ? "default" : "outline"} onClick={() => setView("chart")}>
+        <Button
+          size="sm"
+          variant={view === "chart" ? "default" : "outline"}
+          onClick={() => setView("chart")}
+        >
           <BarChart3 className="size-4" /> Chart
         </Button>
-        <Button size="sm" variant={view === "table" ? "default" : "outline"} onClick={() => setView("table")}>
+        <Button
+          size="sm"
+          variant={view === "table" ? "default" : "outline"}
+          onClick={() => setView("table")}
+        >
           <Table2 className="size-4" /> Table
         </Button>
         <Button
           size="sm"
           variant="ghost"
           onClick={() =>
-            download("copilot-answer.csv", toCsv([...reply.columns], reply.rows.map((r) => [r.label, String(r.value)])), "text/csv")
+            download(
+              "copilot-answer.csv",
+              toCsv(
+                [...reply.columns],
+                reply.rows.map((r) => [r.label, String(r.value)]),
+              ),
+              "text/csv",
+            )
           }
         >
           <Download className="size-4" /> CSV
@@ -90,7 +117,15 @@ function TableAnswer({ reply }: { reply: Extract<CopilotReply, { kind: "table" }
   );
 }
 
-function Reply({ turn, onAsk, onRetry }: { turn: Turn; onAsk: (q: string) => void; onRetry: () => void }) {
+function Reply({
+  turn,
+  onAsk,
+  onRetry,
+}: {
+  turn: Turn;
+  onAsk: (q: string) => void;
+  onRetry: () => void;
+}) {
   const r = turn.reply;
   if (!r) {
     return (
@@ -106,8 +141,14 @@ function Reply({ turn, onAsk, onRetry }: { turn: Turn; onAsk: (q: string) => voi
   if (r.kind === "timeout" || r.kind === "error") {
     return (
       <div className="rounded-md border border-border p-3 text-sm">
-        <p>{r.kind === "timeout" ? "This is taking longer than 30 seconds, so I stopped." : "I couldn't finish that answer."}</p>
-        <p className="mt-1 text-muted-foreground">You can try again or use the Analytics page directly.</p>
+        <p>
+          {r.kind === "timeout"
+            ? "This is taking longer than 30 seconds, so I stopped."
+            : "I couldn't finish that answer."}
+        </p>
+        <p className="mt-1 text-muted-foreground">
+          You can try again or use the Analytics page directly.
+        </p>
         <Button size="sm" variant="outline" className="mt-2" onClick={onRetry}>
           <RotateCcw className="size-4" /> Try again
         </Button>
@@ -146,7 +187,13 @@ function Reply({ turn, onAsk, onRetry }: { turn: Turn; onAsk: (q: string) => voi
                   s.passed === null && "bg-muted text-muted-foreground",
                 )}
               >
-                {s.passed === true ? <Check className="size-3" /> : s.passed === false ? <X className="size-3" /> : <Minus className="size-3" />}
+                {s.passed === true ? (
+                  <Check className="size-3" />
+                ) : s.passed === false ? (
+                  <X className="size-3" />
+                ) : (
+                  <Minus className="size-3" />
+                )}
               </span>
               <span>
                 <span className="font-medium">
@@ -159,7 +206,9 @@ function Reply({ turn, onAsk, onRetry }: { turn: Turn; onAsk: (q: string) => voi
         </ol>
       )}
       {r.kind === "table" && <TableAnswer reply={r} />}
-      {r.sources.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Based on: {r.sources.join(" · ")}</p>}
+      {r.sources.length > 0 && (
+        <p className="mt-2 text-xs text-muted-foreground">Based on: {r.sources.join(" · ")}</p>
+      )}
     </div>
   );
 }
@@ -180,7 +229,11 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
 
   const updateTurn = (sid: number, tid: number, patch: Partial<Turn>) =>
     setSessions((list) =>
-      list.map((s) => (s.id === sid ? { ...s, turns: s.turns.map((t) => (t.id === tid ? { ...t, ...patch } : t)) } : s)),
+      list.map((s) =>
+        s.id === sid
+          ? { ...s, turns: s.turns.map((t) => (t.id === tid ? { ...t, ...patch } : t)) }
+          : s,
+      ),
     );
 
   const ask = (question: string) => {
@@ -191,14 +244,20 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
     setSessions((list) =>
       list.map((s) =>
         s.id === sid
-          ? { ...s, title: s.turns.length === 0 ? text.slice(0, 40) : s.title, turns: [...s.turns, { id: tid, question: text, reply: null, step: 0 }] }
+          ? {
+              ...s,
+              title: s.turns.length === 0 ? text.slice(0, 40) : s.title,
+              turns: [...s.turns, { id: tid, question: text, reply: null, step: 0 }],
+            }
           : s,
       ),
     );
     setInput("");
     timers.current.push(setTimeout(() => updateTurn(sid, tid, { step: 1 }), 500));
     timers.current.push(setTimeout(() => updateTurn(sid, tid, { step: 2 }), 1100));
-    timers.current.push(setTimeout(() => updateTurn(sid, tid, { reply: respond(text, persona) }), 1600));
+    timers.current.push(
+      setTimeout(() => updateTurn(sid, tid, { reply: respond(text, persona) }), 1600),
+    );
   };
 
   const newSession = () => {
@@ -219,10 +278,15 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
   if (!aiAvailable) {
     return (
       <div className="space-y-6">
-        <PageHeading eyebrow="AI" title="Copilot" description="Ask questions about your recognition programme." />
+        <PageHeading
+          eyebrow="AI"
+          title="Copilot"
+          description="Ask questions about your recognition programme."
+        />
         <Card>
           <CardContent className="p-6 text-sm">
-            AI is turned off for your organisation. Everything still works by hand — use Analytics, Fairness and Workflows directly.
+            AI is turned off for your organisation. Everything still works by hand — use Analytics,
+            Fairness and Workflows directly.
           </CardContent>
         </Card>
       </div>
@@ -282,9 +346,15 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
             )}
             {active?.turns.map((t) => (
               <div key={t.id} className="space-y-3">
-                <p className="ml-auto w-fit max-w-[85%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground">{t.question}</p>
+                <p className="ml-auto w-fit max-w-[85%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground">
+                  {t.question}
+                </p>
                 <div className="max-w-[95%]">
-                  <Reply turn={t} onAsk={ask} onRetry={() => ask(t.question.replace(/timeout|slow|error/gi, "coverage"))} />
+                  <Reply
+                    turn={t}
+                    onAsk={ask}
+                    onRetry={() => ask(t.question.replace(/timeout|slow|error/gi, "coverage"))}
+                  />
                 </div>
               </div>
             ))}

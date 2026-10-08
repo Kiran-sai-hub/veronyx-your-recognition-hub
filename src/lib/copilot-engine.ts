@@ -18,7 +18,12 @@ export type CopilotReply =
       steps: { title: string; detail: string; passed: boolean | null }[];
       sources: string[];
     }
-  | { kind: "refusal"; reason: "protected" | "opinion" | "permission"; text: string; alternatives: string[] }
+  | {
+      kind: "refusal";
+      reason: "protected" | "opinion" | "permission";
+      text: string;
+      alternatives: string[];
+    }
   | { kind: "timeout" }
   | { kind: "error" };
 
@@ -38,15 +43,24 @@ export function respond(question: string, persona: string): CopilotReply {
       alternatives: ["Show coverage by shift", "Show coverage by department"],
     };
   }
-  if (/\b(good|bad|lazy|best|worst) (employee|worker|person)\b/.test(q) || q.includes("should i fire")) {
+  if (
+    /\b(good|bad|lazy|best|worst) (employee|worker|person)\b/.test(q) ||
+    q.includes("should i fire")
+  ) {
     return {
       kind: "refusal",
       reason: "opinion",
       text: "I don't give opinions about people. I can share the facts from their boards and recognitions.",
-      alternatives: [`Why didn't ${decisionTrace.employee} get rewarded?`, "Who hasn't been recognised in 60 days?"],
+      alternatives: [
+        `Why didn't ${decisionTrace.employee} get rewarded?`,
+        "Who hasn't been recognised in 60 days?",
+      ],
     };
   }
-  if ((q.includes("salary") || q.includes("payroll") || q.includes("budget")) && persona === "manager") {
+  if (
+    (q.includes("salary") || q.includes("payroll") || q.includes("budget")) &&
+    persona === "manager"
+  ) {
     return {
       kind: "refusal",
       reason: "permission",
@@ -56,7 +70,14 @@ export function respond(question: string, persona: string): CopilotReply {
   }
 
   if (q.includes("why") && (q.includes("win") || q.includes("reward"))) {
-    const name = findEmployees(q.replace(/why|didn't|did not|get|rewarded|win|\?/g, " ").trim().split(/\s+/).slice(0, 2).join(" "))[0];
+    const name = findEmployees(
+      q
+        .replace(/why|didn't|did not|get|rewarded|win|\?/g, " ")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .join(" "),
+    )[0];
     const trace = explainOutcome(name?.code ?? decisionTrace.code);
     if (trace) {
       const failed = trace.steps.find((s) => s.passed === false);
@@ -102,5 +123,10 @@ export function transcriptToText(
   scope: string,
   messages: { role: "user" | "assistant"; text: string }[],
 ): string {
-  return [`Veronyx Copilot — ${title}`, `Scope: ${scope}`, "", ...messages.map((m) => `${m.role === "user" ? "You" : "Copilot"}: ${m.text}`)].join("\n");
+  return [
+    `Veronyx Copilot — ${title}`,
+    `Scope: ${scope}`,
+    "",
+    ...messages.map((m) => `${m.role === "user" ? "You" : "Copilot"}: ${m.text}`),
+  ].join("\n");
 }
