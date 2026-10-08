@@ -46,7 +46,7 @@ function jsonError(status: number, message: string) {
 }
 
 export async function handleInsightsChat(request: Request): Promise<Response> {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return jsonError(500, "AI is not configured for this app yet.");
 
   let parsed: z.infer<typeof bodySchema>;

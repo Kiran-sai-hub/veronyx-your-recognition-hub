@@ -19,6 +19,7 @@ import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ConnectorsRouteImport } from './routes/connectors'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as FairnessRouteImport } from './routes/fairness'
+import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -34,6 +35,8 @@ import { Route as ConnectorsMappingRouteImport } from './routes/connectors.mappi
 import { Route as DashboardHrRouteImport } from './routes/dashboard.hr'
 import { Route as DashboardManagerRouteImport } from './routes/dashboard.manager'
 import { Route as DashboardOwnerRouteImport } from './routes/dashboard.owner'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as InsightsThreadIdRouteImport } from './routes/insights.$threadId'
 import { Route as LoginOtpRouteImport } from './routes/login.otp'
 import { Route as MePreferencesRouteImport } from './routes/me.preferences'
 import { Route as MeRecognitionsRouteImport } from './routes/me.recognitions'
@@ -93,6 +96,11 @@ const DesignSystemRoute = DesignSystemRouteImport.update({
 const FairnessRoute = FairnessRouteImport.update({
   id: '/fairness',
   path: '/fairness',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -170,6 +178,16 @@ const DashboardOwnerRoute = DashboardOwnerRouteImport.update({
   path: '/dashboard/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
+} as any)
+const InsightsThreadIdRoute = InsightsThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => InsightsRoute,
+} as any)
 const LoginOtpRoute = LoginOtpRouteImport.update({
   id: '/otp',
   path: '/otp',
@@ -232,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -245,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -254,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/me/wallet': typeof MeWalletRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -281,6 +302,7 @@ export interface FileRoutesByTo {
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -290,6 +312,7 @@ export interface FileRoutesByTo {
   '/me/wallet': typeof MeWalletRoute
   '/boards': typeof BoardsIndexRoute
   '/connectors': typeof ConnectorsIndexRoute
+  '/insights': typeof InsightsIndexRoute
   '/workflows': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id': typeof WorkflowsIdIndexRoute
@@ -306,6 +329,7 @@ export interface FileRoutesById {
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -319,6 +343,7 @@ export interface FileRoutesById {
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
+  '/insights/$threadId': typeof InsightsThreadIdRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -328,6 +353,7 @@ export interface FileRoutesById {
   '/me/wallet': typeof MeWalletRoute
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
+  '/insights/': typeof InsightsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -345,6 +371,7 @@ export interface FileRouteTypes {
     | '/connectors'
     | '/design-system'
     | '/fairness'
+    | '/insights'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -358,6 +385,7 @@ export interface FileRouteTypes {
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -367,6 +395,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards/'
     | '/connectors/'
+    | '/insights/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -394,6 +423,7 @@ export interface FileRouteTypes {
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -403,6 +433,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards'
     | '/connectors'
+    | '/insights'
     | '/workflows'
     | '/workflows/$id/runs'
     | '/workflows/$id'
@@ -418,6 +449,7 @@ export interface FileRouteTypes {
     | '/connectors'
     | '/design-system'
     | '/fairness'
+    | '/insights'
     | '/login'
     | '/me'
     | '/onboarding'
@@ -431,6 +463,7 @@ export interface FileRouteTypes {
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
+    | '/insights/$threadId'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -440,6 +473,7 @@ export interface FileRouteTypes {
     | '/me/wallet'
     | '/boards/'
     | '/connectors/'
+    | '/insights/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -456,6 +490,7 @@ export interface RootRouteChildren {
   ConnectorsRoute: typeof ConnectorsRouteWithChildren
   DesignSystemRoute: typeof DesignSystemRoute
   FairnessRoute: typeof FairnessRoute
+  InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
@@ -544,6 +579,13 @@ declare module '@tanstack/react-router' {
       path: '/fairness'
       fullPath: '/fairness'
       preLoaderRoute: typeof FairnessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -651,6 +693,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/insights/$threadId': {
+      id: '/insights/$threadId'
+      path: '/$threadId'
+      fullPath: '/insights/$threadId'
+      preLoaderRoute: typeof InsightsThreadIdRouteImport
+      parentRoute: typeof InsightsRoute
+    }
     '/login/otp': {
       id: '/login/otp'
       path: '/otp'
@@ -738,6 +794,20 @@ const ConnectorsRouteWithChildren = ConnectorsRoute._addFileChildren(
   ConnectorsRouteChildren,
 )
 
+interface InsightsRouteChildren {
+  InsightsThreadIdRoute: typeof InsightsThreadIdRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsThreadIdRoute: InsightsThreadIdRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
+
 interface LoginRouteChildren {
   LoginOtpRoute: typeof LoginOtpRoute
 }
@@ -779,6 +849,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnectorsRoute: ConnectorsRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
   FairnessRoute: FairnessRoute,
+  InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
