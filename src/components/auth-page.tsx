@@ -85,8 +85,8 @@ export function LoginPage() {
           Built for Indian SMEs and frontline teams.
         </p>
       </section>
-      <main className="grid place-items-center bg-background p-5">
-        <div className="w-full max-w-md space-y-6">
+      <main className="flex min-w-0 items-center justify-center bg-background p-4 sm:p-5">
+        <div className="w-full min-w-0 max-w-md space-y-6">
           <Card className="rounded-lg border-0 shadow-none sm:border sm:shadow-sm">
             <CardHeader>
               <div className="mb-6 lg:hidden">

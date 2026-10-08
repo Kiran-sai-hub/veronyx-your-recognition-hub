@@ -152,7 +152,8 @@ function buildProposal(q: string): Proposal {
     repairs: ["First draft had no End step (V2) → added End → re-validated ✓"],
     budget: {
       pool,
-      remaining: pool === "Manufacturing A — Selvi" ? 21500 : pool === "Sales A — Vikram" ? 18700 : 120000,
+      remaining:
+        pool === "Manufacturing A — Selvi" ? 21500 : pool === "Sales A — Vikram" ? 18700 : 120000,
       monthlyCost: isCsat ? 3000 : isFactory ? 1200 * 4 : 5500,
     },
     tax: isCsat

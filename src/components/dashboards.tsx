@@ -183,7 +183,7 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <Card className={cn("rounded-lg", className)}>
+    <Card className={cn("min-w-0 rounded-lg", className)}>
       <CardHeader className="flex-row items-start justify-between gap-3 space-y-0 pb-3">
         <div>
           <CardTitle className="flex items-center gap-2 text-base">

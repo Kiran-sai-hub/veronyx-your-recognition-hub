@@ -131,24 +131,22 @@ export function WhatsappSimulator() {
         eyebrow="Frontline · no app install"
         title="WhatsApp bot"
         description="What a factory worker sees on WhatsApp. Messages come from your company's business account, in the worker's language."
-        action={
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => setInvited(true)}>
-              <QrCode className="size-4" /> HR: send opt-in link
-            </Button>
-            <Button variant="outline" onClick={notify}>
-              <Bell className="size-4" /> Send a recognition
-            </Button>
-            <Button
-              variant="outline"
-              onClick={deliverVoucher}
-              disabled={!state.joined || state.stopped}
-            >
-              <Gift className="size-4" /> Simulate: reward picked in app
-            </Button>
-          </div>
-        }
       />
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setInvited(true)}>
+          <QrCode className="size-4" /> HR: send opt-in link
+        </Button>
+        <Button variant="outline" onClick={notify}>
+          <Bell className="size-4" /> Send a recognition
+        </Button>
+        <Button
+          variant="outline"
+          onClick={deliverVoucher}
+          disabled={!state.joined || state.stopped}
+        >
+          <Gift className="size-4" /> Simulate: reward picked in app
+        </Button>
+      </div>
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="mx-auto w-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-foreground/80 shadow-lg">
           <div className="flex items-center gap-3 bg-[#075e54] px-4 py-3 text-white">

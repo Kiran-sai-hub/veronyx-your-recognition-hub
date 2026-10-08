@@ -37,13 +37,13 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background p-8 text-foreground lg:p-12">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="grid size-14 place-items-center rounded-lg bg-reward text-xl font-bold text-reward-foreground">
             RK
           </div>
           <div>
-            <p className="text-3xl font-bold">Radha Krishna Mills</p>
+            <p className="text-2xl font-bold sm:text-3xl">Radha Krishna Mills</p>
             <p className="text-sm text-muted-foreground">Coimbatore plant · powered by Veronyx</p>
           </div>
         </div>

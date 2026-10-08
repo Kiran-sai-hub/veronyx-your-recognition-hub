@@ -43,7 +43,7 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-          <aside className="space-y-3">
+          <aside className="min-w-0 space-y-3">
             <Button className="w-full" onClick={() => newSession()}>
               <Plus /> New session
             </Button>
@@ -75,7 +75,7 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
               <p>Every AI interaction is logged in the audit trail.</p>
             </div>
           </aside>
-          <div className="flex h-[75vh] min-h-[520px] flex-col">
+          <div className="flex h-[75vh] min-h-[520px] min-w-0 flex-col">
             <CopilotConversation persona={persona} screen="copilot" variant="page" />
           </div>
         </div>

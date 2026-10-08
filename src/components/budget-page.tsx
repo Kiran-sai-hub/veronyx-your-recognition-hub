@@ -176,8 +176,8 @@ export function BudgetPage() {
       <section aria-label="Ledger">
         <h2 className="mb-4 text-lg font-semibold">Ledger</h2>
         <Card className="rounded-lg shadow-sm">
-          <CardContent className="p-0">
-            <table className="w-full text-sm">
+          <CardContent className="overflow-x-auto p-0">
+            <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-muted-foreground">
                   <th className="p-4 font-medium">Date</th>

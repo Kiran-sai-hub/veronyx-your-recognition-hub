@@ -1104,7 +1104,10 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify"),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Radha Krishna Mills (organisation)" },
+        budget: {
+          ...baseDraft({ id: "x", name: "x" }).budget,
+          wallet: "Radha Krishna Mills (organisation)",
+        },
       }),
   },
   {
@@ -1157,7 +1160,10 @@ export const workflowTemplates: WorkflowTemplate[] = [
           makeStep("notify", { to: "whole team" }),
           makeStep("end"),
         ],
-        budget: { ...baseDraft({ id: "x", name: "x" }).budget, wallet: "Radha Krishna Mills (organisation)" },
+        budget: {
+          ...baseDraft({ id: "x", name: "x" }).budget,
+          wallet: "Radha Krishna Mills (organisation)",
+        },
       }),
   },
 ];
