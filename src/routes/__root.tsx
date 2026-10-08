@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { setNavigator } from "../lib/navigate";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +122,29 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // Screens use plain <a href> and go() so they stay router-agnostic; the root turns
+  // same-app links into client-side moves so state and scroll feel instant.
+  useEffect(() => {
+    setNavigator((to, options) =>
+      options?.replace ? router.history.replace(to) : router.history.push(to),
+    );
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as HTMLElement | null)?.closest("a");
+      if (!anchor || anchor.target || anchor.hasAttribute("download")) return;
+      const href = anchor.getAttribute("href");
+      if (!href || !href.startsWith("/") || href.startsWith("//") || href.startsWith("/api/"))
+        return;
+      event.preventDefault();
+      router.history.push(href);
+      window.scrollTo({ top: 0 });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

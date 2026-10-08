@@ -26,6 +26,18 @@ export const personaHome: Record<Persona, string> = {
   employee: "/me",
 };
 
+/** Checklist §1.3: AI Copilot is for Owner and HR Admin only. */
+export function canUseCopilot(persona: Persona): boolean {
+  return persona === "owner" || persona === "hr";
+}
+
+/** True when this role may use AI right now; every AI entry point must also have a manual path. */
+export function useCopilotEnabled(): boolean {
+  const persona = useAppStore((s) => s.persona);
+  const aiAvailable = useAppStore((s) => s.aiAvailable);
+  return aiAvailable && canUseCopilot(persona);
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({

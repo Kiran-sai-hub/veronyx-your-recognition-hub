@@ -27,7 +27,7 @@ import {
   whatsappTemplates,
 } from "@/lib/phase3-data";
 
-export function SettingsPage() {
+export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
   const [legalName, setLegalName] = useState("Radha Krishna Mills Private Limited");
   const [gstin, setGstin] = useState("33AABCR1234F1Z5");
   const [udyam, setUdyam] = useState("UDYAM-TN-03-0012345");
@@ -59,7 +59,7 @@ export function SettingsPage() {
         description="Company details, who can do what, message templates and your plan."
       />
 
-      <Tabs defaultValue="org">
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList className="flex h-auto flex-wrap justify-start">
           <TabsTrigger value="org">Organisation</TabsTrigger>
           <TabsTrigger value="roles">Roles & permissions</TabsTrigger>

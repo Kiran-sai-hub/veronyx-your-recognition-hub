@@ -20,13 +20,17 @@ export const Route = createFileRoute("/connectors/mapping")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: string | undefined } => ({
+    tab: typeof search["tab"] === "string" ? search["tab"] : undefined,
+  }),
   component: RoutePage,
 });
 
 function RoutePage() {
+  const { tab } = Route.useSearch();
   return (
     <AdminRoutePage pathname="/connectors/mapping">
-      <MappingPage />
+      <MappingPage tab={tab} />
     </AdminRoutePage>
   );
 }

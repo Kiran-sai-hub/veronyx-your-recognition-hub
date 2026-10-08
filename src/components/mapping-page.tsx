@@ -23,7 +23,7 @@ import {
 
 type IdentityDecision = "pending" | "confirmed" | "rejected";
 
-export function MappingPage() {
+export function MappingPage({ tab = "mapping" }: { tab?: string | undefined }) {
   const [decisions, setDecisions] = useState<Record<string, IdentityDecision>>({});
   const pending = identityQueue.filter((item) => (decisions[item.id] ?? "pending") === "pending");
 
@@ -54,7 +54,7 @@ export function MappingPage() {
         </section>
       )}
 
-      <Tabs defaultValue="mapping">
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList>
           <TabsTrigger value="mapping">Field mapping</TabsTrigger>
           <TabsTrigger value="identity">

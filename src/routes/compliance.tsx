@@ -20,13 +20,17 @@ export const Route = createFileRoute("/compliance")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: string | undefined } => ({
+    tab: typeof search["tab"] === "string" ? search["tab"] : undefined,
+  }),
   component: RoutePage,
 });
 
 function RoutePage() {
+  const { tab } = Route.useSearch();
   return (
     <AdminRoutePage pathname="/compliance">
-      <CompliancePage />
+      <CompliancePage tab={tab} />
     </AdminRoutePage>
   );
 }

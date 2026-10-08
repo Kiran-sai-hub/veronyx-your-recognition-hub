@@ -59,7 +59,7 @@ function downloadCsv(name: string, csv: string) {
   URL.revokeObjectURL(url);
 }
 
-export function CompliancePage() {
+export function CompliancePage({ tab = "tax" }: { tab?: string | undefined }) {
   const [requests, setRequests] = useState(initialRequests);
   const [noticeLang, setNoticeLang] = useState("English");
   const [auditQuery, setAuditQuery] = useState("");
@@ -87,7 +87,7 @@ export function CompliancePage() {
         description="Privacy notices, consent, data requests, retention, tax and the audit trail in one place."
       />
 
-      <Tabs defaultValue="tax">
+      <Tabs key={tab} defaultValue={tab}>
         <TabsList className="flex h-auto flex-wrap justify-start">
           <TabsTrigger value="tax">Tax tracker</TabsTrigger>
           <TabsTrigger value="notice">Privacy notice</TabsTrigger>

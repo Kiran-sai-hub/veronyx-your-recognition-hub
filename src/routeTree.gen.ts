@@ -40,7 +40,9 @@ import { Route as DashboardManagerRouteImport } from './routes/dashboard.manager
 import { Route as DashboardOwnerRouteImport } from './routes/dashboard.owner'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsThreadIdRouteImport } from './routes/insights.$threadId'
+import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as LoginOtpRouteImport } from './routes/login.otp'
+import { Route as MeIndexRouteImport } from './routes/me.index'
 import { Route as MePreferencesRouteImport } from './routes/me.preferences'
 import { Route as MeRecognitionsRouteImport } from './routes/me.recognitions'
 import { Route as MeRedeemRouteImport } from './routes/me.redeem'
@@ -206,10 +208,20 @@ const InsightsThreadIdRoute = InsightsThreadIdRouteImport.update({
   path: '/$threadId',
   getParentRoute: () => InsightsRoute,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LoginRoute,
+} as any)
 const LoginOtpRoute = LoginOtpRouteImport.update({
   id: '/otp',
   path: '/otp',
   getParentRoute: () => LoginRoute,
+} as any)
+const MeIndexRoute = MeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MeRoute,
 } as any)
 const MePreferencesRoute = MePreferencesRouteImport.update({
   id: '/preferences',
@@ -296,6 +308,8 @@ export interface FileRoutesByFullPath {
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/me/': typeof MeIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -312,8 +326,6 @@ export interface FileRoutesByTo {
   '/design-system': typeof DesignSystemRoute
   '/fairness': typeof FairnessRoute
   '/kiosk': typeof KioskRoute
-  '/login': typeof LoginRouteWithChildren
-  '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/payroll': typeof PayrollRoute
   '/people': typeof PeopleRoute
@@ -337,6 +349,8 @@ export interface FileRoutesByTo {
   '/boards': typeof BoardsIndexRoute
   '/connectors': typeof ConnectorsIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/me': typeof MeIndexRoute
   '/workflows': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id': typeof WorkflowsIdIndexRoute
@@ -381,6 +395,8 @@ export interface FileRoutesById {
   '/boards/': typeof BoardsIndexRoute
   '/connectors/': typeof ConnectorsIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/me/': typeof MeIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -426,6 +442,8 @@ export interface FileRouteTypes {
     | '/boards/'
     | '/connectors/'
     | '/insights/'
+    | '/login/'
+    | '/me/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -442,8 +460,6 @@ export interface FileRouteTypes {
     | '/design-system'
     | '/fairness'
     | '/kiosk'
-    | '/login'
-    | '/me'
     | '/onboarding'
     | '/payroll'
     | '/people'
@@ -467,6 +483,8 @@ export interface FileRouteTypes {
     | '/boards'
     | '/connectors'
     | '/insights'
+    | '/login'
+    | '/me'
     | '/workflows'
     | '/workflows/$id/runs'
     | '/workflows/$id'
@@ -510,6 +528,8 @@ export interface FileRouteTypes {
     | '/boards/'
     | '/connectors/'
     | '/insights/'
+    | '/login/'
+    | '/me/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -767,12 +787,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsThreadIdRouteImport
       parentRoute: typeof InsightsRoute
     }
+    '/login/': {
+      id: '/login/'
+      path: '/'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof LoginRoute
+    }
     '/login/otp': {
       id: '/login/otp'
       path: '/otp'
       fullPath: '/login/otp'
       preLoaderRoute: typeof LoginOtpRouteImport
       parentRoute: typeof LoginRoute
+    }
+    '/me/': {
+      id: '/me/'
+      path: '/'
+      fullPath: '/me/'
+      preLoaderRoute: typeof MeIndexRouteImport
+      parentRoute: typeof MeRoute
     }
     '/me/preferences': {
       id: '/me/preferences'
@@ -870,10 +904,12 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
 
 interface LoginRouteChildren {
   LoginOtpRoute: typeof LoginOtpRoute
+  LoginIndexRoute: typeof LoginIndexRoute
 }
 
 const LoginRouteChildren: LoginRouteChildren = {
   LoginOtpRoute: LoginOtpRoute,
+  LoginIndexRoute: LoginIndexRoute,
 }
 
 const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
@@ -885,6 +921,7 @@ interface MeRouteChildren {
   MeShoutoutRoute: typeof MeShoutoutRoute
   MeTrackingRoute: typeof MeTrackingRoute
   MeWalletRoute: typeof MeWalletRoute
+  MeIndexRoute: typeof MeIndexRoute
 }
 
 const MeRouteChildren: MeRouteChildren = {
@@ -894,6 +931,7 @@ const MeRouteChildren: MeRouteChildren = {
   MeShoutoutRoute: MeShoutoutRoute,
   MeTrackingRoute: MeTrackingRoute,
   MeWalletRoute: MeWalletRoute,
+  MeIndexRoute: MeIndexRoute,
 }
 
 const MeRouteWithChildren = MeRoute._addFileChildren(MeRouteChildren)
