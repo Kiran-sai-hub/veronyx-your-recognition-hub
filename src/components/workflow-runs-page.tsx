@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Dialog,
@@ -99,6 +100,27 @@ export function WorkflowRunsPage({ workflowId }: { workflowId: string }) {
   const trace = explainOutcome(code);
   const firstFail = trace?.steps.find((s) => s.passed === false);
   const salesPeople = employees.filter((e) => e.department === "Sales").slice(0, 24);
+  const runSteps = [
+    "Reading monthly_sales_october.xlsx",
+    "Filtering Sales · active (1 exited employee excluded)",
+    "Checking the sales ≥ 100% rule",
+    "Ranking and applying caps",
+    "Creating approval requests",
+  ];
+  const [manualRun, setManualRun] = useState<number | null>(null);
+  const startRun = () => {
+    setManualRun(0);
+    runSteps.forEach((_, i) =>
+      window.setTimeout(
+        () => {
+          setManualRun(i + 1);
+          if (i === runSteps.length - 1)
+            toast.success("Run finished. 3 rewards are waiting in Approvals.");
+        },
+        900 * (i + 1),
+      ),
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -112,8 +134,47 @@ export function WorkflowRunsPage({ workflowId }: { workflowId: string }) {
         eyebrow="Run history & versions"
         title={workflow?.name ?? "Workflow"}
         description="Every run, every version, and why each person did or did not get a reward."
-        action={<Button onClick={() => setTraceOpen(true)}>Explain a decision</Button>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              disabled={manualRun !== null && manualRun < runSteps.length}
+              onClick={startRun}
+            >
+              Run now (test period)
+            </Button>
+            <Button onClick={() => setTraceOpen(true)}>Explain a decision</Button>
+          </div>
+        }
       />
+      {manualRun !== null && (
+        <Card className="rounded-lg">
+          <CardContent className="space-y-3 p-4" aria-live="polite">
+            <p className="text-sm font-medium">
+              {manualRun < runSteps.length
+                ? `Running · step ${manualRun + 1} of ${runSteps.length}: ${runSteps[manualRun]}…`
+                : "Run finished · 24 people checked · 3 rewarded · sent to Approvals"}
+            </p>
+            <Progress value={(manualRun / runSteps.length) * 100} aria-label="Run progress" />
+            <ol className="grid gap-1 text-xs sm:grid-cols-5">
+              {runSteps.map((step, i) => (
+                <li
+                  key={step}
+                  className={cn(
+                    i < manualRun
+                      ? "text-success"
+                      : i === manualRun
+                        ? "font-medium text-primary"
+                        : "text-muted-foreground",
+                  )}
+                >
+                  {i < manualRun ? "✓" : i === manualRun ? "…" : "○"} {step}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
       {failed && (
         <Alert variant="destructive">
           <XCircle className="size-4" />

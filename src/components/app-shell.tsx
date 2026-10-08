@@ -29,12 +29,21 @@ import {
   Workflow,
   Eye,
   TrendingUp,
+  TimerReset,
+  TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { AiCopilot } from "@/components/ai-copilot";
 import { Brand } from "@/components/brand";
+import {
+  OfflineBanner,
+  PageSkeleton,
+  SessionTimeout,
+  showApiError,
+} from "@/components/global-states";
 import { NotificationsPanel } from "@/components/notifications-panel";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,6 +81,7 @@ import {
 import { cn } from "@/lib/utils";
 import { type Persona, canUseCopilot, personaHome, useAppStore } from "@/store/app-store";
 import { useDemoStore } from "@/store/demo-store";
+import { useStatusStore } from "@/store/status-store";
 
 const navIcons: Record<NavKey, LucideIcon> = {
   dashboard: LayoutDashboard,
@@ -111,6 +121,13 @@ export function AppShell({ children, pathname }: AppShellProps) {
   const access = isEmployee ? "full" : accessFor(pathname, persona);
   const section = sectionFor(pathname);
   const copilotOn = aiAvailable && canUseCopilot(persona) && !isEmployee;
+  // Skeleton on page load (checklist §6.2), briefly, while the screen's data "arrives".
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    setReady(false);
+    const t = window.setTimeout(() => setReady(true), 300);
+    return () => window.clearTimeout(t);
+  }, [pathname]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -226,11 +243,14 @@ export function AppShell({ children, pathname }: AppShellProps) {
             </div>
           </div>
         </header>
+        <OfflineBanner />
         <main
           id="main-content"
           className="mx-auto w-full max-w-[1440px] px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-10"
         >
-          {access === "none" ? (
+          {!ready ? (
+            <PageSkeleton />
+          ) : access === "none" ? (
             <PermissionDenied persona={persona} />
           ) : (
             <>
@@ -249,6 +269,7 @@ export function AppShell({ children, pathname }: AppShellProps) {
       </div>
 
       <MobileBottomNav pathname={pathname} persona={persona} isEmployee={isEmployee} />
+      <SessionTimeout />
 
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
         <SheetContent side="left" className="w-[290px] overflow-y-auto p-0">
@@ -463,6 +484,7 @@ function ProfileMenu({
   const user = personaUser[persona];
   const { emptyOrg, setEmptyOrg, reset } = useDemoStore();
   const { aiAvailable, setAiAvailable } = useAppStore();
+  const { simulatedOffline, setSimulatedOffline, setSessionWarning } = useStatusStore();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -520,6 +542,24 @@ function ProfileMenu({
             AI available
           </label>
           <Switch id="demo-ai" checked={aiAvailable} onCheckedChange={setAiAvailable} />
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="justify-between">
+          <label htmlFor="demo-offline" className="cursor-pointer">
+            Simulate offline
+          </label>
+          <Switch
+            id="demo-offline"
+            checked={simulatedOffline}
+            onCheckedChange={setSimulatedOffline}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={() => showApiError(() => toast.success("Retried — everything loaded."))}
+        >
+          <TriangleAlert /> Simulate an API error
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setSessionWarning(true)}>
+          <TimerReset /> Simulate session timeout
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => reset()}>
           <RotateCcw /> Reset demo data

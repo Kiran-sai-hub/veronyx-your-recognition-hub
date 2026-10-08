@@ -46,7 +46,7 @@ const demoRoles: { persona: Persona; title: string; detail: string; icon: typeof
   },
 ];
 
-export function LoginPage() {
+export function LoginPage({ expired = false }: { expired?: boolean }) {
   const setPersona = useAppStore((s) => s.setPersona);
   const [email, setEmail] = useState("ramesh@rkmills.in");
   const [password, setPassword] = useState("demo-password");
@@ -96,6 +96,14 @@ export function LoginPage() {
               <CardDescription>Sign in to Veronyx Recognise.</CardDescription>
             </CardHeader>
             <CardContent>
+              {expired && (
+                <p
+                  role="alert"
+                  className="mb-5 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm"
+                >
+                  Your session expired. Please log in again.
+                </p>
+              )}
               <form className="space-y-5" onSubmit={signIn} noValidate>
                 <div>
                   <Label htmlFor="email">Work email</Label>

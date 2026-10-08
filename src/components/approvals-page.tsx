@@ -501,7 +501,7 @@ export function ApprovalsPage({
                         )}
                       >
                         {amountTooHigh
-                          ? `Above your limit of ${formatIndianNumber(single.maxPoints)} points.`
+                          ? `You don't have permission to perform this action. Your limit is ${formatIndianNumber(single.maxPoints)} points — escalate for more.`
                           : `Your limit: up to ${formatIndianNumber(single.maxPoints)} points.`}
                       </p>
                     </div>

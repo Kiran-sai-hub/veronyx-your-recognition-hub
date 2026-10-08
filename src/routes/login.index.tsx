@@ -12,5 +12,13 @@ export const Route = createFileRoute("/login/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: LoginPage,
+  validateSearch: (search: Record<string, unknown>): { expired?: string | undefined } => ({
+    expired: search["expired"] === undefined ? undefined : String(search["expired"]),
+  }),
+  component: RoutePage,
 });
+
+function RoutePage() {
+  const { expired } = Route.useSearch();
+  return <LoginPage expired={expired === "1"} />;
+}
