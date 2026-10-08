@@ -532,24 +532,105 @@ export const redemptionOrders: RedemptionOrder[] = [
 export type CaptureField = {
   id: string;
   label: string;
-  kind: "Number" | "Text" | "Date" | "Choice" | "Photo";
+  labelHi: string;
+  labelTa: string;
+  kind:
+    | "Text"
+    | "Number"
+    | "Decimal"
+    | "Date"
+    | "Boolean"
+    | "Picklist"
+    | "Employee lookup"
+    | "File/Evidence";
   required: boolean;
+  validation: string;
+  defaultValue: string;
 };
 
+/** Field types for native capture forms (checklist §4.10 step 2). */
 export const captureFieldPalette: CaptureField["kind"][] = [
-  "Number",
   "Text",
+  "Number",
+  "Decimal",
   "Date",
-  "Choice",
-  "Photo",
+  "Boolean",
+  "Picklist",
+  "Employee lookup",
+  "File/Evidence",
 ];
 
 export const captureFields: CaptureField[] = [
-  { id: "cf-1", label: "Shift date", kind: "Date", required: true },
-  { id: "cf-2", label: "Defects found", kind: "Number", required: true },
-  { id: "cf-3", label: "Line", kind: "Choice", required: true },
-  { id: "cf-4", label: "Photo of defect", kind: "Photo", required: false },
-  { id: "cf-5", label: "Notes", kind: "Text", required: false },
+  {
+    id: "cf-1",
+    label: "Employee",
+    labelHi: "कर्मचारी",
+    labelTa: "ஊழியர்",
+    kind: "Employee lookup",
+    required: true,
+    validation: "Active employee in scope",
+    defaultValue: "",
+  },
+  {
+    id: "cf-2",
+    label: "Shift date",
+    labelHi: "शिफ्ट की तारीख",
+    labelTa: "ஷிஃப்ட் தேதி",
+    kind: "Date",
+    required: true,
+    validation: "Not in the future · DD/MM/YYYY",
+    defaultValue: "Today",
+  },
+  {
+    id: "cf-3",
+    label: "Shift",
+    labelHi: "शिफ्ट",
+    labelTa: "ஷிஃப்ட்",
+    kind: "Picklist",
+    required: true,
+    validation: "A, B or C",
+    defaultValue: "A",
+  },
+  {
+    id: "cf-4",
+    label: "Units produced",
+    labelHi: "उत्पादित इकाइयाँ",
+    labelTa: "உற்பத்தி அலகுகள்",
+    kind: "Number",
+    required: true,
+    validation: "0 – 1,000",
+    defaultValue: "",
+  },
+  {
+    id: "cf-5",
+    label: "Reject rate (%)",
+    labelHi: "अस्वीकृति दर (%)",
+    labelTa: "நிராகரிப்பு விகிதம் (%)",
+    kind: "Decimal",
+    required: false,
+    validation: "0 – 100, 1 decimal",
+    defaultValue: "0",
+  },
+  {
+    id: "cf-6",
+    label: "Present",
+    labelHi: "उपस्थित",
+    labelTa: "வருகை",
+    kind: "Boolean",
+    required: true,
+    validation: "Yes / No",
+    defaultValue: "Yes",
+  },
+  {
+    id: "cf-7",
+    label: "Photo of output sheet",
+    labelHi: "आउटपुट शीट की फोटो",
+    labelTa: "உற்பத்தித் தாளின் படம்",
+    kind: "File/Evidence",
+    required: false,
+    validation: "Image up to 5 MB",
+    defaultValue: "",
+  },
 ];
 
 export type NativeEntry = {
@@ -605,21 +686,21 @@ export const analyticsMetrics: AnalyticsMetric[] = [
   {
     id: "coverage",
     label: "Recognition coverage",
-    value: "68%",
-    detail: "Share of active employees recognised this month",
+    value: "71%",
+    detail: "Recognised in the last 30 days. Chart: by department, last 90 days (64% overall)",
     series: [
-      { label: "Manufacturing", value: 71 },
-      { label: "Quality", value: 84 },
-      { label: "Sales", value: 66 },
-      { label: "Operations", value: 58 },
+      { label: "Manufacturing", value: 64 },
+      { label: "Quality", value: 78 },
+      { label: "Sales", value: 71 },
+      { label: "Operations", value: 49 },
     ],
     table: {
       headers: ["Department", "Coverage"],
       rows: [
-        ["Manufacturing", "71%"],
-        ["Quality", "84%"],
-        ["Sales", "66%"],
-        ["Operations", "58%"],
+        ["Manufacturing", "64%"],
+        ["Quality", "78%"],
+        ["Sales", "71%"],
+        ["Operations", "49%"],
       ],
     },
   },

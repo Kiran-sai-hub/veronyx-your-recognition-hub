@@ -83,7 +83,8 @@ export const useDemoStore = create<DemoState>()(
     (set) => ({
       ...initial,
       setEmptyOrg: (emptyOrg) => set({ emptyOrg }),
-      saveBoard: (b) => set((s) => ({ savedBoards: [b, ...s.savedBoards.filter((x) => x.id !== b.id)] })),
+      saveBoard: (b) =>
+        set((s) => ({ savedBoards: [b, ...s.savedBoards.filter((x) => x.id !== b.id)] })),
       finishOnboarding: () => set({ onboarded: true, emptyOrg: true }),
       decide: (id, decision) => set((s) => ({ decisions: { ...s.decisions, [id]: decision } })),
       undoDecision: (id) =>

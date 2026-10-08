@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { CapturePage } from "@/components/capture-page";
+import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/capture")({
   head: () => ({
@@ -24,9 +25,10 @@ export const Route = createFileRoute("/capture")({
 });
 
 function RoutePage() {
+  const persona = useAppStore((s) => s.persona);
   return (
     <AdminRoutePage pathname="/capture">
-      <CapturePage />
+      <CapturePage readOnly={persona === "manager"} />
     </AdminRoutePage>
   );
 }
