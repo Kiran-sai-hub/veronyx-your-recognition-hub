@@ -65,7 +65,9 @@ function EvidenceList({ message }: { message: UIMessage }) {
       <ul className="space-y-2">
         {shown.map((e) => (
           <li key={e.id} className="text-xs">
-            <span className="mr-1.5 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-primary">{e.id}</span>
+            <span className="mr-1.5 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-primary">
+              {e.id}
+            </span>
             <span className="font-medium">{e.label}</span>
             <p className="mt-0.5 text-muted-foreground">
               {e.detail} · <span className="italic">{e.source}</span>
@@ -84,7 +86,12 @@ type InsightsChatProps = {
   onMessagesChange: (messages: UIMessage[]) => void;
 };
 
-export function InsightsChat({ threadId, persona, initialMessages, onMessagesChange }: InsightsChatProps) {
+export function InsightsChat({
+  threadId,
+  persona,
+  initialMessages,
+  onMessagesChange,
+}: InsightsChatProps) {
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/insights", body: { threadId, persona } }),
     [threadId, persona],
@@ -121,7 +128,12 @@ export function InsightsChat({ threadId, persona, initialMessages, onMessagesCha
             >
               <div className="mt-4 flex flex-col gap-2">
                 {suggestions.map((s) => (
-                  <Button key={s} variant="outline" className="h-auto whitespace-normal text-left" onClick={() => ask(s)}>
+                  <Button
+                    key={s}
+                    variant="outline"
+                    className="h-auto whitespace-normal text-left"
+                    onClick={() => ask(s)}
+                  >
                     {s}
                   </Button>
                 ))}
@@ -161,13 +173,17 @@ export function InsightsChat({ threadId, persona, initialMessages, onMessagesCha
                   }
                   return null;
                 })}
-                {m.role === "assistant" && !(busy && m.id === messages.at(-1)?.id) && <EvidenceList message={m} />}
+                {m.role === "assistant" && !(busy && m.id === messages.at(-1)?.id) && (
+                  <EvidenceList message={m} />
+                )}
               </MessageContent>
             </Message>
           ))}
           {status === "submitted" && <Shimmer>Checking the records…</Shimmer>}
           {error && !busy && (
-            <p className="text-sm text-destructive">{error.message || "Something went wrong. Please ask again."}</p>
+            <p className="text-sm text-destructive">
+              {error.message || "Something went wrong. Please ask again."}
+            </p>
           )}
         </ConversationContent>
         <ConversationScrollButton />
@@ -175,7 +191,11 @@ export function InsightsChat({ threadId, persona, initialMessages, onMessagesCha
 
       <div className="border-t border-border p-4">
         <PromptInput onSubmit={(msg) => ask(msg.text ?? "")}>
-          <PromptInputTextarea autoFocus placeholder="Ask, e.g. why didn't Priya win this month?" maxLength={1000} />
+          <PromptInputTextarea
+            autoFocus
+            placeholder="Ask, e.g. why didn't Priya win this month?"
+            maxLength={1000}
+          />
           <PromptInputFooter className="justify-between">
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <LockKeyhole className="size-3" /> Won't analyse gender, caste, religion or health
@@ -196,7 +216,13 @@ type InsightsThreadListProps = {
   onDelete: (id: string) => void;
 };
 
-export function InsightsThreadList({ threads, activeId, onNew, onSelect, onDelete }: InsightsThreadListProps) {
+export function InsightsThreadList({
+  threads,
+  activeId,
+  onNew,
+  onSelect,
+  onDelete,
+}: InsightsThreadListProps) {
   return (
     <div className="flex flex-col gap-2">
       <Button onClick={onNew} className="w-full">
@@ -211,7 +237,11 @@ export function InsightsThreadList({ threads, activeId, onNew, onSelect, onDelet
               t.id === activeId ? "bg-muted" : "hover:bg-muted/60",
             )}
           >
-            <button type="button" onClick={() => onSelect(t.id)} className="flex-1 truncate px-3 py-2 text-left text-sm">
+            <button
+              type="button"
+              onClick={() => onSelect(t.id)}
+              className="flex-1 truncate px-3 py-2 text-left text-sm"
+            >
               {t.title}
             </button>
             <button
@@ -225,7 +255,9 @@ export function InsightsThreadList({ threads, activeId, onNew, onSelect, onDelet
           </li>
         ))}
       </ul>
-      <p className="px-1 text-xs text-muted-foreground">Conversations are cleared when you close this page.</p>
+      <p className="px-1 text-xs text-muted-foreground">
+        Conversations are cleared when you close this page.
+      </p>
     </div>
   );
 }

@@ -55,10 +55,17 @@ export function employeeEvidence(e: Employee): Evidence {
   };
 }
 
-export type OutcomeStep = { title: string; detail: string; passed: boolean | null; evidence: Evidence };
+export type OutcomeStep = {
+  title: string;
+  detail: string;
+  passed: boolean | null;
+  evidence: Evidence;
+};
 
 /** Deterministic decision trace for the latest "Sales target achievers" run (run-118). */
-export function explainOutcome(code: string): { employee: Employee; outcome: string; steps: OutcomeStep[] } | null {
+export function explainOutcome(
+  code: string,
+): { employee: Employee; outcome: string; steps: OutcomeStep[] } | null {
   const employee = employees.find((e) => e.code.toLowerCase() === code.toLowerCase());
   if (!employee) return null;
   const run = "run-118";
@@ -91,7 +98,15 @@ export function explainOutcome(code: string): { employee: Employee; outcome: str
     return {
       employee,
       outcome: "Not in scope",
-      steps: [start, mk(2, "Choose people", `Not in scope: ${employee.department} is not part of this workflow`, false)],
+      steps: [
+        start,
+        mk(
+          2,
+          "Choose people",
+          `Not in scope: ${employee.department} is not part of this workflow`,
+          false,
+        ),
+      ],
     };
   }
   const pct = 70 + (hash(employee.code) % 61);
@@ -101,8 +116,18 @@ export function explainOutcome(code: string): { employee: Employee; outcome: str
   const steps = [
     start,
     mk(2, "Choose people", "Sales department · active", true),
-    mk(3, "Check a rule", `Sales ₹${actual.toLocaleString("en-IN")} vs target ₹5,00,000 → ${pct}%`, met),
-    mk(4, "Ask for approval", met ? "Approved by Priya Raman on 08/09/2026" : "Skipped because the rule was not met", met ? true : null),
+    mk(
+      3,
+      "Check a rule",
+      `Sales ₹${actual.toLocaleString("en-IN")} vs target ₹5,00,000 → ${pct}%`,
+      met,
+    ),
+    mk(
+      4,
+      "Ask for approval",
+      met ? "Approved by Priya Raman on 08/09/2026" : "Skipped because the rule was not met",
+      met ? true : null,
+    ),
     mk(5, "Give points", met ? "1,000 points awarded" : "Skipped", met ? true : null),
   ];
   return { employee, outcome: met ? "Rewarded" : "Not rewarded", steps };

@@ -28,3 +28,25 @@ describe("phase 3 rules", () => {
     expect(canShowGenderCut(false)).toBe(false);
   });
 });
+
+import { explainOutcome, mentionsProtectedAttribute } from "@/lib/insights-evidence";
+import { employees } from "@/lib/mock-data";
+
+describe("insights evidence", () => {
+  it("exited employees are excluded at the choose-people step", () => {
+    const exited = employees.find((e) => e.status === "exited");
+    const r = exited ? explainOutcome(exited.code) : null;
+    expect(r?.outcome).toBe("Not considered");
+    expect(r?.steps[1]?.passed).toBe(false);
+  });
+
+  it("every trace step carries an evidence id", () => {
+    const r = explainOutcome(employees[2]?.code ?? "");
+    expect(r?.steps.every((s) => s.evidence.id.startsWith("TRACE-"))).toBe(true);
+  });
+
+  it("detects protected attribute questions", () => {
+    expect(mentionsProtectedAttribute("Do women win less? Compare by gender")).toBe(true);
+    expect(mentionsProtectedAttribute("Which teams are missed?")).toBe(false);
+  });
+});

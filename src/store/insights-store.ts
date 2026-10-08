@@ -1,7 +1,12 @@
 import type { UIMessage } from "ai";
 import { create } from "zustand";
 
-export type InsightsThread = { id: string; title: string; updatedAt: number; messages: UIMessage[] };
+export type InsightsThread = {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messages: UIMessage[];
+};
 
 type InsightsState = {
   threads: InsightsThread[];
@@ -21,13 +26,17 @@ export const useInsightsStore = create<InsightsState>((set) => ({
   threads: [],
   createThread: () => {
     const id = crypto.randomUUID().slice(0, 8);
-    set((s) => ({ threads: [{ id, title: "New question", updatedAt: Date.now(), messages: [] }, ...s.threads] }));
+    set((s) => ({
+      threads: [{ id, title: "New question", updatedAt: Date.now(), messages: [] }, ...s.threads],
+    }));
     return id;
   },
   saveMessages: (id, messages) =>
     set((s) => ({
       threads: s.threads.map((t) =>
-        t.id === id ? { ...t, messages, updatedAt: Date.now(), title: titleFrom(messages) ?? t.title } : t,
+        t.id === id
+          ? { ...t, messages, updatedAt: Date.now(), title: titleFrom(messages) ?? t.title }
+          : t,
       ),
     })),
   deleteThread: (id) => set((s) => ({ threads: s.threads.filter((t) => t.id !== id) })),

@@ -71,7 +71,8 @@ export async function handleInsightsChat(request: Request): Promise<Response> {
 
   const tools = {
     findEmployee: tool({
-      description: "Find employees by name or employee code. Returns matching people with evidence ids.",
+      description:
+        "Find employees by name or employee code. Returns matching people with evidence ids.",
       inputSchema: z.object({ query: z.string() }),
       execute: async ({ query }) => {
         const matches = findEmployees(query).map(employeeEvidence);
@@ -89,7 +90,12 @@ export async function handleInsightsChat(request: Request): Promise<Response> {
           found: true,
           employee: result.employee.name,
           outcome: result.outcome,
-          steps: result.steps.map((s) => ({ title: s.title, detail: s.detail, passed: s.passed, evidenceId: s.evidence.id })),
+          steps: result.steps.map((s) => ({
+            title: s.title,
+            detail: s.detail,
+            passed: s.passed,
+            evidenceId: s.evidence.id,
+          })),
           evidence: [employeeEvidence(result.employee), ...result.steps.map((s) => s.evidence)],
         };
       },
@@ -137,8 +143,10 @@ export async function handleInsightsChat(request: Request): Promise<Response> {
           typeof error === "object" && error !== null && "statusCode" in error
             ? Number((error as { statusCode: unknown }).statusCode)
             : 0;
-        if (status === 402) return "AI credits have run out. Add credits in Settings → Plans & credits.";
-        if (status === 429) return "Too many questions at once. Please wait a moment and try again.";
+        if (status === 402)
+          return "AI credits have run out. Add credits in Settings → Plans & credits.";
+        if (status === 429)
+          return "Too many questions at once. Please wait a moment and try again.";
         if (status === 403) return "AI access is not available for this workspace right now.";
         return "The assistant could not answer just now. Please try again.";
       },
