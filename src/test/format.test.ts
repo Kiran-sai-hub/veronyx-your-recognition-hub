@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDate, formatIndianNumber, formatRupees, isValidGstin, isValidUdyam } from "@/lib/format";
+import {
+  formatDate,
+  formatIndianNumber,
+  formatRupees,
+  isValidGstin,
+  isValidUdyam,
+} from "@/lib/format";
 
 describe("Indian localisation utilities", () => {
   it("formats numbers using Indian grouping", () => {

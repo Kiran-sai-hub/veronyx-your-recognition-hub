@@ -1,5 +1,8 @@
 import {
   Bell,
+  CheckSquare,
+  GitBranch,
+  LayoutDashboard,
   ChevronDown,
   Gift,
   Home,
@@ -24,7 +27,8 @@ import {
 } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { type Persona, useAppStore } from "@/store/app-store";
+import { AiCopilot } from "@/components/ai-copilot";
+import { type Persona, personaHome, useAppStore } from "@/store/app-store";
 
 const employeeNavigation = [
   { to: "/me", label: "Home", icon: Home },
@@ -34,10 +38,48 @@ const employeeNavigation = [
   { to: "/me/redeem", label: "Rewards", icon: Gift },
 ] as const;
 
+function adminNavigation(persona: Persona) {
+  return [
+    { to: personaHome[persona], label: "Dashboard", icon: LayoutDashboard },
+    { to: "/workflows", label: "Workflows", icon: GitBranch },
+    { to: "/approvals", label: "Approvals", icon: CheckSquare },
+  ];
+}
+
+function screenFor(pathname: string, persona: Persona): string {
+  if (pathname.startsWith("/workflows/")) return "builder";
+  if (pathname.startsWith("/workflows")) return "workflows";
+  if (pathname.startsWith("/approvals")) return "approvals";
+  if (pathname.startsWith("/dashboard")) return persona;
+  return "default";
+}
+
+const personaLabel: Record<Persona, string> = {
+  owner: "Owner workspace",
+  hr: "HR workspace",
+  manager: "Manager workspace",
+  employee: "Employee experience",
+};
+
 type AppShellProps = { children: React.ReactNode; pathname: string };
 
 export function AppShell({ children, pathname }: AppShellProps) {
-  const { persona, setPersona, theme, setTheme } = useAppStore();
+  const { persona, setPersona, theme, setTheme, openCopilot } = useAppStore();
+  const isEmployee = pathname.startsWith("/me");
+  const navigation = isEmployee ? employeeNavigation : adminNavigation(persona);
+  const isActive = (to: string) =>
+    to === "/me" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
+  const mobileNavigation = isEmployee
+    ? employeeNavigation.filter((item) => ["/me", "/me/wallet", "/me/redeem"].includes(item.to))
+    : [
+        { to: personaHome[persona], label: "Dashboard", icon: LayoutDashboard },
+        { to: "/approvals", label: "Approvals", icon: CheckSquare },
+        { to: "/me/redeem", label: "Rewards", icon: Gift },
+      ];
+  const changePersona = (next: Persona) => {
+    setPersona(next);
+    window.location.assign(personaHome[next]);
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -53,22 +95,32 @@ export function AppShell({ children, pathname }: AppShellProps) {
       </a>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
         <div className="border-b border-sidebar-border p-5">
-          <Brand employer={persona === "employee"} />
+          <Brand employer={isEmployee} />
         </div>
         <nav className="flex-1 space-y-1 p-3" aria-label="Main navigation">
-          {employeeNavigation.map((item) => (
+          {navigation.map((item) => (
             <a
               key={item.to}
               href={item.to}
               className={cn(
                 "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent",
-                pathname === item.to && "bg-sidebar-accent text-sidebar-primary",
+                isActive(item.to) && "bg-sidebar-accent text-sidebar-primary",
               )}
             >
               <item.icon className="size-5" />
               <span>{item.label}</span>
             </a>
           ))}
+          {!isEmployee && (
+            <button
+              type="button"
+              onClick={() => openCopilot()}
+              className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent"
+            >
+              <Sparkles className="size-5 text-primary" />
+              AI Copilot
+            </button>
+          )}
         </nav>
         <div className="border-t border-sidebar-border p-3">
           <a
@@ -91,14 +143,14 @@ export function AppShell({ children, pathname }: AppShellProps) {
       <div className="lg:pl-64">
         <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="lg:hidden">
-            <Brand compact employer={persona === "employee"} />
+            <Brand compact employer={isEmployee} />
           </div>
           <div className="hidden lg:block">
             <p className="text-xs text-muted-foreground">Radha Krishna Mills</p>
-            <p className="text-sm font-semibold">Employee experience</p>
+            <p className="text-sm font-semibold">{personaLabel[persona]}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Select value={persona} onValueChange={(value) => setPersona(value as Persona)}>
+            <Select value={persona} onValueChange={(value) => changePersona(value as Persona)}>
               <SelectTrigger className="h-10 w-[132px]" aria-label="Preview persona">
                 <UserRound className="size-4" />
                 <SelectValue />
@@ -112,6 +164,21 @@ export function AppShell({ children, pathname }: AppShellProps) {
               </SelectContent>
             </Select>
             <TooltipProvider>
+              {!isEmployee && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Open AI Copilot"
+                      onClick={() => openCopilot()}
+                    >
+                      <Sparkles />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>AI Copilot</TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -148,21 +215,19 @@ export function AppShell({ children, pathname }: AppShellProps) {
         className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
         aria-label="Mobile navigation"
       >
-        {employeeNavigation
-          .filter((item) => ["/me", "/me/wallet", "/me/redeem"].includes(item.to))
-          .map((item) => (
-            <a
-              key={item.to}
-              href={item.to}
-              className={cn(
-                "flex min-h-16 flex-col items-center justify-center gap-1 text-xs text-muted-foreground",
-                pathname === item.to && "text-primary",
-              )}
-            >
-              <item.icon className="size-5" />
-              {item.label}
-            </a>
-          ))}
+        {mobileNavigation.map((item) => (
+          <a
+            key={item.to}
+            href={item.to}
+            className={cn(
+              "flex min-h-16 flex-col items-center justify-center gap-1 text-xs text-muted-foreground",
+              isActive(item.to) && "text-primary",
+            )}
+          >
+            <item.icon className="size-5" />
+            {item.label}
+          </a>
+        ))}
         <a
           href="/me/preferences"
           className={cn(
@@ -174,6 +239,7 @@ export function AppShell({ children, pathname }: AppShellProps) {
           Profile
         </a>
       </nav>
+      <AiCopilot screen={screenFor(pathname, persona)} />
     </div>
   );
 }
