@@ -13,7 +13,7 @@ export const initialBotState: BotState = {
   joined: false,
   stopped: false,
   language: "en",
-  balance: currentEmployee.points,
+  balance: currentEmployee?.points ?? 0,
 };
 
 const copy: Record<BotLanguage, Record<string, string>> = {

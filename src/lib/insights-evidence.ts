@@ -30,8 +30,8 @@ export const PROTECTED_TERMS = [
 
 /** True when a question asks to analyse a protected attribute. */
 export function mentionsProtectedAttribute(text: string): boolean {
-  const lower = ` ${text.toLowerCase()} `;
-  return PROTECTED_TERMS.some((t) => lower.includes(t));
+  const lower = text.toLowerCase();
+  return PROTECTED_TERMS.some((t) => new RegExp(`\\b${t.trim()}`).test(lower));
 }
 
 function hash(value: string): number {
