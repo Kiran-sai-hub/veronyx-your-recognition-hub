@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as DashboardHrRouteImport } from './routes/dashboard.hr'
+import { Route as DashboardManagerRouteImport } from './routes/dashboard.manager'
+import { Route as DashboardOwnerRouteImport } from './routes/dashboard.owner'
 import { Route as LoginOtpRouteImport } from './routes/login.otp'
 import { Route as MePreferencesRouteImport } from './routes/me.preferences'
 import { Route as MeRecognitionsRouteImport } from './routes/me.recognitions'
@@ -21,10 +25,18 @@ import { Route as MeRedeemRouteImport } from './routes/me.redeem'
 import { Route as MeShoutoutRouteImport } from './routes/me.shoutout'
 import { Route as MeTrackingRouteImport } from './routes/me.tracking'
 import { Route as MeWalletRouteImport } from './routes/me.wallet'
+import { Route as WorkflowsIndexRouteImport } from './routes/workflows.index'
+import { Route as WorkflowsIdIndexRouteImport } from './routes/workflows.$id.index'
+import { Route as WorkflowsIdRunsRouteImport } from './routes/workflows.$id.runs'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApprovalsRoute = ApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
@@ -45,6 +57,21 @@ const MeRoute = MeRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardHrRoute = DashboardHrRouteImport.update({
+  id: '/dashboard/hr',
+  path: '/dashboard/hr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardManagerRoute = DashboardManagerRouteImport.update({
+  id: '/dashboard/manager',
+  path: '/dashboard/manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardOwnerRoute = DashboardOwnerRouteImport.update({
+  id: '/dashboard/owner',
+  path: '/dashboard/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginOtpRoute = LoginOtpRouteImport.update({
@@ -82,13 +109,32 @@ const MeWalletRoute = MeWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => MeRoute,
 } as any)
+const WorkflowsIndexRoute = WorkflowsIndexRouteImport.update({
+  id: '/workflows/',
+  path: '/workflows/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkflowsIdIndexRoute = WorkflowsIdIndexRouteImport.update({
+  id: '/workflows/$id/',
+  path: '/workflows/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkflowsIdRunsRoute = WorkflowsIdRunsRouteImport.update({
+  id: '/workflows/$id/runs',
+  path: '/workflows/$id/runs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/dashboard/hr': typeof DashboardHrRoute
+  '/dashboard/manager': typeof DashboardManagerRoute
+  '/dashboard/owner': typeof DashboardOwnerRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -96,13 +142,20 @@ export interface FileRoutesByFullPath {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows/': typeof WorkflowsIndexRoute
+  '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
+  '/workflows/$id/': typeof WorkflowsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/dashboard/hr': typeof DashboardHrRoute
+  '/dashboard/manager': typeof DashboardManagerRoute
+  '/dashboard/owner': typeof DashboardOwnerRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -110,14 +163,21 @@ export interface FileRoutesByTo {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows': typeof WorkflowsIndexRoute
+  '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
+  '/workflows/$id': typeof WorkflowsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/dashboard/hr': typeof DashboardHrRoute
+  '/dashboard/manager': typeof DashboardManagerRoute
+  '/dashboard/owner': typeof DashboardOwnerRoute
   '/login/otp': typeof LoginOtpRoute
   '/me/preferences': typeof MePreferencesRoute
   '/me/recognitions': typeof MeRecognitionsRoute
@@ -125,15 +185,22 @@ export interface FileRoutesById {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/workflows/': typeof WorkflowsIndexRoute
+  '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
+  '/workflows/$id/': typeof WorkflowsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/approvals'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/dashboard/hr'
+    | '/dashboard/manager'
+    | '/dashboard/owner'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -141,13 +208,20 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows/'
+    | '/workflows/$id/runs'
+    | '/workflows/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/approvals'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/dashboard/hr'
+    | '/dashboard/manager'
+    | '/dashboard/owner'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -155,13 +229,20 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows'
+    | '/workflows/$id/runs'
+    | '/workflows/$id'
   id:
     | '__root__'
     | '/'
+    | '/approvals'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/dashboard/hr'
+    | '/dashboard/manager'
+    | '/dashboard/owner'
     | '/login/otp'
     | '/me/preferences'
     | '/me/recognitions'
@@ -169,14 +250,24 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/workflows/'
+    | '/workflows/$id/runs'
+    | '/workflows/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApprovalsRoute: typeof ApprovalsRoute
   DesignSystemRoute: typeof DesignSystemRoute
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  DashboardHrRoute: typeof DashboardHrRoute
+  DashboardManagerRoute: typeof DashboardManagerRoute
+  DashboardOwnerRoute: typeof DashboardOwnerRoute
+  WorkflowsIndexRoute: typeof WorkflowsIndexRoute
+  WorkflowsIdRunsRoute: typeof WorkflowsIdRunsRoute
+  WorkflowsIdIndexRoute: typeof WorkflowsIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approvals': {
+      id: '/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof ApprovalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design-system': {
@@ -214,6 +312,27 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/hr': {
+      id: '/dashboard/hr'
+      path: '/dashboard/hr'
+      fullPath: '/dashboard/hr'
+      preLoaderRoute: typeof DashboardHrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/manager': {
+      id: '/dashboard/manager'
+      path: '/dashboard/manager'
+      fullPath: '/dashboard/manager'
+      preLoaderRoute: typeof DashboardManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/owner': {
+      id: '/dashboard/owner'
+      path: '/dashboard/owner'
+      fullPath: '/dashboard/owner'
+      preLoaderRoute: typeof DashboardOwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/otp': {
@@ -265,6 +384,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MeWalletRouteImport
       parentRoute: typeof MeRoute
     }
+    '/workflows/': {
+      id: '/workflows/'
+      path: '/workflows'
+      fullPath: '/workflows/'
+      preLoaderRoute: typeof WorkflowsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workflows/$id/': {
+      id: '/workflows/$id/'
+      path: '/workflows/$id'
+      fullPath: '/workflows/$id/'
+      preLoaderRoute: typeof WorkflowsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workflows/$id/runs': {
+      id: '/workflows/$id/runs'
+      path: '/workflows/$id/runs'
+      fullPath: '/workflows/$id/runs'
+      preLoaderRoute: typeof WorkflowsIdRunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -300,10 +440,17 @@ const MeRouteWithChildren = MeRoute._addFileChildren(MeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApprovalsRoute: ApprovalsRoute,
   DesignSystemRoute: DesignSystemRoute,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  DashboardHrRoute: DashboardHrRoute,
+  DashboardManagerRoute: DashboardManagerRoute,
+  DashboardOwnerRoute: DashboardOwnerRoute,
+  WorkflowsIndexRoute: WorkflowsIndexRoute,
+  WorkflowsIdRunsRoute: WorkflowsIdRunsRoute,
+  WorkflowsIdIndexRoute: WorkflowsIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
