@@ -281,7 +281,13 @@ export function EmptyIllustration({
   className?: string | undefined;
 }) {
   return (
-    <svg viewBox="0 0 240 160" className={className} aria-hidden="true" focusable="false" data-decorative="">
+    <svg
+      viewBox="0 0 240 160"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+      data-decorative=""
+    >
       <Scene kind={kind} />
     </svg>
   );
