@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AdminRoutePage } from "@/components/admin-route-page";
 import { BudgetPage } from "@/components/budget-page";
+import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/budget")({
   head: () => ({
@@ -24,9 +25,10 @@ export const Route = createFileRoute("/budget")({
 });
 
 function RoutePage() {
+  const persona = useAppStore((s) => s.persona);
   return (
     <AdminRoutePage pathname="/budget">
-      <BudgetPage />
+      <BudgetPage ownPoolId={persona === "manager" ? "pool-sales-a" : undefined} />
     </AdminRoutePage>
   );
 }

@@ -403,12 +403,68 @@ export const ledgerEntries: LedgerEntry[] = [
 ];
 
 export const burnForecast = [
-  { month: "Oct", actual: 34600, forecast: 42000 },
-  { month: "Nov", actual: 0, forecast: 44500 },
-  { month: "Dec", actual: 0, forecast: 46000 },
-  { month: "Jan", actual: 0, forecast: 43000 },
-  { month: "Feb", actual: 0, forecast: 41500 },
-  { month: "Mar", actual: 0, forecast: 44000 },
+  { month: "Oct", actual: 34600, forecast: 36000 },
+  { month: "Nov", actual: 0, forecast: 38500 },
+  { month: "Dec", actual: 0, forecast: 36000 },
+  { month: "Jan", actual: 0, forecast: 35000 },
+  { month: "Feb", actual: 0, forecast: 34500 },
+  { month: "Mar", actual: 0, forecast: 36000 },
+];
+
+/** Average monthly spend over the last three months, per pool (drives forecasting). */
+export const poolBurn: Record<string, number> = {
+  "pool-org": 36000,
+  "pool-mfg": 14200,
+  "pool-quality": 5600,
+  "pool-sales": 11800,
+  "pool-ops": 4400,
+  "pool-mfg-a": 6400,
+  "pool-mfg-b": 6700,
+  "pool-sales-a": 8500,
+};
+
+export const BUDGET_TODAY = new Date(2026, 9, 8);
+const DAY = 86400000;
+
+function parseDmy(value: string): Date {
+  const [d = 1, m = 1, y = 2026] = value.split("/").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export type PoolForecast = {
+  /** Date the pool reaches zero at the current pace, or null if nothing is being spent. */
+  runOut: Date | null;
+  /** True when the money runs out before the pool's expiry date. */
+  runsOutEarly: boolean;
+  /** Money still unspent when the pool expires (0 if it runs out first). */
+  unspentAtExpiry: number;
+};
+
+/** Straight-line forecast from the pool's recent monthly burn (checklist P3 budget forecasting). */
+export function forecastPool(
+  pool: BudgetPool,
+  burnPerMonth: number,
+  from: Date = BUDGET_TODAY,
+): PoolForecast {
+  const remaining = poolRemaining(pool);
+  const expiry = parseDmy(pool.expires);
+  const daysToExpiry = Math.max(0, (expiry.getTime() - from.getTime()) / DAY);
+  if (burnPerMonth <= 0) return { runOut: null, runsOutEarly: false, unspentAtExpiry: remaining };
+  if (remaining <= 0) return { runOut: from, runsOutEarly: true, unspentAtExpiry: 0 };
+  const daysLeft = (remaining / burnPerMonth) * 30.4;
+  const runOut = new Date(from.getTime() + daysLeft * DAY);
+  const spendToExpiry = (burnPerMonth / 30.4) * daysToExpiry;
+  return {
+    runOut,
+    runsOutEarly: daysLeft < daysToExpiry,
+    unspentAtExpiry: Math.max(0, Math.round((remaining - spendToExpiry) / 100) * 100),
+  };
+}
+
+/** Points that will lapse soon if employees don't redeem them. */
+export const pointExpiries = [
+  { label: "Welcome bonus points (FY 2025-26)", people: 38, points: 7600, date: "31/03/2027" },
+  { label: "Diwali 2025 campaign points", people: 12, points: 2400, date: "15/11/2026" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -434,94 +490,184 @@ export const locations = [
 // Admin rewards & redemption orders (R- screens)
 // ---------------------------------------------------------------------------
 
+export const rewardProviders = ["Xoxoday", "Pine Labs", "Amazon direct", "In-house"] as const;
+
 export type CatalogueItem = {
   id: string;
   title: string;
   brand: string;
+  provider: string;
+  sku: string;
+  /** Face values offered, in rupees. */
+  denominations: number[];
   points: number;
   value: number;
   category: string;
-  taxNature: string;
+  taxNature: TaxNature;
+  delivery: string;
   stock: number | null;
   active: boolean;
 };
+
+const providerFor: Record<string, string> = {
+  Amazon: "Amazon direct",
+  Flipkart: "Xoxoday",
+  Swiggy: "Xoxoday",
+  "Indian Oil": "Pine Labs",
+  BookMyShow: "Pine Labs",
+  "Akshaya Patra": "Xoxoday",
+  "Radha Krishna Mills": "In-house",
+  UPI: "In-house",
+};
+
+const natureFor = (taxNature: string): TaxNature =>
+  taxNature === "Meal voucher"
+    ? "meal_voucher"
+    : taxNature === "Cash equivalent"
+      ? "cash_taxable"
+      : "perquisite_noncash";
 
 export const catalogueItems: CatalogueItem[] = rewards.map((reward, index) => ({
   id: reward.id,
   title: reward.title,
   brand: reward.brand,
+  provider: providerFor[reward.brand] ?? "Xoxoday",
+  sku: `${reward.brand.slice(0, 3).toUpperCase()}-${reward.value}-${String(index + 1).padStart(3, "0")}`,
+  denominations: reward.value >= 1000 ? [500, 1000, 2000] : [reward.value],
   points: reward.points,
   value: reward.value,
   category: reward.category,
-  taxNature: reward.taxNature,
-  stock: index === 3 ? 0 : null,
+  taxNature: natureFor(reward.taxNature),
+  delivery: reward.delivery,
+  stock: index === 3 ? 0 : reward.delivery === "Physical" ? 46 : null,
   active: index !== 3,
 }));
+
+export type OrderStatus = "Requested" | "Hold" | "Ordered" | "Fulfilled" | "Failed";
+export const orderStatuses: OrderStatus[] = ["Requested", "Hold", "Ordered", "Fulfilled", "Failed"];
 
 export type RedemptionOrder = {
   id: string;
   employee: string;
   code: string;
+  team: string;
   item: string;
   points: number;
-  taxNature: string;
-  status: "Delivered" | "Processing" | "Failed" | "Refunded";
+  taxNature: TaxNature;
+  status: OrderStatus;
   date: string;
   note?: string;
+  refunded?: boolean;
 };
+
+const orderPerson = (index: number) => ({
+  employee: employees[index]?.name ?? "",
+  code: employees[index]?.code ?? "",
+  team: employees[index]?.team ?? "",
+});
 
 export const redemptionOrders: RedemptionOrder[] = [
   {
-    id: "ord-1042",
-    employee: employees[8]?.name ?? "",
-    code: "RKM0009",
-    item: "Amazon shopping voucher",
+    id: "ord-1047",
+    ...orderPerson(18),
+    item: "Amazon Pay e-gift card",
     points: 500,
-    taxNature: "Non-cash gift",
-    status: "Delivered",
-    date: "06/10/2026",
+    taxNature: "perquisite_noncash",
+    status: "Requested",
+    date: "08/10/2026",
   },
   {
     id: "ord-1043",
-    employee: employees[1]?.name ?? "",
-    code: "RKM0002",
+    ...orderPerson(1),
     item: "Swiggy meal voucher",
     points: 300,
-    taxNature: "Meal voucher",
-    status: "Processing",
+    taxNature: "meal_voucher",
+    status: "Hold",
+    date: "07/10/2026",
+    note: "Points held while the provider confirms the order.",
+  },
+  {
+    id: "ord-1048",
+    ...orderPerson(50),
+    item: "Flipkart gift voucher",
+    points: 1000,
+    taxNature: "perquisite_noncash",
+    status: "Ordered",
     date: "07/10/2026",
   },
   {
     id: "ord-1044",
-    employee: employees[6]?.name ?? "",
-    code: "RKM0007",
+    ...orderPerson(6),
     item: "Fuel gift card",
     points: 1000,
-    taxNature: "Non-cash gift",
+    taxNature: "perquisite_noncash",
     status: "Failed",
     date: "07/10/2026",
-    note: "Vendor timeout — safe to retry, points are held.",
+    note: "Provider timeout — safe to retry. Points are held until retry or refund.",
+  },
+  {
+    id: "ord-1042",
+    ...orderPerson(8),
+    item: "Amazon Pay e-gift card",
+    points: 500,
+    taxNature: "perquisite_noncash",
+    status: "Fulfilled",
+    date: "06/10/2026",
   },
   {
     id: "ord-1045",
-    employee: employees[13]?.name ?? "",
-    code: "RKM0014",
+    ...orderPerson(13),
     item: "UPI cash reward",
     points: 1100,
-    taxNature: "Cash equivalent",
-    status: "Refunded",
+    taxNature: "cash_taxable",
+    status: "Failed",
     date: "05/10/2026",
-    note: "Employee cancelled before the code was revealed.",
+    note: "UPI ID rejected by the bank. Points returned to the wallet.",
+    refunded: true,
   },
   {
     id: "ord-1046",
-    employee: employees[3]?.name ?? "",
-    code: "RKM0004",
+    ...orderPerson(34),
     item: "Movies for two",
     points: 500,
-    taxNature: "Non-cash gift",
-    status: "Delivered",
+    taxNature: "perquisite_noncash",
+    status: "Fulfilled",
     date: "04/10/2026",
+  },
+];
+
+export type OfflineReward = {
+  id: string;
+  employee: string;
+  code: string;
+  what: string;
+  value: number;
+  taxNature: TaxNature;
+  date: string;
+  reason: string;
+  by: string;
+};
+
+export const offlineRewards: OfflineReward[] = [
+  {
+    id: "off-12",
+    ...orderPerson(20),
+    what: "Silver coin (10 g)",
+    value: 950,
+    taxNature: "perquisite_noncash",
+    date: "15/09/2026",
+    reason: "10 years of service — given at the plant meeting",
+    by: "Ramesh Krishnan",
+  },
+  {
+    id: "off-11",
+    ...orderPerson(41),
+    what: "Cash prize",
+    value: 1000,
+    taxNature: "cash_taxable",
+    date: "28/08/2026",
+    reason: "Safety suggestion adopted on Line B",
+    by: "Lakshmi Menon",
   },
 ];
 
