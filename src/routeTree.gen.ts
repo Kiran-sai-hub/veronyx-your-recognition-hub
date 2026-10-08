@@ -13,15 +13,19 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as BudgetRouteImport } from './routes/budget'
+import { Route as CampaignsRouteImport } from './routes/campaigns'
 import { Route as CaptureRouteImport } from './routes/capture'
+import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ConnectorsRouteImport } from './routes/connectors'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
+import { Route as FairnessRouteImport } from './routes/fairness'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PayrollRouteImport } from './routes/payroll'
 import { Route as PeopleRouteImport } from './routes/people'
 import { Route as RewardsRouteImport } from './routes/rewards'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as BoardsIndexRouteImport } from './routes/boards.index'
 import { Route as BoardsIdRouteImport } from './routes/boards.$id'
 import { Route as ConnectorsIndexRouteImport } from './routes/connectors.index'
@@ -60,9 +64,19 @@ const BudgetRoute = BudgetRouteImport.update({
   path: '/budget',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampaignsRoute = CampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CaptureRoute = CaptureRouteImport.update({
   id: '/capture',
   path: '/capture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConnectorsRoute = ConnectorsRouteImport.update({
@@ -73,6 +87,11 @@ const ConnectorsRoute = ConnectorsRouteImport.update({
 const DesignSystemRoute = DesignSystemRouteImport.update({
   id: '/design-system',
   path: '/design-system',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FairnessRoute = FairnessRouteImport.update({
+  id: '/fairness',
+  path: '/fairness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -103,6 +122,11 @@ const PeopleRoute = PeopleRouteImport.update({
 const RewardsRoute = RewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BoardsIndexRoute = BoardsIndexRouteImport.update({
@@ -196,15 +220,19 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
   '/budget': typeof BudgetRoute
+  '/campaigns': typeof CampaignsRoute
   '/capture': typeof CaptureRoute
+  '/compliance': typeof ComplianceRoute
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
+  '/fairness': typeof FairnessRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/payroll': typeof PayrollRoute
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -228,14 +256,18 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
   '/budget': typeof BudgetRoute
+  '/campaigns': typeof CampaignsRoute
   '/capture': typeof CaptureRoute
+  '/compliance': typeof ComplianceRoute
   '/design-system': typeof DesignSystemRoute
+  '/fairness': typeof FairnessRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/payroll': typeof PayrollRoute
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -260,15 +292,19 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
   '/budget': typeof BudgetRoute
+  '/campaigns': typeof CampaignsRoute
   '/capture': typeof CaptureRoute
+  '/compliance': typeof ComplianceRoute
   '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
+  '/fairness': typeof FairnessRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/payroll': typeof PayrollRoute
   '/people': typeof PeopleRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
   '/boards/$id': typeof BoardsIdRoute
   '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
@@ -294,15 +330,19 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/approvals'
     | '/budget'
+    | '/campaigns'
     | '/capture'
+    | '/compliance'
     | '/connectors'
     | '/design-system'
+    | '/fairness'
     | '/login'
     | '/me'
     | '/onboarding'
     | '/payroll'
     | '/people'
     | '/rewards'
+    | '/settings'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -326,14 +366,18 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/approvals'
     | '/budget'
+    | '/campaigns'
     | '/capture'
+    | '/compliance'
     | '/design-system'
+    | '/fairness'
     | '/login'
     | '/me'
     | '/onboarding'
     | '/payroll'
     | '/people'
     | '/rewards'
+    | '/settings'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -357,15 +401,19 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/approvals'
     | '/budget'
+    | '/campaigns'
     | '/capture'
+    | '/compliance'
     | '/connectors'
     | '/design-system'
+    | '/fairness'
     | '/login'
     | '/me'
     | '/onboarding'
     | '/payroll'
     | '/people'
     | '/rewards'
+    | '/settings'
     | '/boards/$id'
     | '/connectors/mapping'
     | '/dashboard/hr'
@@ -390,15 +438,19 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   ApprovalsRoute: typeof ApprovalsRoute
   BudgetRoute: typeof BudgetRoute
+  CampaignsRoute: typeof CampaignsRoute
   CaptureRoute: typeof CaptureRoute
+  ComplianceRoute: typeof ComplianceRoute
   ConnectorsRoute: typeof ConnectorsRouteWithChildren
   DesignSystemRoute: typeof DesignSystemRoute
+  FairnessRoute: typeof FairnessRoute
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   PayrollRoute: typeof PayrollRoute
   PeopleRoute: typeof PeopleRoute
   RewardsRoute: typeof RewardsRoute
+  SettingsRoute: typeof SettingsRoute
   BoardsIdRoute: typeof BoardsIdRoute
   DashboardHrRoute: typeof DashboardHrRoute
   DashboardManagerRoute: typeof DashboardManagerRoute
@@ -439,11 +491,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BudgetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/campaigns': {
+      id: '/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof CampaignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/capture': {
       id: '/capture'
       path: '/capture'
       fullPath: '/capture'
       preLoaderRoute: typeof CaptureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/connectors': {
@@ -458,6 +524,13 @@ declare module '@tanstack/react-router' {
       path: '/design-system'
       fullPath: '/design-system'
       preLoaderRoute: typeof DesignSystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fairness': {
+      id: '/fairness'
+      path: '/fairness'
+      fullPath: '/fairness'
+      preLoaderRoute: typeof FairnessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -500,6 +573,13 @@ declare module '@tanstack/react-router' {
       path: '/rewards'
       fullPath: '/rewards'
       preLoaderRoute: typeof RewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boards/': {
@@ -673,15 +753,19 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   ApprovalsRoute: ApprovalsRoute,
   BudgetRoute: BudgetRoute,
+  CampaignsRoute: CampaignsRoute,
   CaptureRoute: CaptureRoute,
+  ComplianceRoute: ComplianceRoute,
   ConnectorsRoute: ConnectorsRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
+  FairnessRoute: FairnessRoute,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   PayrollRoute: PayrollRoute,
   PeopleRoute: PeopleRoute,
   RewardsRoute: RewardsRoute,
+  SettingsRoute: SettingsRoute,
   BoardsIdRoute: BoardsIdRoute,
   DashboardHrRoute: DashboardHrRoute,
   DashboardManagerRoute: DashboardManagerRoute,
