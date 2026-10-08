@@ -44,6 +44,14 @@ export const connectors: Connector[] = [
     note: "Connection expired. Sign in to Zoho again to resume.",
   },
   {
+    id: "freshdesk",
+    name: "Freshdesk — support tickets",
+    kind: "Freshdesk",
+    status: "connected",
+    lastSync: "08/10/2026 10:45",
+    records: 3120,
+  },
+  {
     id: "email-suggestions",
     name: "Safety suggestions inbox",
     kind: "Email",
@@ -61,49 +69,147 @@ export const connectors: Connector[] = [
   },
 ];
 
+export type ConnectorCategory =
+  "CRM" | "Helpdesk" | "HRIS" | "Sheets" | "Email" | "Webhook" | "Custom";
+export type AuthType =
+  "OAuth" | "API key" | "Service account" | "File upload" | "Forwarding address" | "Signed URL";
+
 export type GalleryConnector = {
   id: string;
   name: string;
   description: string;
-  setupSteps: string[];
+  category: ConnectorCategory;
+  auth: AuthType;
+  syncMode: "webhook" | "poll" | "upload" | "push";
+  setupTime: string;
+  objects: string[];
+  fields: { name: string; type: string; sample: string; maps: string }[];
 };
+
+const salesFields = [
+  { name: "Deal_Name", type: "text", sample: "Salem distributor", maps: "ignore" },
+  { name: "Amount", type: "currency", sample: "₹ 2,10,000", maps: "amount_paise" },
+  { name: "Owner.email", type: "email", sample: "pooja.kumar@rkmills.in", maps: "subject_ref" },
+  { name: "Stage", type: "picklist", sample: "Closed Won", maps: "status" },
+  { name: "Closing_Date", type: "date", sample: "18/09/2026", maps: "occurred_at" },
+  { name: "id", type: "id", sample: "88213", maps: "source_record_id" },
+];
 
 export const connectorGallery: GalleryConnector[] = [
   {
     id: "csv",
     name: "CSV / Excel upload",
     description: "Upload a monthly file from your computer.",
-    setupSteps: ["Download the template", "Upload your file", "Match the columns", "Preview rows"],
+    category: "Sheets",
+    auth: "File upload",
+    syncMode: "upload",
+    setupTime: "2 min",
+    objects: ["Rows in the first sheet"],
+    fields: salesFields,
   },
   {
     id: "gsheet",
     name: "Google Sheets",
     description: "Keep a shared sheet in sync automatically.",
-    setupSteps: ["Sign in with Google", "Pick the sheet", "Match the columns", "Set sync time"],
+    category: "Sheets",
+    auth: "Service account",
+    syncMode: "poll",
+    setupTime: "5 min",
+    objects: ["Daily_Output tab", "Attendance tab"],
+    fields: [
+      { name: "Date", type: "date", sample: "07/10/2026", maps: "occurred_at" },
+      { name: "Emp Code", type: "text", sample: "RKM0009", maps: "subject_ref" },
+      { name: "Units", type: "number", sample: "412", maps: "value" },
+      { name: "Line", type: "text", sample: "Line B", maps: "team" },
+      { name: "Row", type: "id", sample: "R-2291", maps: "source_record_id" },
+    ],
   },
   {
     id: "zoho-crm",
     name: "Zoho CRM",
-    description: "Pull orders and targets from Zoho CRM.",
-    setupSteps: ["Sign in to Zoho", "Choose modules", "Match the fields", "Test the connection"],
+    description: "Pull deals and targets from Zoho CRM.",
+    category: "CRM",
+    auth: "OAuth",
+    syncMode: "webhook",
+    setupTime: "5 min",
+    objects: ["Deals", "Accounts", "Targets"],
+    fields: salesFields,
   },
   {
     id: "zoho-bigin",
     name: "Zoho Bigin",
     description: "Use Bigin pipelines as a performance source.",
-    setupSteps: ["Sign in to Zoho", "Choose pipelines", "Match the fields", "Test the connection"],
+    category: "CRM",
+    auth: "OAuth",
+    syncMode: "poll",
+    setupTime: "5 min",
+    objects: ["Pipelines", "Contacts"],
+    fields: salesFields,
+  },
+  {
+    id: "freshdesk",
+    name: "Freshdesk",
+    description: "Tickets resolved and CSAT ratings.",
+    category: "Helpdesk",
+    auth: "API key",
+    syncMode: "poll",
+    setupTime: "4 min",
+    objects: ["Tickets", "Satisfaction ratings", "Agents"],
+    fields: [
+      { name: "ticket_id", type: "id", sample: "51022", maps: "source_record_id" },
+      { name: "responder_email", type: "email", sample: "agent.x@support", maps: "subject_ref" },
+      { name: "rating", type: "number", sample: "5", maps: "value" },
+      { name: "resolved_at", type: "datetime", sample: "07/10/2026 16:40", maps: "occurred_at" },
+    ],
+  },
+  {
+    id: "keka",
+    name: "Keka HR",
+    description: "Employee master and attendance from Keka.",
+    category: "HRIS",
+    auth: "API key",
+    syncMode: "poll",
+    setupTime: "5 min",
+    objects: ["Employees", "Attendance"],
+    fields: salesFields.slice(2),
   },
   {
     id: "email",
     name: "Email inbox",
-    description: "Turn a shared inbox into a data source.",
-    setupSteps: ["Get your Veronyx inbox address", "Send a test email", "Confirm the format"],
+    description: "Forward structured emails to a Veronyx address.",
+    category: "Email",
+    auth: "Forwarding address",
+    syncMode: "push",
+    setupTime: "3 min",
+    objects: ["Emails with a CSV attachment"],
+    fields: salesFields.slice(1, 4),
   },
   {
     id: "webhook",
     name: "Webhook",
     description: "Send events from your own software.",
-    setupSteps: ["Copy the webhook URL", "Send a test event", "Match the fields"],
+    category: "Webhook",
+    auth: "Signed URL",
+    syncMode: "webhook",
+    setupTime: "10 min",
+    objects: ["production.output", "quality.inspection"],
+    fields: [
+      { name: "event_id", type: "id", sample: "evt_8812", maps: "source_record_id" },
+      { name: "employee_code", type: "text", sample: "RKM0012", maps: "subject_ref" },
+      { name: "units", type: "number", sample: "398", maps: "value" },
+      { name: "ts", type: "datetime", sample: "08/10/2026 11:00", maps: "occurred_at" },
+    ],
+  },
+  {
+    id: "custom",
+    name: "Custom REST API",
+    description: "Poll any JSON API with a key.",
+    category: "Custom",
+    auth: "API key",
+    syncMode: "poll",
+    setupTime: "15 min",
+    objects: ["Endpoint of your choice"],
+    fields: salesFields.slice(1, 5),
   },
 ];
 
@@ -118,114 +224,6 @@ export const dataHealth = {
 // ---------------------------------------------------------------------------
 // Field mapping, identity resolution, field registry (C- screens)
 // ---------------------------------------------------------------------------
-
-export type FieldMapping = {
-  source: string;
-  target: string | null;
-  sample: string;
-};
-
-export const targetFields = [
-  "Employee code",
-  "Employee name",
-  "Metric value",
-  "Target",
-  "Date",
-  "Department",
-  "Ignore this column",
-] as const;
-
-export const fieldMappings: FieldMapping[] = [
-  { source: "emp_code", target: "Employee code", sample: "RKM0007" },
-  { source: "emp_name", target: "Employee name", sample: "Meera Joshi" },
-  { source: "sales_rs", target: "Metric value", sample: "462000" },
-  { source: "month", target: "Date", sample: "Sep 2026" },
-  { source: "dept", target: "Department", sample: "Sales" },
-  { source: "target_rs", target: null, sample: "500000" },
-];
-
-export type IdentityMatch = {
-  id: string;
-  sourceName: string;
-  sourceDetail: string;
-  candidateName: string | null;
-  candidateCode: string | null;
-  confidence: "High" | "Medium" | "No match";
-  reason: string;
-};
-
-export const identityQueue: IdentityMatch[] = [
-  {
-    id: "id-1",
-    sourceName: "R. Kumar",
-    sourceDetail: "Sales file · row 12",
-    candidateName: "Rahul Kumar",
-    candidateCode: "RKM0005",
-    confidence: "High",
-    reason: "Name and phone ending match",
-  },
-  {
-    id: "id-2",
-    sourceName: "Meera J",
-    sourceDetail: "Sales file · row 19",
-    candidateName: "Meera Joshi",
-    candidateCode: "RKM0027",
-    confidence: "Medium",
-    reason: "Name matches, department differs",
-  },
-  {
-    id: "id-3",
-    sourceName: "S. Velu",
-    sourceDetail: "Attendance sheet · row 44",
-    candidateName: null,
-    candidateCode: null,
-    confidence: "No match",
-    reason: "No employee with a similar name",
-  },
-  {
-    id: "id-4",
-    sourceName: "Aarav Sharma",
-    sourceDetail: "ERP webhook · event 981",
-    candidateName: "Aarav Sharma",
-    candidateCode: "RKM0001",
-    confidence: "High",
-    reason: "Exact employee code match",
-  },
-  {
-    id: "id-5",
-    sourceName: "Kavya Reddy (old)",
-    sourceDetail: "Sales file · row 31",
-    candidateName: "Kavya Reddy",
-    candidateCode: "RKM0200",
-    confidence: "Medium",
-    reason: "This employee has exited — confirm before linking",
-  },
-];
-
-export const fieldRegistry = [
-  { field: "Employee code", type: "Text", usedBy: "All connectors", pii: false },
-  { field: "Employee name", type: "Text", usedBy: "All connectors", pii: true },
-  { field: "Metric value", type: "Number", usedBy: "Sales file, ERP webhook", pii: false },
-  { field: "Target", type: "Number", usedBy: "Sales file", pii: false },
-  { field: "Date", type: "Date", usedBy: "All connectors", pii: false },
-  { field: "Phone number", type: "Text", usedBy: "Employee import", pii: true },
-];
-
-export const schemaDriftAlerts = [
-  {
-    id: "drift-1",
-    source: "Monthly sales file",
-    message:
-      "The “Target” column disappeared on 07/10/2026. One workflow run failed because of this.",
-    date: "07/10/2026",
-  },
-  {
-    id: "drift-2",
-    source: "Production ERP webhook",
-    message: "A new field “shift_id” appeared. It is ignored until you map it.",
-    date: "02/10/2026",
-  },
-];
 
 // ---------------------------------------------------------------------------
 // Budget & Ledger
