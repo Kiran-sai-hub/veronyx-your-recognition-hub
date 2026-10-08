@@ -45,6 +45,17 @@ describe("whatsapp bot", () => {
     expect(botReply("BALANCE", stopped).reply).toMatch(/JOIN/);
     expect(botReply("JOIN", stopped).state.stopped).toBe(false);
   });
+  it("confirms a shoutout in the checklist's words", () => {
+    const joined = botReply("JOIN", initialBotState).state;
+    expect(botReply("THANKS @priya for Diwali rush help", joined).reply).toBe(
+      "Sent! Priya received your shoutout 🙌",
+    );
+  });
+  it("replies 1 and 2 only after a recognition push", () => {
+    const joined = botReply("JOIN", initialBotState).state;
+    expect(botReply("2", joined).reply).toMatch(/didn't understand/);
+    expect(botReply("2", { ...joined, lastNotification: true }).reply).toMatch(/Line B/);
+  });
   it("LANG cycles to Tamil", () => {
     const joined = botReply("JOIN", initialBotState).state;
     expect(botReply("LANG", joined).state.language).toBe("ta");
