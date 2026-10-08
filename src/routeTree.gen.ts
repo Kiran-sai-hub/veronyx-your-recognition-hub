@@ -10,11 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as ApprovalsRouteImport } from './routes/approvals'
+import { Route as BudgetRouteImport } from './routes/budget'
+import { Route as CaptureRouteImport } from './routes/capture'
+import { Route as ConnectorsRouteImport } from './routes/connectors'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PayrollRouteImport } from './routes/payroll'
+import { Route as PeopleRouteImport } from './routes/people'
+import { Route as RewardsRouteImport } from './routes/rewards'
+import { Route as BoardsIndexRouteImport } from './routes/boards.index'
+import { Route as BoardsIdRouteImport } from './routes/boards.$id'
+import { Route as ConnectorsIndexRouteImport } from './routes/connectors.index'
+import { Route as ConnectorsMappingRouteImport } from './routes/connectors.mapping'
 import { Route as DashboardHrRouteImport } from './routes/dashboard.hr'
 import { Route as DashboardManagerRouteImport } from './routes/dashboard.manager'
 import { Route as DashboardOwnerRouteImport } from './routes/dashboard.owner'
@@ -34,9 +45,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApprovalsRoute = ApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetRoute = BudgetRouteImport.update({
+  id: '/budget',
+  path: '/budget',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaptureRoute = CaptureRouteImport.update({
+  id: '/capture',
+  path: '/capture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectorsRoute = ConnectorsRouteImport.update({
+  id: '/connectors',
+  path: '/connectors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignSystemRoute = DesignSystemRouteImport.update({
@@ -58,6 +89,41 @@ const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PayrollRoute = PayrollRouteImport.update({
+  id: '/payroll',
+  path: '/payroll',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PeopleRoute = PeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RewardsRoute = RewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoardsIndexRoute = BoardsIndexRouteImport.update({
+  id: '/boards/',
+  path: '/boards/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoardsIdRoute = BoardsIdRouteImport.update({
+  id: '/boards/$id',
+  path: '/boards/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectorsIndexRoute = ConnectorsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConnectorsRoute,
+} as any)
+const ConnectorsMappingRoute = ConnectorsMappingRouteImport.update({
+  id: '/mapping',
+  path: '/mapping',
+  getParentRoute: () => ConnectorsRoute,
 } as any)
 const DashboardHrRoute = DashboardHrRouteImport.update({
   id: '/dashboard/hr',
@@ -127,11 +193,20 @@ const WorkflowsIdRunsRoute = WorkflowsIdRunsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
+  '/budget': typeof BudgetRoute
+  '/capture': typeof CaptureRoute
+  '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/payroll': typeof PayrollRoute
+  '/people': typeof PeopleRoute
+  '/rewards': typeof RewardsRoute
+  '/boards/$id': typeof BoardsIdRoute
+  '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
@@ -142,17 +217,27 @@ export interface FileRoutesByFullPath {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/boards/': typeof BoardsIndexRoute
+  '/connectors/': typeof ConnectorsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
+  '/budget': typeof BudgetRoute
+  '/capture': typeof CaptureRoute
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/payroll': typeof PayrollRoute
+  '/people': typeof PeopleRoute
+  '/rewards': typeof RewardsRoute
+  '/boards/$id': typeof BoardsIdRoute
+  '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
@@ -163,6 +248,8 @@ export interface FileRoutesByTo {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/boards': typeof BoardsIndexRoute
+  '/connectors': typeof ConnectorsIndexRoute
   '/workflows': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id': typeof WorkflowsIdIndexRoute
@@ -170,11 +257,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/approvals': typeof ApprovalsRoute
+  '/budget': typeof BudgetRoute
+  '/capture': typeof CaptureRoute
+  '/connectors': typeof ConnectorsRouteWithChildren
   '/design-system': typeof DesignSystemRoute
   '/login': typeof LoginRouteWithChildren
   '/me': typeof MeRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/payroll': typeof PayrollRoute
+  '/people': typeof PeopleRoute
+  '/rewards': typeof RewardsRoute
+  '/boards/$id': typeof BoardsIdRoute
+  '/connectors/mapping': typeof ConnectorsMappingRoute
   '/dashboard/hr': typeof DashboardHrRoute
   '/dashboard/manager': typeof DashboardManagerRoute
   '/dashboard/owner': typeof DashboardOwnerRoute
@@ -185,6 +281,8 @@ export interface FileRoutesById {
   '/me/shoutout': typeof MeShoutoutRoute
   '/me/tracking': typeof MeTrackingRoute
   '/me/wallet': typeof MeWalletRoute
+  '/boards/': typeof BoardsIndexRoute
+  '/connectors/': typeof ConnectorsIndexRoute
   '/workflows/': typeof WorkflowsIndexRoute
   '/workflows/$id/runs': typeof WorkflowsIdRunsRoute
   '/workflows/$id/': typeof WorkflowsIdIndexRoute
@@ -193,11 +291,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics'
     | '/approvals'
+    | '/budget'
+    | '/capture'
+    | '/connectors'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/payroll'
+    | '/people'
+    | '/rewards'
+    | '/boards/$id'
+    | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
@@ -208,17 +315,27 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/boards/'
+    | '/connectors/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
     | '/approvals'
+    | '/budget'
+    | '/capture'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/payroll'
+    | '/people'
+    | '/rewards'
+    | '/boards/$id'
+    | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
@@ -229,17 +346,28 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/boards'
+    | '/connectors'
     | '/workflows'
     | '/workflows/$id/runs'
     | '/workflows/$id'
   id:
     | '__root__'
     | '/'
+    | '/analytics'
     | '/approvals'
+    | '/budget'
+    | '/capture'
+    | '/connectors'
     | '/design-system'
     | '/login'
     | '/me'
     | '/onboarding'
+    | '/payroll'
+    | '/people'
+    | '/rewards'
+    | '/boards/$id'
+    | '/connectors/mapping'
     | '/dashboard/hr'
     | '/dashboard/manager'
     | '/dashboard/owner'
@@ -250,6 +378,8 @@ export interface FileRouteTypes {
     | '/me/shoutout'
     | '/me/tracking'
     | '/me/wallet'
+    | '/boards/'
+    | '/connectors/'
     | '/workflows/'
     | '/workflows/$id/runs'
     | '/workflows/$id/'
@@ -257,14 +387,23 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   ApprovalsRoute: typeof ApprovalsRoute
+  BudgetRoute: typeof BudgetRoute
+  CaptureRoute: typeof CaptureRoute
+  ConnectorsRoute: typeof ConnectorsRouteWithChildren
   DesignSystemRoute: typeof DesignSystemRoute
   LoginRoute: typeof LoginRouteWithChildren
   MeRoute: typeof MeRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  PayrollRoute: typeof PayrollRoute
+  PeopleRoute: typeof PeopleRoute
+  RewardsRoute: typeof RewardsRoute
+  BoardsIdRoute: typeof BoardsIdRoute
   DashboardHrRoute: typeof DashboardHrRoute
   DashboardManagerRoute: typeof DashboardManagerRoute
   DashboardOwnerRoute: typeof DashboardOwnerRoute
+  BoardsIndexRoute: typeof BoardsIndexRoute
   WorkflowsIndexRoute: typeof WorkflowsIndexRoute
   WorkflowsIdRunsRoute: typeof WorkflowsIdRunsRoute
   WorkflowsIdIndexRoute: typeof WorkflowsIdIndexRoute
@@ -279,11 +418,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/approvals': {
       id: '/approvals'
       path: '/approvals'
       fullPath: '/approvals'
       preLoaderRoute: typeof ApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budget': {
+      id: '/budget'
+      path: '/budget'
+      fullPath: '/budget'
+      preLoaderRoute: typeof BudgetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/capture': {
+      id: '/capture'
+      path: '/capture'
+      fullPath: '/capture'
+      preLoaderRoute: typeof CaptureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connectors': {
+      id: '/connectors'
+      path: '/connectors'
+      fullPath: '/connectors'
+      preLoaderRoute: typeof ConnectorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design-system': {
@@ -313,6 +480,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/payroll': {
+      id: '/payroll'
+      path: '/payroll'
+      fullPath: '/payroll'
+      preLoaderRoute: typeof PayrollRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/people': {
+      id: '/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof PeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rewards': {
+      id: '/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof RewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boards/': {
+      id: '/boards/'
+      path: '/boards'
+      fullPath: '/boards/'
+      preLoaderRoute: typeof BoardsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boards/$id': {
+      id: '/boards/$id'
+      path: '/boards/$id'
+      fullPath: '/boards/$id'
+      preLoaderRoute: typeof BoardsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connectors/': {
+      id: '/connectors/'
+      path: '/'
+      fullPath: '/connectors/'
+      preLoaderRoute: typeof ConnectorsIndexRouteImport
+      parentRoute: typeof ConnectorsRoute
+    }
+    '/connectors/mapping': {
+      id: '/connectors/mapping'
+      path: '/mapping'
+      fullPath: '/connectors/mapping'
+      preLoaderRoute: typeof ConnectorsMappingRouteImport
+      parentRoute: typeof ConnectorsRoute
     }
     '/dashboard/hr': {
       id: '/dashboard/hr'
@@ -408,6 +624,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ConnectorsRouteChildren {
+  ConnectorsMappingRoute: typeof ConnectorsMappingRoute
+  ConnectorsIndexRoute: typeof ConnectorsIndexRoute
+}
+
+const ConnectorsRouteChildren: ConnectorsRouteChildren = {
+  ConnectorsMappingRoute: ConnectorsMappingRoute,
+  ConnectorsIndexRoute: ConnectorsIndexRoute,
+}
+
+const ConnectorsRouteWithChildren = ConnectorsRoute._addFileChildren(
+  ConnectorsRouteChildren,
+)
+
 interface LoginRouteChildren {
   LoginOtpRoute: typeof LoginOtpRoute
 }
@@ -440,14 +670,23 @@ const MeRouteWithChildren = MeRoute._addFileChildren(MeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
   ApprovalsRoute: ApprovalsRoute,
+  BudgetRoute: BudgetRoute,
+  CaptureRoute: CaptureRoute,
+  ConnectorsRoute: ConnectorsRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
   LoginRoute: LoginRouteWithChildren,
   MeRoute: MeRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  PayrollRoute: PayrollRoute,
+  PeopleRoute: PeopleRoute,
+  RewardsRoute: RewardsRoute,
+  BoardsIdRoute: BoardsIdRoute,
   DashboardHrRoute: DashboardHrRoute,
   DashboardManagerRoute: DashboardManagerRoute,
   DashboardOwnerRoute: DashboardOwnerRoute,
+  BoardsIndexRoute: BoardsIndexRoute,
   WorkflowsIndexRoute: WorkflowsIndexRoute,
   WorkflowsIdRunsRoute: WorkflowsIdRunsRoute,
   WorkflowsIdIndexRoute: WorkflowsIdIndexRoute,

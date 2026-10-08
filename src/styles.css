@@ -19,7 +19,9 @@
  */
 
 @theme inline {
-  --font-sans: "DM Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Malayalam", sans-serif;
+  --font-sans:
+    "DM Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada",
+    "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Malayalam", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -173,11 +175,26 @@
     letter-spacing: 0;
   }
 
-  button, a, input, textarea, select { outline-offset: 2px; }
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    outline-offset: 2px;
+  }
 
-  :focus-visible { outline: 2px solid var(--color-ring); }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
