@@ -56,8 +56,6 @@ import { formatIndianNumber, formatRupees } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { type Decision as StoredDecision, useDemoStore } from "@/store/demo-store";
 
-export { isBudgetExhausted };
-
 export type Decision = "approve" | "modify" | "reject" | "escalate";
 
 const decisionCopy: Record<Decision, { title: string; button: string }> = {

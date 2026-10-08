@@ -50,10 +50,10 @@ export const recognitionPoints = employees
   .map((e) => e.points);
 
 export const departmentCoverage = [
-  { group: "Production", coverage: 64, people: 80 },
+  { group: "Manufacturing", coverage: 64, people: 80 },
   { group: "Quality", coverage: 78, people: 40 },
   { group: "Sales", coverage: 71, people: 45 },
-  { group: "Office & HR", coverage: 49, people: 35 },
+  { group: "Operations", coverage: 49, people: 35 },
 ];
 export const locationCoverage = [
   { group: "Coimbatore plant", coverage: 68, people: 120 },
@@ -190,7 +190,7 @@ export const campaigns: Campaign[] = [
     end: "05/09/2026",
     budget: 80000,
     status: "ended",
-    audience: "Production",
+    audience: "Manufacturing",
   },
   {
     id: "c3",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isBudgetExhausted } from "@/components/approvals-page";
+import { isBudgetExhausted } from "@/lib/approvals-data";
 import { approvals, initialSteps, validateWorkflow } from "@/lib/admin-data";
 
 describe("approval and workflow rules", () => {

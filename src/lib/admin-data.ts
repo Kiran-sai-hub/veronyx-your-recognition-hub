@@ -296,11 +296,12 @@ export const monthlyTrend = [
   { month: "Oct", recognitions: 118, points: 34600 },
 ];
 
+/** Same figures as the Fairness screen (last 90 days) so every screen agrees. */
 export const departmentCoverage = [
-  { department: "Manufacturing", coverage: 71 },
-  { department: "Quality", coverage: 84 },
-  { department: "Sales", coverage: 66 },
-  { department: "Operations", coverage: 58 },
+  { department: "Manufacturing", coverage: 64 },
+  { department: "Quality", coverage: 78 },
+  { department: "Sales", coverage: 71 },
+  { department: "Operations", coverage: 49 },
 ];
 
 export const teamMembers = employees

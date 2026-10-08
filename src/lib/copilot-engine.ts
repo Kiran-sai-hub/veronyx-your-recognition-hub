@@ -104,7 +104,7 @@ export function respond(question: string, persona: string): CopilotReply {
   if (q.includes("coverage") || q.includes("department") || q.includes("missed")) {
     return {
       kind: "table",
-      text: "Office & HR has the lowest coverage at 49%.",
+      text: "Operations has the lowest coverage at 49%.",
       columns: ["Department", "Coverage %"],
       rows: departmentCoverage.map((r) => ({ label: r.group, value: r.coverage })),
       sources: ["Fairness · last 90 days"],
