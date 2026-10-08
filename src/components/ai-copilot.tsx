@@ -70,7 +70,7 @@ export function AiCopilot({ screen }: { screen: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [progress, setProgress] = useState<number | null>(null);
-  const suggestions = aiSuggestionsByScreen[screen] ?? aiSuggestionsByScreen.default ?? [];
+  const suggestions = aiSuggestionsByScreen[screen] ?? aiSuggestionsByScreen["default"] ?? [];
 
   const ask = (question: string) => {
     if (!question.trim() || progress !== null) return;
