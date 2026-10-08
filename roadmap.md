@@ -6,6 +6,7 @@
 - [x] Review gate 1b — approved by user
 - [x] Phase 2 — data, boards, people, budgets, rewards admin, analytics, payroll
 - [ ] Review gate 2 — awaiting user review
-- [x] Phase 3 (screens; full-page AI copilot pending) — governance, compliance, fairness, campaigns, complete AI
-- [ ] Phase 4 — WhatsApp and kiosk
+- [x] Phase 3 — incl. full-page mock Copilot — governance, compliance, fairness, campaigns, complete AI
+- [x] Phase 4 — WhatsApp simulator and kiosk
+- [ ] Review gate 4 — awaiting user review
 - [x] Recognition insights (AI Q&A with evidence, owners/managers)
