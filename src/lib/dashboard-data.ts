@@ -1,4 +1,5 @@
 import { MANAGER_TEAM } from "@/lib/approvals-data";
+import { employees } from "@/lib/mock-data";
 
 /** Figures behind the Owner (D-01), HR (H-01) and Manager (M-01) dashboards. */
 
@@ -48,41 +49,43 @@ export type TeamMember = {
 };
 
 const member = (
-  id: string,
-  name: string,
-  code: string,
+  index: number,
   monthPoints: number,
   daysSince: number,
   salesPct: number,
   deals: number,
-): TeamMember => ({
-  id,
-  name,
-  code,
-  initials: name
-    .split(" ")
-    .map((p) => p[0])
-    .join(""),
-  monthPoints,
-  daysSince,
-  lastRecognised: daysSince <= 1 ? "Yesterday" : `${daysSince} days ago`,
-  salesPct,
-  deals,
-});
+): TeamMember => {
+  const e = employees[index];
+  const name = e?.name ?? "Employee";
+  return {
+    id: e?.id ?? `emp-${index + 1}`,
+    name,
+    code: e?.code ?? "",
+    initials: name
+      .split(" ")
+      .map((p) => p[0])
+      .join(""),
+    monthPoints,
+    daysSince,
+    lastRecognised: daysSince <= 1 ? "Yesterday" : `${daysSince} days ago`,
+    salesPct,
+    deals,
+  };
+};
 
-/** Vikram Rao's team (Sales A). */
+/** Vikram Rao's team (Sales A) — the same people as in People & Teams and Approvals. */
 export const managerTeam = {
   name: MANAGER_TEAM,
   manager: "Vikram Rao",
   members: [
-    member("tm-1", "Meera Sharma", "RKM0007", 1450, 2, 128, 14),
-    member("tm-2", "Priya Iyer", "RKM0019", 1200, 5, 112, 9),
-    member("tm-3", "Aarav Iyer", "RKM0011", 980, 7, 104, 8),
-    member("tm-4", "Ishaan Patel", "RKM0035", 760, 14, 97, 7),
-    member("tm-5", "Kavya Rao", "RKM0047", 0, 41, 88, 5),
-    member("tm-6", "Nikhil Das", "RKM0059", 520, 21, 93, 6),
-    member("tm-7", "Rahul Joshi", "RKM0071", 0, 52, 76, 4),
-    member("tm-8", "Deepa Reddy", "RKM0083", 340, 28, 91, 6),
+    member(18, 1450, 2, 128, 14),
+    member(50, 1200, 5, 112, 9),
+    member(34, 980, 7, 104, 8),
+    member(66, 760, 14, 97, 7),
+    member(82, 0, 41, 88, 5),
+    member(98, 520, 21, 93, 6),
+    member(114, 0, 52, 76, 4),
+    member(2, 340, 28, 92, 6),
   ],
   wallet: { balance: 4200, cap: 8000, used: 3800, refill: "01/11/2026" },
 };

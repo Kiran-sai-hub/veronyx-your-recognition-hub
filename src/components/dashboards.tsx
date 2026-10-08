@@ -761,7 +761,7 @@ export function HrDashboard() {
         <ul className="space-y-2">
           <AttentionRow
             tone="warning"
-            text="Meera Sharma would cross the ₹ 15,000 yearly gift limit if approved"
+            text="Pooja Kumar would cross the ₹ 15,000 yearly gift limit if approved"
             href="/approvals?id=ap-2"
             action="Review"
           />

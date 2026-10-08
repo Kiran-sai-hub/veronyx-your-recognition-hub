@@ -32,6 +32,17 @@ const firstNames = [
   "Nikhil",
   "Priya",
   "Rahul",
+  "Sanjay",
+  "Lakshmi",
+  "Imran",
+  "Fatima",
+  "Gurpreet",
+  "Anil",
+  "Divya",
+  "Karthik",
+  "Pooja",
+  "Joseph",
+  "Suresh",
 ];
 const lastNames = [
   "Sharma",
@@ -44,17 +55,30 @@ const lastNames = [
   "Das",
   "Joshi",
   "Reddy",
+  "Khan",
+  "Menon",
+  "Pillai",
+  "Banerjee",
+  "Gowda",
+  "Fernandes",
 ];
 
+/**
+ * 200 deterministic employees. Every first/last name pair is unique, and each department is
+ * spread across teams A–D (e.g. Sales A is indices 2, 18, 34, …).
+ */
 export const employees: Employee[] = Array.from({ length: 200 }, (_, index) => {
   const department = departments[index % departments.length] ?? "Operations";
+  const first = firstNames[index % firstNames.length];
+  const last = lastNames[(index + 2 * Math.floor(index / firstNames.length)) % lastNames.length];
   return {
     id: `emp-${index + 1}`,
-    name: `${firstNames[index % firstNames.length]} ${lastNames[Math.floor(index / firstNames.length) % lastNames.length]}`,
+    name: `${first} ${last}`,
     code: `RKM${String(index + 1).padStart(4, "0")}`,
     department,
-    team: `${department} ${String.fromCharCode(65 + (index % 4))}`,
-    location: ["Coimbatore", "Chennai", "Erode", "Tiruppur"][index % 4] ?? "Chennai",
+    team: `${department} ${String.fromCharCode(65 + (Math.floor(index / 4) % 4))}`,
+    location:
+      ["Coimbatore", "Chennai", "Erode", "Tiruppur"][Math.floor(index / 2) % 4] ?? "Chennai",
     points: 300 + ((index * 137) % 2400),
     status: index === 199 ? "exited" : "active",
   };

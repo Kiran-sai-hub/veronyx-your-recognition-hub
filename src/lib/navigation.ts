@@ -1,3 +1,4 @@
+import { currentEmployee } from "@/lib/mock-data";
 import type { Persona } from "@/store/app-store";
 
 /**
@@ -200,5 +201,9 @@ export const personaUser: Record<Persona, { name: string; initials: string; deta
   owner: { name: "Ramesh Krishnan", initials: "RK", detail: "Managing Director" },
   hr: { name: "Lakshmi Menon", initials: "LM", detail: "HR Admin" },
   manager: { name: "Vikram Rao", initials: "VR", detail: "Manager · Sales A" },
-  employee: { name: "Priya Sharma", initials: "PS", detail: "Manufacturing A · Coimbatore" },
+  employee: {
+    name: currentEmployee?.name ?? "Priya Joshi",
+    initials: "PJ",
+    detail: `${currentEmployee?.team ?? "Manufacturing C"} · ${currentEmployee?.location ?? "Coimbatore"}`,
+  },
 };

@@ -1,10 +1,18 @@
-import { ChevronLeft, ChevronRight, MapPin, Search, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Search, Upload, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { EmployeeImportWizard } from "@/components/employee-import";
 import { PageHeading } from "@/components/page-heading";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,11 +30,20 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { employees, type Employee } from "@/lib/mock-data";
+import { MANAGER_TEAM } from "@/lib/approvals-data";
 import { departmentSummary, locations } from "@/lib/phase2-data";
 
 const PAGE_SIZE = 10;
 
-export function PeoplePage() {
+export function PeoplePage({
+  teamOnly = false,
+  emptyOrg = false,
+}: {
+  /** Manager view (checklist §1.3): only their own team. */
+  teamOnly?: boolean;
+  emptyOrg?: boolean;
+}) {
+  const [importOpen, setImportOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState("all");
   const [page, setPage] = useState(0);
@@ -34,14 +51,19 @@ export function PeoplePage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return employees.filter(
+    const scope = emptyOrg
+      ? []
+      : teamOnly
+        ? employees.filter((e) => e.team === MANAGER_TEAM)
+        : employees;
+    return scope.filter(
       (employee) =>
         (department === "all" || employee.department === department) &&
         (q === "" ||
           employee.name.toLowerCase().includes(q) ||
           employee.code.toLowerCase().includes(q)),
     );
-  }, [query, department]);
+  }, [query, department, teamOnly, emptyOrg]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
@@ -51,9 +73,31 @@ export function PeoplePage() {
     <div className="space-y-8">
       <PageHeading
         eyebrow="People"
-        title="People & teams"
-        description="Everyone at Radha Krishna Mills, their teams and locations."
+        title={teamOnly ? `People · ${MANAGER_TEAM}` : "People & teams"}
+        description={
+          teamOnly
+            ? "Your own team. HR manages employee records."
+            : "Everyone at Radha Krishna Mills, their teams and locations."
+        }
+        action={
+          !teamOnly && (
+            <Button onClick={() => setImportOpen(true)}>
+              <Upload /> Import employees
+            </Button>
+          )
+        }
       />
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Import employees</DialogTitle>
+            <DialogDescription>
+              Upload a file, link a Google Sheet or add people by hand.
+            </DialogDescription>
+          </DialogHeader>
+          <EmployeeImportWizard />
+        </DialogContent>
+      </Dialog>
 
       <Tabs defaultValue="people">
         <TabsList>
@@ -133,7 +177,16 @@ export function PeoplePage() {
                   {rows.length === 0 && (
                     <tr>
                       <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                        Nobody matches that search. Try a different name or code.
+                        {emptyOrg ? (
+                          <span className="flex flex-col items-center gap-3">
+                            No employees yet. Import your team.
+                            <Button size="sm" onClick={() => setImportOpen(true)}>
+                              <Upload /> Import employees
+                            </Button>
+                          </span>
+                        ) : (
+                          "Nobody matches that search. Try a different name or code."
+                        )}
                       </td>
                     </tr>
                   )}
