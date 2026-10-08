@@ -74,6 +74,8 @@ const en = {
   "pref.language": "Language",
   "pref.fallback":
     "Some screens are not yet translated into {language}. They are shown in English.",
+  "copilot.greeting":
+    "Hi! I can help you create workflows, explain leaderboards, and answer questions. What would you like to do?",
   "pref.saved": "Language preference saved",
 } as const;
 
@@ -146,6 +148,8 @@ const hi: Dictionary = {
   "pref.title": "पसंद",
   "pref.desc": "अपनी भाषा चुनें और तय करें कि राधा कृष्णा मिल्स आपसे कैसे संपर्क करे।",
   "pref.language": "भाषा",
+  "copilot.greeting":
+    "नमस्ते! मैं वर्कफ़्लो बनाने, लीडरबोर्ड समझाने और सवालों के जवाब देने में मदद कर सकता हूँ। आप क्या करना चाहेंगे?",
   "pref.saved": "भाषा सहेजी गई",
 };
 
@@ -217,6 +221,8 @@ const ta: Dictionary = {
   "pref.desc":
     "உங்கள் மொழியையும் ராதா கிருஷ்ணா மில்ஸ் உங்களைத் தொடர்பு கொள்ளும் முறையையும் தேர்ந்தெடுக்கவும்.",
   "pref.language": "மொழி",
+  "copilot.greeting":
+    "வணக்கம்! வொர்க்ஃப்ளோக்களை உருவாக்க, லீடர்போர்டுகளை விளக்க, கேள்விகளுக்குப் பதில் சொல்ல உதவுவேன். என்ன செய்ய விரும்புகிறீர்கள்?",
   "pref.saved": "மொழி விருப்பம் சேமிக்கப்பட்டது",
 };
 

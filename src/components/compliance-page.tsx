@@ -81,7 +81,16 @@ function downloadFile(name: string, content: string, type = "text/csv") {
 }
 
 function stamp(date = new Date()) {
-  return `${date.toLocaleDateString("en-GB")} ${date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata",
+  })
+    .format(date)
+    .replace(",", "");
 }
 
 function months(n: number) {

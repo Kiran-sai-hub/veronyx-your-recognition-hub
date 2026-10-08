@@ -11,7 +11,6 @@ import {
   Eye,
   Gauge,
   LockKeyhole,
-  Mic,
   Plus,
   RotateCcw,
   Search,
@@ -25,7 +24,16 @@ import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
+import { VoiceInputButton } from "@/components/voice-input-button";
 import { DryRunReport, ValidationReport } from "@/components/workflow-reports";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
@@ -35,12 +43,15 @@ import {
   type CopilotReply,
   type Proposal,
   QUERY_LIMIT,
+  detectLanguage,
+  isSuspicious,
   progressByKind,
   replyToText,
   respond,
   transcriptToText,
 } from "@/lib/copilot-engine";
 import { formatRupees } from "@/lib/format";
+import { translate } from "@/lib/i18n";
 import { go } from "@/lib/navigate";
 import { roleLabel } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -52,7 +63,7 @@ import {
   simulateDryRun,
   validateDraft,
 } from "@/lib/workflow-model";
-import type { Persona } from "@/store/app-store";
+import { type Persona, useAppStore } from "@/store/app-store";
 import { type Turn, useCopilotStore } from "@/store/copilot-store";
 import { useDemoStore } from "@/store/demo-store";
 
@@ -120,10 +131,26 @@ export function useCopilotAsk(persona: Persona) {
   const { addTurn, patchTurn, sessions, activeId } = useCopilotStore();
   const session = sessions.find((s) => s.id === activeId) ?? sessions[0];
   const used = session?.turns.length ?? 0;
+  const logAudit = useDemoStore((s) => s.logAudit);
+  const actor = persona === "owner" ? "Ramesh Krishnan" : "Lakshmi Menon";
   return (question: string, screen: string) => {
     const text = question.trim().slice(0, MAX_CHARS);
     if (!text) return;
     const reply = respond(text, persona, used);
+    // Every AI interaction is audited (§5.5); suspicious input is logged silently (§5.3 I).
+    logAudit({
+      actor,
+      action: `AI Copilot ${reply.kind === "proposal" ? "proposal generated" : reply.kind === "refusal" ? "request refused" : "question answered"}`,
+      target: `“${text.slice(0, 80)}${text.length > 80 ? "…" : ""}” · on ${screen}`,
+      type: "ai",
+    });
+    if (isSuspicious(text))
+      logAudit({
+        actor: "System",
+        action: "AI suspicious input logged for admin review",
+        target: `Possible prompt injection: “${text.slice(0, 60)}”`,
+        type: "ai",
+      });
     const steps = progressByKind[reply.kind] ?? progressByKind["default"]!;
     const id = Math.random().toString(36).slice(2, 10);
     addTurn({
@@ -171,6 +198,7 @@ export function CopilotConversation({
   const ask = useCopilotAsk(persona);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
+  const language = useAppStore((s) => s.language);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastRef = useRef<HTMLDivElement>(null);
   const busy = session.turns.some((t) => t.reply === null && !t.cancelled && inflight.has(t.id));
@@ -260,8 +288,7 @@ export function CopilotConversation({
             <div className="flex gap-2">
               <Bot className="mt-1 size-5 shrink-0 text-primary" aria-hidden />
               <p className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
-                Hi! I can help you create workflows, explain leaderboards, and answer questions.
-                What would you like to do?
+                {translate(language, "copilot.greeting")}
               </p>
             </div>
             <div className="space-y-2">
@@ -331,6 +358,8 @@ export function CopilotConversation({
                   {turn.reply && (
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
                       Copilot · {time(turn.at + 3000)}
+                      {detectLanguage(turn.question).lang !== "en" &&
+                        ` · understood your ${detectLanguage(turn.question).name} question; answering in English`}
                     </p>
                   )}
                 </div>
@@ -402,16 +431,21 @@ export function CopilotConversation({
               </span>
             </p>
           </div>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            disabled
-            aria-label="Voice input (coming soon)"
-            title="Voice input — coming soon"
-          >
-            <Mic />
-          </Button>
+          <VoiceInputButton
+            language={language}
+            disabled={busy}
+            demoText={
+              language === "hi"
+                ? "विभाग के हिसाब से कवरेज दिखाओ"
+                : language === "ta"
+                  ? "துறை வாரியாக கவரேஜ் காட்டு"
+                  : "Show coverage by department"
+            }
+            onTranscript={(t) => {
+              setDraft(t.slice(0, MAX_CHARS));
+              inputRef.current?.focus();
+            }}
+          />
           <Button type="submit" size="icon" disabled={busy || !draft.trim()} aria-label="Send">
             <Send />
           </Button>
@@ -507,15 +541,32 @@ function TurnBody({
   );
 }
 
+/** Where each kind of source lives, so every cited number links to its underlying records. */
+function sourceHref(source: string): string {
+  const s = source.toLowerCase();
+  if (s.includes("fairness")) return "/fairness";
+  if (s.includes("analytics")) return "/analytics";
+  if (s.includes("ledger") || s.includes("budget")) return "/budget";
+  if (s.includes("approval")) return "/approvals";
+  if (s.includes("field registry")) return "/connectors/mapping?tab=registry";
+  if (s.includes("people")) return "/people";
+  if (s.includes("workflow") || s.includes("run")) return "/workflows/wf-sales/runs";
+  return "/connectors";
+}
+
 function Sources({ sources }: { sources: string[] }) {
   if (!sources.length) return null;
   return (
     <p className="mt-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
       Source:
       {sources.map((s) => (
-        <span key={s} className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5">
+        <a
+          key={s}
+          href={sourceHref(s)}
+          className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 hover:underline"
+        >
           {s} <ExternalLink className="size-3" aria-hidden />
-        </span>
+        </a>
       ))}
     </p>
   );
@@ -552,6 +603,34 @@ function ReplyView({
       );
     case "table":
       return <TableReply reply={reply} onAsk={onAsk} />;
+    case "number":
+      return (
+        <div className={box}>
+          <p>{reply.text}</p>
+          <div className="mt-2 rounded-lg border border-border bg-card p-4">
+            <p className="text-xs text-muted-foreground">{reply.label}</p>
+            <p className="text-3xl font-bold">{reply.value}</p>
+            <p className="text-xs text-muted-foreground">{reply.detail}</p>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Metric: {reply.metric} · Window: {reply.window}
+          </p>
+          <Sources sources={reply.sources} />
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="text-xs text-muted-foreground">Ask a follow-up:</span>
+            {reply.followUps.map((f) => (
+              <button
+                key={f}
+                type="button"
+                className="text-xs text-primary underline"
+                onClick={() => onAsk(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
     case "trace":
       return (
         <div className={box}>
@@ -895,7 +974,25 @@ function ProposalCard({
   const [reason, setReason] = useState("");
   const checks = validateDraft(draft);
   const blocked = hasErrors(checks);
-  const dry = simulateDryRun(draft, 3, null);
+  const [periods, setPeriods] = useState("3");
+  const [run, setRun] = useState<{ status: "done" | "running" | "failed"; done: number }>({
+    status: "done",
+    done: 3,
+  });
+  const ranPeriods = run.status === "done" ? Number(periods) : 3;
+  const dry = simulateDryRun(draft, ranPeriods, null);
+  const rerun = (n: string) => {
+    setPeriods(n);
+    setRun({ status: "running", done: 0 });
+    const total = Number(n);
+    for (let i = 1; i <= total; i++) {
+      window.setTimeout(() => {
+        // Freshdesk history starts in May 2026, so a 6-period run fails on the oldest period.
+        if (total > 5 && i === total) setRun({ status: "failed", done: i - 1 });
+        else setRun({ status: i === total ? "done" : "running", done: i });
+      }, 450 * i);
+    }
+  };
   const state = turn.proposalState ?? "open";
   const decided = state !== "open";
 
@@ -1036,6 +1133,18 @@ function ProposalCard({
         <ValidationReport
           checks={checks}
           onAutoFix={decided ? undefined : (fix) => setDraft((d) => applyAutoFix(d, fix))}
+          onAskAi={
+            decided
+              ? undefined
+              : (check) => {
+                  if (check.autoFix) {
+                    const fix = check.autoFix;
+                    setDraft((d) => applyAutoFix(d, fix));
+                    toast.success(`Copilot fixed ${check.code}: ${check.fix ?? check.title}`);
+                  } else
+                    toast(`Copilot suggests: ${check.fix ?? "edit this step in the builder."}`);
+                }
+          }
           onRevalidate={() => toast.success("Re-validated.")}
         />
         {proposal.repairs.map((r) => (
@@ -1052,12 +1161,62 @@ function ProposalCard({
             Dry-run results, fairness & unmatched records
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent>
-          <p className="mb-2 font-medium">
-            📊 Dry-run: {dry.periods.length} periods, {formatRupees(dry.totalCost)} total, budget{" "}
-            {dry.budgetOk ? "OK" : "insufficient"} · ⚖️ {dry.fairnessNotes[0]}
-          </p>
-          <DryRunReport result={dry} pool={draft.budget.wallet} />
+        <CollapsibleContent className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Periods</span>
+            <Select value={periods} onValueChange={setPeriods} disabled={run.status === "running"}>
+              <SelectTrigger className="h-8 w-40" aria-label="Dry-run periods">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {["1", "3", "6"].map((n) => (
+                  <SelectItem key={n} value={n}>
+                    Last {n} period{n === "1" ? "" : "s"}
+                    {n === "3" ? " (default)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8"
+              disabled={run.status === "running"}
+              onClick={() => rerun(periods)}
+            >
+              <RotateCcw /> Re-run with these parameters
+            </Button>
+          </div>
+          {run.status === "running" && (
+            <div className="space-y-1" aria-live="polite">
+              <p className="text-xs">
+                Running dry-run… period {Math.min(run.done + 1, Number(periods))} of {periods}
+              </p>
+              <Progress value={(run.done / Number(periods)) * 100} aria-label="Dry-run progress" />
+            </div>
+          )}
+          {run.status === "failed" && (
+            <div role="alert" className="space-y-2 rounded-md bg-destructive/10 p-3">
+              <p className="font-medium text-destructive">
+                Dry-run failed for period {run.done + 1} of {periods} (April 2026).
+              </p>
+              <p className="text-xs">
+                Freshdesk history starts on 01/05/2026, so there is no CSAT data for April.
+              </p>
+              <Button size="sm" variant="outline" onClick={() => rerun("3")}>
+                Retry with fewer periods
+              </Button>
+            </div>
+          )}
+          {run.status === "done" && (
+            <>
+              <p className="font-medium">
+                📊 Dry-run: {dry.periods.length} periods, {formatRupees(dry.totalCost)} total,
+                budget {dry.budgetOk ? "OK" : "insufficient"} · ⚖️ {dry.fairnessNotes[0]}
+              </p>
+              <DryRunReport result={dry} pool={draft.budget.wallet} />
+            </>
+          )}
         </CollapsibleContent>
       </Collapsible>
 

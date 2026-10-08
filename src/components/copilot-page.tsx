@@ -70,7 +70,8 @@ export function CopilotPage({ persona, aiAvailable }: CopilotPageProps) {
                 <Coins className="size-3.5" /> Usage (admins only)
               </p>
               <p className="mt-1">
-                {queries} questions · ~{(queries * 1850).toLocaleString("en-IN")} tokens this month
+                {queries} question{queries === 1 ? "" : "s"} · ~
+                {(queries * 1850).toLocaleString("en-IN")} tokens this month
               </p>
               <p>Every AI interaction is logged in the audit trail.</p>
             </div>

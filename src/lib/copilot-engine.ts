@@ -65,6 +65,17 @@ export type CopilotReply =
       alternatives: string[];
       contact?: string;
     }
+  | {
+      kind: "number";
+      text: string;
+      label: string;
+      value: string;
+      detail: string;
+      metric: string;
+      window: string;
+      sources: string[];
+      followUps: string[];
+    }
   | { kind: "rate_limit"; resetsAt: string }
   | { kind: "timeout" }
   | { kind: "error"; code: string };
@@ -163,8 +174,54 @@ function buildProposal(q: string): Proposal {
   };
 }
 
+const scripts: { lang: string; name: string; re: RegExp }[] = [
+  { lang: "hi", name: "हिन्दी", re: /[\u0900-\u097F]/ },
+  { lang: "ta", name: "தமிழ்", re: /[\u0B80-\u0BFF]/ },
+  { lang: "te", name: "తెలుగు", re: /[\u0C00-\u0C7F]/ },
+  { lang: "kn", name: "ಕನ್ನಡ", re: /[\u0C80-\u0CFF]/ },
+  { lang: "bn", name: "বাংলা", re: /[\u0980-\u09FF]/ },
+  { lang: "gu", name: "ગુજરાતી", re: /[\u0A80-\u0AFF]/ },
+  { lang: "ml", name: "മലയാളം", re: /[\u0D00-\u0D7F]/ },
+];
+
+/** Detects the script a question is written in (checklist §5.3 B multi-language input). */
+export function detectLanguage(question: string): { lang: string; name: string } {
+  return scripts.find((s) => s.re.test(question)) ?? { lang: "en", name: "English" };
+}
+
+/** Hindi and Tamil keywords mapped onto the English intents the engine understands. */
+const keywordMap: [RegExp, string][] = [
+  [/कवरेज|கவரேஜ்/, "coverage"],
+  [/विभाग|துறை/, "department"],
+  [/शिफ्ट|ஷிஃப்ட்/, "shift"],
+  [/क्यों|ஏன்/, "why"],
+  [/जीत|வெற்றி|வெல்ல/, "win"],
+  [/इनाम|वेकुमति|வெகுமதி/, "reward"],
+  [/वर्कफ़्लो|वर्कफ्लो|வொர்க்ஃப்ளோ/, "workflow"],
+  [/बनाओ|बनाएं|बनाइए|உருவாக்கு/, "create"],
+  [/कितने|எத்தனை/, "how many"],
+  [/मंज़ूरी|अनुमोदन|ஒப்புதல்/, "approval"],
+  [/लीडरबोर्ड|லீடர்போர்டு/, "leaderboard"],
+  [/भुनाने|ரிடீம்/, "redemption rate"],
+];
+
+export function normaliseQuestion(question: string): string {
+  const extra = keywordMap.filter(([re]) => re.test(question)).map(([, word]) => word);
+  return [question.toLowerCase(), ...extra].join(" ");
+}
+
+/**
+ * Prompt-injection patterns. Matching input is answered normally (silent protection) but logged
+ * for admin review (checklist §5.3 I).
+ */
+export function isSuspicious(question: string): boolean {
+  return /ignore (all |the )?(previous|above|prior) (instructions|rules)|system prompt|you are now|disregard (your|the) (rules|instructions)|act as (an? )?admin|reveal (your|the) (prompt|instructions)|approve (everything|all pending)/i.test(
+    question,
+  );
+}
+
 export function respond(question: string, persona: string, queriesUsed = 0): CopilotReply {
-  const q = question.toLowerCase();
+  const q = normaliseQuestion(question);
   if (queriesUsed >= QUERY_LIMIT) return { kind: "rate_limit", resetsAt: "00:00 IST tonight" };
   if (q.includes("timeout") || q.includes("slow")) return { kind: "timeout" };
   if (q.includes("error") || q.includes("fail test")) return { kind: "error", code: "AI-502-7F3A" };
@@ -307,6 +364,46 @@ export function respond(question: string, persona: string, queriesUsed = 0): Cop
     };
   }
 
+  if (q.includes("redemption rate") || q.includes("redeemed")) {
+    return {
+      kind: "number",
+      text: "64% of the points given this quarter have been turned into rewards.",
+      label: "Redemption rate",
+      value: "64%",
+      detail: "1,82,600 of 2,85,300 points redeemed · up 6 points on last quarter",
+      metric: "AN-04 Redemption rate (points redeemed ÷ awarded)",
+      window: "Jul–Sep 2026",
+      sources: ["Ledger · rewards and redemptions, Q2 FY 2026-27"],
+      followUps: ["Which orders need a retry or refund?", "Show coverage by department"],
+    };
+  }
+  if (q.includes("spend per") || q.includes("per employee") || q.includes("per fte")) {
+    return {
+      kind: "number",
+      text: "You have spent about ₹ 1,414 per employee on rewards this financial year.",
+      label: "Spend per FTE",
+      value: "₹ 1,414",
+      detail: "₹ 2,81,400 fulfilled ÷ 199 average headcount",
+      metric: "AN-02 Spend per FTE",
+      window: "01/04/2026 – 08/10/2026",
+      sources: ["Budget & Ledger · organisation pool", "People · average headcount"],
+      followUps: ["Show coverage by department", "What is our redemption rate?"],
+    };
+  }
+  if (q.includes("how many") && !q.includes("approval")) {
+    return {
+      kind: "number",
+      text: "141 of 199 people were recognised at least once in the last 30 days.",
+      label: "People recognised",
+      value: "141",
+      detail: "71% of 199 active employees",
+      metric: "AN-01 Recognition coverage",
+      window: "Last 30 days",
+      sources: ["Analytics · AN-01 Recognition coverage"],
+      followUps: ["Who hasn't been recognised in 60 days?", "Show coverage by shift"],
+    };
+  }
+
   if (q.includes("shift")) {
     return {
       kind: "table",
@@ -352,6 +449,15 @@ export function respond(question: string, persona: string, queriesUsed = 0): Cop
       confidence: "high",
     };
   }
+  const language = detectLanguage(question);
+  if (language.lang !== "en" && language.lang !== "hi" && language.lang !== "ta") {
+    return {
+      kind: "text",
+      text: `I can see this is ${language.name}. In this version I understand English, हिन्दी and தமிழ் best — please try one of those, or use a quick action below.`,
+      sources: [],
+      confidence: "low",
+    };
+  }
   return {
     kind: "text",
     text: "I'm not sure I can answer that. I can create workflows, explain why someone did or didn't win, and answer questions about coverage, budget and approvals. Try one of the quick actions below.",
@@ -371,6 +477,8 @@ export function replyToText(reply: CopilotReply | null): string {
       return `Query limit reached; resets ${reply.resetsAt}.`;
     case "proposal":
       return `${reply.text}\n[Proposal ${reply.proposal.id}] ${reply.proposal.summary}`;
+    case "number":
+      return `${reply.text}\n${reply.label}: ${reply.value} (${reply.metric}, ${reply.window})`;
     case "table":
       return `${reply.text}\n${reply.rows.map((r) => `${r.label}: ${r.value}`).join("\n")}`;
     default:
