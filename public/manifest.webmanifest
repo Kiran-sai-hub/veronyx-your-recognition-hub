@@ -1,0 +1,23 @@
+{
+  "name": "Veronyx Recognise — Radha Krishna Mills",
+  "short_name": "Recognise",
+  "description": "Your recognition, points and rewards at work.",
+  "start_url": "/me",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2563EB",
+  "lang": "en-IN",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "My wallet", "url": "/me/wallet" },
+    { "name": "Redeem rewards", "url": "/me/redeem" },
+    { "name": "Send a shoutout", "url": "/me/shoutout" }
+  ]
+}

@@ -123,7 +123,8 @@ function screenFor(pathname: string, persona: Persona): string {
 type AppShellProps = { children: ReactNode; pathname: string };
 
 export function AppShell({ children, pathname }: AppShellProps) {
-  const { persona, setPersona, theme, setTheme, openCopilot, aiAvailable } = useAppStore();
+  const { persona, setPersona, theme, setTheme, openCopilot, aiAvailable, copilotOpen } =
+    useAppStore();
   const isEmployee = pathname.startsWith("/me");
   const [menuOpen, setMenuOpen] = useState(false);
   const access = isEmployee ? "full" : accessFor(pathname, persona);
@@ -156,7 +157,10 @@ export function AppShell({ children, pathname }: AppShellProps) {
       >
         Skip to content
       </a>
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
+      <aside
+        aria-label="Sidebar"
+        className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex"
+      >
         <div className="border-b border-sidebar-border p-5">
           <Brand employer={isEmployee} />
           {!isEmployee && (
@@ -172,14 +176,39 @@ export function AppShell({ children, pathname }: AppShellProps) {
         </div>
       </aside>
 
-      <div className="lg:pl-64">
+      {/* Tablet (768–1023 px): collapsible icon rail; "Expand" opens the full menu (§8.1). */}
+      <aside
+        className="fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center gap-2 border-r border-sidebar-border bg-sidebar py-3 md:flex lg:hidden"
+        aria-label="Collapsed navigation"
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11"
+          aria-label="Expand menu"
+          onClick={() => setMenuOpen(true)}
+        >
+          <Menu />
+        </Button>
+        <div className="w-full flex-1 overflow-y-auto">
+          {isEmployee ? (
+            <EmployeeNav pathname={pathname} collapsed />
+          ) : (
+            <AdminNav pathname={pathname} persona={persona} collapsed />
+          )}
+        </div>
+      </aside>
+
+      <div
+        className={cn("md:pl-16 lg:pl-64", copilotOn && copilotOpen && "min-[1440px]:pr-[420px]")}
+      >
         <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-2 border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 lg:hidden">
             <Button
               variant="ghost"
               size="icon"
               aria-label="Open menu"
-              className="size-11"
+              className="size-11 md:hidden"
               onClick={() => setMenuOpen(true)}
             >
               <Menu />
@@ -250,7 +279,7 @@ export function AppShell({ children, pathname }: AppShellProps) {
         <OfflineBanner />
         <main
           id="main-content"
-          className="mx-auto w-full max-w-[1440px] px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-10"
+          className="mx-auto w-full max-w-[1440px] px-4 py-6 pb-28 sm:px-6 md:pb-10 lg:px-8"
         >
           {!ready ? (
             <PageSkeleton />
@@ -302,6 +331,7 @@ function NavLink({
   active,
   badge,
   sub = false,
+  collapsed = false,
 }: {
   to: string;
   label: string;
@@ -309,7 +339,28 @@ function NavLink({
   active: boolean;
   badge?: number | undefined;
   sub?: boolean;
+  collapsed?: boolean;
 }) {
+  if (collapsed)
+    return (
+      <a
+        href={to}
+        aria-current={active ? "page" : undefined}
+        aria-label={badge ? `${label}, ${badge} pending` : label}
+        title={label}
+        className={cn(
+          "relative mx-auto grid size-11 place-items-center rounded-md text-sidebar-foreground hover:bg-sidebar-accent",
+          active && "bg-sidebar-accent text-primary",
+        )}
+      >
+        {Icon && <Icon className="size-5" {...activeFill(active)} />}
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-white">
+            {badge}
+          </span>
+        )}
+      </a>
+    );
   return (
     <a
       href={to}
@@ -335,7 +386,15 @@ function NavLink({
   );
 }
 
-function AdminNav({ pathname, persona }: { pathname: string; persona: Persona }) {
+function AdminNav({
+  pathname,
+  persona,
+  collapsed = false,
+}: {
+  pathname: string;
+  persona: Persona;
+  collapsed?: boolean;
+}) {
   const pending = usePendingApprovals(persona).length;
   const [path, query] = pathname.split("?");
   const items = visibleNav(persona);
@@ -359,8 +418,9 @@ function AdminNav({ pathname, persona }: { pathname: string; persona: Persona })
               icon={navIcons[item.key]}
               active={active}
               badge={item.key === "approvals" ? pending : undefined}
+              collapsed={collapsed}
             />
-            {active && children && children.length > 1 && (
+            {!collapsed && active && children && children.length > 1 && (
               <div className="mb-1 mt-0.5 space-y-0.5">
                 {children.map((child) => {
                   const [childPath, childQuery] = child.to.split("?");
@@ -403,7 +463,7 @@ function AdminNav({ pathname, persona }: { pathname: string; persona: Persona })
   );
 }
 
-function EmployeeNav({ pathname }: { pathname: string }) {
+function EmployeeNav({ pathname, collapsed = false }: { pathname: string; collapsed?: boolean }) {
   const t = useT();
   const items = [
     { to: "/me", label: t("nav.home"), icon: Home },
@@ -417,7 +477,7 @@ function EmployeeNav({ pathname }: { pathname: string }) {
   return (
     <nav className="space-y-0.5 p-3" aria-label="Main navigation">
       {items.map((item) => (
-        <NavLink key={item.to} {...item} active={pathname === item.to} />
+        <NavLink key={item.to} {...item} active={pathname === item.to} collapsed={collapsed} />
       ))}
     </nav>
   );
@@ -450,7 +510,7 @@ function MobileBottomNav({
       ];
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-background px-2 pb-[env(safe-area-inset-bottom)] md:hidden"
       aria-label="Mobile navigation"
     >
       {items.map((item) => (

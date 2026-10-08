@@ -28,6 +28,9 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { WhatsAppIcon } from "@/components/domain-icons";
+import { InstallPrompt } from "@/components/install-prompt";
+import { PullToRefresh } from "@/components/library/pull-to-refresh";
 import { PageHeading } from "@/components/page-heading";
 import { StatCard } from "@/components/stat-card";
 import { StatusBadge } from "@/components/status-badge";
@@ -109,31 +112,6 @@ function LanguageFallbackNotice() {
   );
 }
 
-function InstallPrompt() {
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
-  return (
-    <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm lg:hidden">
-      <Smartphone className="size-5 shrink-0 text-primary" />
-      <span className="flex-1">
-        Add Radha Krishna Mills Rewards to your home screen — works on slow networks.
-      </span>
-      <Button
-        size="sm"
-        onClick={() => {
-          setDismissed(true);
-          toast.success("Added to home screen");
-        }}
-      >
-        <Download /> Install
-      </Button>
-      <Button size="sm" variant="ghost" onClick={() => setDismissed(true)} aria-label="Dismiss">
-        ✕
-      </Button>
-    </div>
-  );
-}
-
 function EmployeeHome() {
   const t = useT();
   const points = useDemoStore((s) => s.employeePoints);
@@ -187,6 +165,21 @@ function EmployeeHome() {
           </Button>
         </div>
       )}
+      <a
+        href="https://wa.me/918047012345?text=BALANCE"
+        target="_blank"
+        rel="noreferrer"
+        className="flex min-h-11 items-center gap-3 rounded-lg border border-border p-3 text-sm hover:bg-muted"
+      >
+        <WhatsAppIcon className="size-6 shrink-0 text-[#25D366]" />
+        <span className="flex-1">
+          <span className="block font-medium">Get updates on WhatsApp</span>
+          <span className="text-muted-foreground">
+            Opens a chat with Radha Krishna Mills · reply BALANCE, REDEEM or THANKS
+          </span>
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </a>
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">{t("home.recent")}</h2>
@@ -450,82 +443,95 @@ function WalletPage() {
 function RecognitionsPage() {
   const t = useT();
   return (
-    <div className="space-y-8">
-      <PageHeading
-        title={t("rec.title")}
-        description={t("rec.desc")}
-        action={
-          <Button asChild>
-            <a href="/me/shoutout">
-              <Send />
-              {t("rec.send")}
-            </a>
-          </Button>
-        }
-      />
-      <section aria-labelledby="badges-heading" className="space-y-3">
-        <h2 id="badges-heading" className="text-lg font-semibold">
-          {t("rec.badges")}
-        </h2>
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {badges.map((b) => (
-            <li
-              key={b.name}
-              className={cn(
-                "rounded-lg border border-border p-4 text-center",
-                b.locked && "opacity-60",
-              )}
-            >
-              <span className="text-3xl" aria-hidden>
-                {b.icon}
-              </span>
-              <p className="mt-2 text-sm font-medium">{b.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {b.locked ? b.earned : `Earned ${b.earned}`}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <Tabs defaultValue="received">
-        <TabsList>
-          <TabsTrigger value="received">
-            {t("rec.received")} ({recognitions.length})
-          </TabsTrigger>
-          <TabsTrigger value="given">
-            {t("rec.given")} ({recognitionsGiven.length})
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="received" className="mt-5 grid gap-4 md:grid-cols-2">
-          {recognitions.map((item) => (
-            <Card key={item.id} className="rounded-lg">
-              <CardHeader>
-                <StatusBadge tone="reward">{t("home.points", { points: item.points })}</StatusBadge>
-                <CardTitle className="pt-3 text-lg">{item.title}</CardTitle>
-                <CardDescription>{item.message}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{t("home.from", { name: item.from })}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{item.date}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-        <TabsContent value="given" className="mt-5 grid gap-4 md:grid-cols-2">
-          {recognitionsGiven.map((g) => (
-            <Card key={g.to + g.date} className="rounded-lg">
-              <CardContent className="space-y-1 p-5">
-                <p className="flex items-center gap-2 font-medium">
-                  <Heart className="size-4 text-primary" /> To {g.to}
+    <PullToRefresh
+      onRefresh={() =>
+        new Promise<void>((resolve) =>
+          window.setTimeout(() => {
+            toast.success("Up to date");
+            resolve();
+          }, 600),
+        )
+      }
+    >
+      <div className="space-y-8">
+        <PageHeading
+          title={t("rec.title")}
+          description={t("rec.desc")}
+          action={
+            <Button asChild>
+              <a href="/me/shoutout">
+                <Send />
+                {t("rec.send")}
+              </a>
+            </Button>
+          }
+        />
+        <section aria-labelledby="badges-heading" className="space-y-3">
+          <h2 id="badges-heading" className="text-lg font-semibold">
+            {t("rec.badges")}
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {badges.map((b) => (
+              <li
+                key={b.name}
+                className={cn(
+                  "rounded-lg border border-border p-4 text-center",
+                  b.locked && "border-dashed bg-muted/40",
+                )}
+              >
+                <span className={cn("text-3xl", b.locked && "opacity-50 grayscale")} aria-hidden>
+                  {b.icon}
+                </span>
+                <p className="mt-2 text-sm font-medium">{b.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {b.locked ? b.earned : `Earned ${b.earned}`}
                 </p>
-                <p className="text-sm text-muted-foreground">“{g.message}”</p>
-                <p className="text-xs text-muted-foreground">{g.date}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-      </Tabs>
-    </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <Tabs defaultValue="received">
+          <TabsList>
+            <TabsTrigger value="received">
+              {t("rec.received")} ({recognitions.length})
+            </TabsTrigger>
+            <TabsTrigger value="given">
+              {t("rec.given")} ({recognitionsGiven.length})
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="received" className="mt-5 grid gap-4 md:grid-cols-2">
+            {recognitions.map((item) => (
+              <Card key={item.id} className="rounded-lg">
+                <CardHeader>
+                  <StatusBadge tone="reward">
+                    {t("home.points", { points: item.points })}
+                  </StatusBadge>
+                  <CardTitle className="pt-3 text-lg">{item.title}</CardTitle>
+                  <CardDescription>{item.message}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">{t("home.from", { name: item.from })}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{item.date}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+          <TabsContent value="given" className="mt-5 grid gap-4 md:grid-cols-2">
+            {recognitionsGiven.map((g) => (
+              <Card key={g.to + g.date} className="rounded-lg">
+                <CardContent className="space-y-1 p-5">
+                  <p className="flex items-center gap-2 font-medium">
+                    <Heart className="size-4 text-primary" /> To {g.to}
+                  </p>
+                  <p className="text-sm text-muted-foreground">“{g.message}”</p>
+                  <p className="text-xs text-muted-foreground">{g.date}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </PullToRefresh>
   );
 }
 
@@ -1269,7 +1275,7 @@ function PreferencesPage() {
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Text size</Label>
-              <div className="flex gap-2" role="radiogroup" aria-label="Text size">
+              <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Text size">
                 {(
                   [
                     ["md", "Normal", "text-sm"],

@@ -67,24 +67,27 @@ export function LoginPage({ expired = false }: { expired?: boolean }) {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
-      <section className="hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between">
-        <Brand className="[&_p]:text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70" />
+      <aside
+        aria-label="About Veronyx Recognise"
+        className="hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between"
+      >
+        <Brand className="[&_p]:text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/90" />
         <div className="max-w-xl">
-          <p className="text-sm font-semibold uppercase text-primary-foreground/70">
+          <p className="text-sm font-semibold uppercase text-primary-foreground/90">
             Recognition that reaches everyone
           </p>
-          <h1 className="mt-4 text-4xl font-bold leading-tight">
+          <p className="mt-4 text-4xl font-bold leading-tight">
             Make great work visible, fair and rewarding.
-          </h1>
-          <p className="mt-5 text-base text-primary-foreground/80">
+          </p>
+          <p className="mt-5 text-base text-primary-foreground">
             Connect performance data, manager decisions and meaningful rewards in one trusted place
             — on the web, on WhatsApp and on the factory floor.
           </p>
         </div>
-        <p className="text-sm text-primary-foreground/70">
+        <p className="text-sm text-primary-foreground/90">
           Built for Indian SMEs and frontline teams.
         </p>
-      </section>
+      </aside>
       <main className="flex min-w-0 items-center justify-center bg-background p-4 sm:p-5">
         <div className="w-full min-w-0 max-w-md space-y-6">
           <Card className="rounded-lg border-0 shadow-none sm:border sm:shadow-sm">
@@ -92,7 +95,7 @@ export function LoginPage({ expired = false }: { expired?: boolean }) {
               <div className="mb-6 lg:hidden">
                 <Brand />
               </div>
-              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <h1 className="text-2xl font-semibold leading-none tracking-tight">Welcome back</h1>
               <CardDescription>Sign in to Veronyx Recognise.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -237,11 +240,13 @@ export function OtpLoginPage() {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-muted p-5">
+    <main className="grid min-h-screen place-items-center bg-muted p-5">
       <Card className="w-full max-w-md rounded-lg">
         <CardHeader>
           <Brand employer />
-          <CardTitle className="pt-5 text-2xl">Mobile sign in</CardTitle>
+          <h1 className="pt-5 text-2xl font-semibold leading-none tracking-tight">
+            Mobile sign in
+          </h1>
           <CardDescription>
             For frontline staff without a work email. We will send a code to your registered
             WhatsApp or mobile number.
@@ -336,6 +341,6 @@ export function OtpLoginPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

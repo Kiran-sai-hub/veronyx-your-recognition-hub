@@ -929,15 +929,10 @@ function StepNode({
   const Icon = stepIcons[step.kind];
   return (
     <div
-      role="button"
-      tabIndex={0}
       draggable={!readOnly}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       title={readOnly ? undefined : "Drag to reorder, or use the arrows"}
-      onClick={onSelect}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
-      aria-pressed={selected}
       className={cn(
         "flex items-center gap-3 rounded-lg border bg-card p-3",
         selected ? "border-primary ring-2 ring-primary/20" : "border-border",
@@ -945,35 +940,45 @@ function StepNode({
         step.kind === "end" && "mx-auto w-fit rounded-full px-5 py-2",
       )}
     >
-      <span
-        className={cn(
-          "grid size-9 shrink-0 place-items-center rounded-md",
-          step.kind === "end" ? "bg-muted" : "bg-primary/10 text-primary",
-        )}
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
+        className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
-        <Icon className="size-4" aria-hidden />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-muted-foreground">Step {index + 1}</p>
-        <p className="font-medium">{step.label}</p>
-        {step.kind !== "end" && (
-          <p
-            className={cn("truncate text-sm", error ? "text-destructive" : "text-muted-foreground")}
-          >
-            {describeStep(step)}
-          </p>
-        )}
-        {step.kind === "branch" && (
-          <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <span className="rounded border border-success/30 bg-success/5 px-2 py-1">
-              Then → {String(step.config["then"])}
+        <span
+          className={cn(
+            "grid size-9 shrink-0 place-items-center rounded-md",
+            step.kind === "end" ? "bg-muted" : "bg-primary/10 text-primary",
+          )}
+        >
+          <Icon className="size-4" aria-hidden />
+        </span>
+        <span className="block min-w-0 flex-1">
+          <span className="block text-xs text-muted-foreground">Step {index + 1}</span>
+          <span className="block font-medium">{step.label}</span>
+          {step.kind !== "end" && (
+            <span
+              className={cn(
+                "block truncate text-sm",
+                error ? "text-destructive" : "text-muted-foreground",
+              )}
+            >
+              {describeStep(step)}
             </span>
-            <span className="rounded border border-border bg-muted px-2 py-1">
-              Else → {String(step.config["else"])}
+          )}
+          {step.kind === "branch" && (
+            <span className="mt-2 grid grid-cols-2 gap-2 text-xs">
+              <span className="rounded border border-success/30 bg-success/5 px-2 py-1">
+                Then → {String(step.config["then"])}
+              </span>
+              <span className="rounded border border-border bg-muted px-2 py-1">
+                Else → {String(step.config["else"])}
+              </span>
             </span>
-          </div>
-        )}
-      </div>
+          )}
+        </span>
+      </button>
       {!readOnly && (
         <div className="flex shrink-0 gap-0.5">
           <Button

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 import { PageHeading } from "@/components/page-heading";
 import { Kanban } from "@/components/library/kanban";
+import { SegmentedControl } from "@/components/library/segmented-control";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +31,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type Workflow, workflows as seeded } from "@/lib/admin-data";
 import { workflowTemplates } from "@/lib/workflow-model";
 import { useDemoStore } from "@/store/demo-store";
@@ -238,14 +238,17 @@ export function WorkflowListPage({
           ) : (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-                  <TabsList>
-                    <TabsTrigger value="all">All ({rows.length})</TabsTrigger>
-                    <TabsTrigger value="live">Active</TabsTrigger>
-                    <TabsTrigger value="draft">Draft</TabsTrigger>
-                    <TabsTrigger value="paused">Paused</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <SegmentedControl
+                  label="Filter by status"
+                  value={filter}
+                  onChange={setFilter}
+                  options={[
+                    { value: "all", label: `All (${rows.length})` },
+                    { value: "live", label: "Active" },
+                    { value: "draft", label: "Draft" },
+                    { value: "paused", label: "Paused" },
+                  ]}
+                />
                 <Input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}

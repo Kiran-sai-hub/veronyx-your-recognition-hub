@@ -134,9 +134,9 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>MSME category</Label>
+                <Label htmlFor="org-msme">MSME category</Label>
                 <Select defaultValue="Small">
-                  <SelectTrigger aria-label="MSME category">
+                  <SelectTrigger id="org-msme">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -149,8 +149,8 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Time zone</Label>
-                <Input value="Asia/Kolkata (IST)" readOnly />
+                <Label htmlFor="org-tz">Time zone</Label>
+                <Input id="org-tz" value="Asia/Kolkata (IST)" readOnly />
               </div>
             </CardContent>
           </Card>
@@ -379,7 +379,7 @@ export function SettingsPage({ tab = "org" }: { tab?: string | undefined }) {
                             ))}
                           </span>
                           {missing.length > 0 && (
-                            <span className="mt-1 flex items-center gap-1 text-xs text-warning-foreground">
+                            <span className="mt-1 flex items-center gap-1 text-xs text-warning-foreground dark:text-warning">
                               <TriangleAlert className="size-3" /> {missing.length} missing — falls
                               back to English
                             </span>

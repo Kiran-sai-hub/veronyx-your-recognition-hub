@@ -223,7 +223,10 @@ export function AdminRewardsPage({
                   {group.list.map((item) => (
                     <Card
                       key={item.id}
-                      className={cn("rounded-lg shadow-sm", !item.active && "opacity-70")}
+                      className={cn(
+                        "rounded-lg shadow-sm",
+                        !item.active && "border-dashed bg-muted/30",
+                      )}
                     >
                       <CardContent className="space-y-3 p-5">
                         <div className="flex items-start justify-between gap-3">

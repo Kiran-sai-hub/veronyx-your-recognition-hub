@@ -40,7 +40,8 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PullToRefresh } from "@/components/library/pull-to-refresh";
+import { SegmentedControl } from "@/components/library/segmented-control";
 import { Textarea } from "@/components/ui/textarea";
 import {
   type Approval,
@@ -294,14 +295,18 @@ export function ApprovalsPage({
       )}
 
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <Tabs value={view} onValueChange={(v) => setView(v as typeof view)}>
-          <TabsList>
-            <TabsTrigger value="pending">
-              Waiting ({open.filter((a) => a.status !== "auto_approved").length})
-            </TabsTrigger>
-            <TabsTrigger value="decided">Decided ({decided.length})</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <SegmentedControl
+          label="Show"
+          value={view}
+          onChange={setView}
+          options={[
+            {
+              value: "pending",
+              label: `Waiting (${open.filter((a) => a.status !== "auto_approved").length})`,
+            },
+            { value: "decided", label: `Decided (${decided.length})` },
+          ]}
+        />
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           <FilterSelect
             label="Workflow"
@@ -357,64 +362,73 @@ export function ApprovalsPage({
         </div>
       )}
 
-      {loading ? (
-        <div className="space-y-2" aria-busy="true" aria-label="Loading approvals">
-          {Array.from({ length: 5 }, (_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-lg" />
-          ))}
-        </div>
-      ) : visible.length === 0 ? (
-        <Card className="rounded-lg border-dashed">
-          <CardContent className="p-10 text-center">
-            <Check className="mx-auto size-8 text-success" />
-            <p className="mt-2 font-semibold">
-              {view === "pending"
-                ? "No pending approvals. You're all caught up! 🎉"
-                : "No decisions yet."}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {view === "pending"
-                ? "New requests will appear here with their evidence."
-                : "Approved, modified, rejected and escalated items appear here."}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="gap-4 lg:grid lg:grid-cols-[minmax(320px,400px)_1fr]">
-          <ul className="space-y-2" aria-label="Approval queue">
-            {visible.map((item) => (
-              <QueueItem
-                key={item.id}
-                item={item}
-                now={now}
-                active={selected?.id === item.id}
-                decided={decisions[item.id]}
-                checkable={view === "pending" && item.status !== "auto_approved"}
-                checked={checked.includes(item.id)}
-                onCheck={(v) =>
-                  setChecked((c) => (v ? [...c, item.id] : c.filter((id) => id !== item.id)))
-                }
-                onOpen={() => {
-                  setSelectedId(item.id);
-                  setMobileOpen(true);
-                }}
-                onSwipe={(kind) => openDecision([item.id], kind)}
-              />
+      <PullToRefresh
+        onRefresh={() =>
+          new Promise<void>((r) => {
+            refresh();
+            window.setTimeout(r, 700);
+          })
+        }
+      >
+        {loading ? (
+          <div className="space-y-2" aria-busy="true" aria-label="Loading approvals">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
             ))}
-          </ul>
-          {selected && (
-            <div className="hidden lg:block">
-              <ApprovalDetail
-                item={selected}
-                now={now}
-                decided={decisions[selected.id]}
-                onDecide={(kind) => openDecision([selected.id], kind)}
-                onUndo={() => undoDecision(selected.id)}
-              />
-            </div>
-          )}
-        </div>
-      )}
+          </div>
+        ) : visible.length === 0 ? (
+          <Card className="rounded-lg border-dashed">
+            <CardContent className="p-10 text-center">
+              <Check className="mx-auto size-8 text-success" />
+              <p className="mt-2 font-semibold">
+                {view === "pending"
+                  ? "No pending approvals. You're all caught up! 🎉"
+                  : "No decisions yet."}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {view === "pending"
+                  ? "New requests will appear here with their evidence."
+                  : "Approved, modified, rejected and escalated items appear here."}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="gap-4 lg:grid lg:grid-cols-[minmax(320px,400px)_1fr]">
+            <ul className="space-y-2" aria-label="Approval queue">
+              {visible.map((item) => (
+                <QueueItem
+                  key={item.id}
+                  item={item}
+                  now={now}
+                  active={selected?.id === item.id}
+                  decided={decisions[item.id]}
+                  checkable={view === "pending" && item.status !== "auto_approved"}
+                  checked={checked.includes(item.id)}
+                  onCheck={(v) =>
+                    setChecked((c) => (v ? [...c, item.id] : c.filter((id) => id !== item.id)))
+                  }
+                  onOpen={() => {
+                    setSelectedId(item.id);
+                    setMobileOpen(true);
+                  }}
+                  onSwipe={(kind) => openDecision([item.id], kind)}
+                />
+              ))}
+            </ul>
+            {selected && (
+              <div className="hidden lg:block">
+                <ApprovalDetail
+                  item={selected}
+                  now={now}
+                  decided={decisions[selected.id]}
+                  onDecide={(kind) => openDecision([selected.id], kind)}
+                  onUndo={() => undoDecision(selected.id)}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </PullToRefresh>
 
       <Sheet open={mobileOpen && Boolean(selected)} onOpenChange={setMobileOpen}>
         <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto p-0 pt-10 lg:hidden">

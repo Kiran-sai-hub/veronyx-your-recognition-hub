@@ -381,7 +381,12 @@ function FieldMappingWizard() {
             issues in total
           </p>
         </CardHeader>
-        <CardContent className="max-h-72 overflow-auto p-0">
+        <CardContent
+          className="max-h-72 overflow-auto p-0"
+          tabIndex={0}
+          role="region"
+          aria-label="Validation preview rows"
+        >
           <table className="w-full min-w-[520px] text-xs">
             <thead className="sticky top-0 bg-muted text-left text-muted-foreground">
               <tr>

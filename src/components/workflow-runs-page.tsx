@@ -211,7 +211,9 @@ export function WorkflowRunsPage({ workflowId }: { workflowId: string }) {
                   <th className="p-3 font-medium">Result</th>
                   <th className="p-3 font-medium">Checked</th>
                   <th className="p-3 font-medium">Rewarded</th>
-                  <th className="p-3" />
+                  <th className="relative p-3">
+                    <span className="sr-only">Details</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
