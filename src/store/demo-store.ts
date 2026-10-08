@@ -24,6 +24,9 @@ export type SavedWorkflow = {
   version: number;
   savedAt: number;
   fromAi?: boolean;
+  trigger?: string;
+  /** Full builder definition so a saved workflow re-opens exactly as left. */
+  draft?: unknown;
 };
 
 export type Redemption = {
