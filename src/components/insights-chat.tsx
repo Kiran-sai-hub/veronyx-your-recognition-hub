@@ -23,6 +23,7 @@ import { Tool, ToolContent, ToolHeader, ToolInput } from "@/components/ai-elemen
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Evidence } from "@/lib/insights-evidence";
+import { decisionTrace } from "@/lib/admin-data";
 
 export type InsightsThreadSummary = { id: string; title: string };
 
@@ -34,7 +35,7 @@ const toolLabels: Record<string, string> = {
 };
 
 const suggestions = [
-  "Why didn't Arjun Sharma get rewarded in the sales workflow?",
+  `Why didn't ${decisionTrace.employee} get rewarded in the sales workflow?`,
   "Which teams are being missed by recognition?",
   "Is recognition spread fairly across shifts?",
 ];
