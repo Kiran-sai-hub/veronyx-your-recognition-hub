@@ -1,5 +1,8 @@
 import {
   BarChart3,
+  CalendarHeart,
+  Scale,
+  ShieldCheck,
   Bell,
   CheckSquare,
   ClipboardList,
@@ -56,6 +59,10 @@ function adminNavigation(persona: Persona) {
     { to: "/analytics", label: "Analytics", icon: BarChart3 },
     { to: "/budget", label: "Budget & ledger", icon: IndianRupee },
     { to: "/payroll", label: "Payroll export", icon: WalletCards },
+    { to: "/fairness", label: "Fairness", icon: Scale },
+    { to: "/campaigns", label: "Campaigns", icon: CalendarHeart },
+    { to: "/compliance", label: "Compliance", icon: ShieldCheck },
+    { to: "/settings", label: "Settings", icon: Settings },
   ];
 }
 
@@ -72,6 +79,10 @@ function screenFor(pathname: string, persona: Persona): string {
   if (pathname.startsWith("/capture")) return "capture";
   if (pathname.startsWith("/analytics")) return "analytics";
   if (pathname.startsWith("/payroll")) return "payroll";
+  if (pathname.startsWith("/fairness")) return "fairness";
+  if (pathname.startsWith("/campaigns")) return "campaigns";
+  if (pathname.startsWith("/compliance")) return "compliance";
+  if (pathname.startsWith("/settings")) return "settings";
   if (pathname.startsWith("/dashboard")) return persona;
   return "default";
 }

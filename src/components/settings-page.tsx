@@ -233,7 +233,7 @@ export function SettingsPage() {
               <div>
                 <div className="mb-1 flex justify-between">
                   <span>WhatsApp messages this month</span>
-                  <span>3.420 of 5.000</span>
+                  <span>3,420 of 5,000</span>
                 </div>
                 <Progress value={68} aria-label="Message usage" />
               </div>
