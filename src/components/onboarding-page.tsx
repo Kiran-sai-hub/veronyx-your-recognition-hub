@@ -105,6 +105,7 @@ type Invite = {
 };
 
 export function OnboardingPage() {
+  const [account, setAccount] = useState(false);
   const [step, setStep] = useState(0);
   const [saved, setSaved] = useState(true);
   const [touched, setTouched] = useState(false);
@@ -124,11 +125,11 @@ export function OnboardingPage() {
       name: "Manufacturing",
       code: "MFG",
       teams: [
-        { name: "Manufacturing A", manager: "Suresh Babu" },
+        { name: "Manufacturing A", manager: "Selvi Murugan" },
         { name: "Manufacturing B", manager: "" },
       ],
     },
-    { name: "Quality", code: "QA", teams: [{ name: "Quality B", manager: "Meena Pillai" }] },
+    { name: "Quality", code: "QA", teams: [{ name: "Quality A", manager: "Anjali Desai" }] },
     { name: "Sales", code: "SAL", teams: [{ name: "Sales A", manager: "Vikram Rao" }] },
   ]);
   const [locations, setLocations] = useState<Location[]>([
@@ -172,6 +173,8 @@ export function OnboardingPage() {
     toast.success("Your organisation is ready.");
     go("/dashboard/owner");
   };
+
+  if (!account) return <SignUp onDone={() => setAccount(true)} />;
 
   return (
     <div className="min-h-screen bg-muted">
@@ -796,5 +799,108 @@ function DataSource({ value, onChange }: { value: string | null; onChange: (v: s
           : "Not sure yet? Skip — you can connect sources any time from Connectors & Data."}
       </p>
     </div>
+  );
+}
+
+/** Checklist §4.1 step 1: sign up with email + password or SSO, then go to the setup wizard. */
+function SignUp({ onDone }: { onDone: () => void }) {
+  const [email, setEmail] = useState("ramesh@rkmills.in");
+  const [password, setPassword] = useState("");
+  const [restrict, setRestrict] = useState(true);
+  const [error, setError] = useState("");
+  const domain = email.split("@")[1] ?? "";
+  const strength =
+    password.length >= 12 && /\d/.test(password) && /[A-Za-z]/.test(password)
+      ? "Strong"
+      : password.length >= 8
+        ? "Okay"
+        : "Too short";
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setError("Enter a valid work email.");
+    if (/@(gmail|yahoo|outlook|hotmail)\./i.test(email) && restrict)
+      return setError(
+        "That looks like a personal address. Use your work email, or turn off the domain check.",
+      );
+    if (password.length < 8) return setError("Use at least 8 characters for your password.");
+    setError("");
+    toast.success("Account created. Let's set up your organisation.");
+    onDone();
+  };
+  return (
+    <main className="grid min-h-screen place-items-center bg-muted p-4">
+      <Card className="w-full max-w-md rounded-lg">
+        <CardHeader>
+          <Brand />
+          <h1 className="pt-4 text-2xl font-semibold">Create your account</h1>
+          <CardDescription>Then a short 5-step setup for your organisation.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={submit} noValidate>
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="outline" onClick={onDone}>
+                Google
+              </Button>
+              <Button type="button" variant="outline" onClick={onDone}>
+                Microsoft
+              </Button>
+            </div>
+            <p className="text-center text-xs text-muted-foreground">or with email</p>
+            <div className="space-y-1.5">
+              <Label htmlFor="su-email">Work email</Label>
+              <Input
+                id="su-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "su-error" : undefined}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="su-password">Password</Label>
+              <Input
+                id="su-password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                aria-describedby="su-strength"
+              />
+              <p id="su-strength" className="text-xs text-muted-foreground">
+                Strength: {password ? strength : "—"} · at least 8 characters
+              </p>
+            </div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 size-4"
+                checked={restrict}
+                onChange={(e) => setRestrict(e.target.checked)}
+              />
+              <span>
+                Only people with an <b>@{domain || "your-company"}</b> email can join with email
+                sign-in (optional). Frontline staff still sign in with mobile OTP.
+              </span>
+            </label>
+            {error && (
+              <p id="su-error" role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <Button type="submit" className="w-full">
+              Create account and continue
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <a href="/login" className="text-primary hover:underline">
+                Sign in
+              </a>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
+    </main>
   );
 }

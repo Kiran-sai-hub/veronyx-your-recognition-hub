@@ -120,12 +120,19 @@ export const stepCatalog: Record<
         type: "select",
         options: ["previous calendar month", "last 7 days", "previous quarter", "current shift"],
       },
+      {
+        key: "grain",
+        label: "Grain (per)",
+        type: "select",
+        options: ["employee", "team", "location", "shift", "day"],
+      },
       { key: "min_sample_size", label: "Minimum sample size", type: "number" },
     ],
     defaults: {
       metric: "sales.sales_vs_target",
       function: "sum",
       window: "previous calendar month",
+      grain: "employee",
       min_sample_size: 0,
     },
   },
@@ -1272,7 +1279,7 @@ export function describeStep(s: Step): string {
     case "filter":
       return `${metric("field")} ${c["operator"]} ${c["value"]}`;
     case "aggregate":
-      return `${c["function"]} of ${metric("metric")} · ${c["window"]}${Number(c["min_sample_size"]) > 0 ? ` · min ${c["min_sample_size"]} samples` : ""}`;
+      return `${c["function"]} of ${metric("metric")} · ${c["window"]} · per ${c["grain"] ?? "employee"}${Number(c["min_sample_size"]) > 0 ? ` · min ${c["min_sample_size"]} samples` : ""}`;
     case "rank":
       return `Top ${c["top_n"]} by ${metric("metric")}${c["partition"] !== "none" ? ` per ${c["partition"]}` : ""}`;
     case "threshold":
