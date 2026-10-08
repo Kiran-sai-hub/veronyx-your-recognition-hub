@@ -49,58 +49,118 @@ export const recognitionPoints = employees
   .filter((e) => e.status !== "exited")
   .map((e) => e.points);
 
+const activeIn = (key: "department" | "location", value: string) =>
+  employees.filter((e) => e[key] === value && e.status === "active").length;
+
 export const departmentCoverage = [
-  { group: "Manufacturing", coverage: 64, people: 80 },
-  { group: "Quality", coverage: 78, people: 40 },
-  { group: "Sales", coverage: 71, people: 45 },
-  { group: "Operations", coverage: 49, people: 35 },
+  { group: "Manufacturing", coverage: 64, people: activeIn("department", "Manufacturing") },
+  { group: "Quality", coverage: 78, people: activeIn("department", "Quality") },
+  { group: "Sales", coverage: 71, people: activeIn("department", "Sales") },
+  { group: "Operations", coverage: 49, people: activeIn("department", "Operations") },
 ];
 export const locationCoverage = [
-  { group: "Coimbatore plant", coverage: 68, people: 120 },
-  { group: "Tiruppur unit", coverage: 52, people: 50 },
-  { group: "Chennai office", coverage: 74, people: 30 },
+  { group: "Coimbatore", coverage: 68, people: activeIn("location", "Coimbatore") },
+  { group: "Chennai", coverage: 74, people: activeIn("location", "Chennai") },
+  { group: "Erode", coverage: 61, people: activeIn("location", "Erode") },
+  { group: "Tiruppur", coverage: 52, people: activeIn("location", "Tiruppur") },
 ];
 export const shiftCoverage = [
-  { group: "Day shift", coverage: 72, people: 110 },
+  { group: "Day shift", coverage: 72, people: 109 },
   { group: "Night shift", coverage: 41, people: 60 },
   { group: "General", coverage: 69, people: 30 },
 ];
 export const tenureCoverage = [
   { group: "Under 1 year", coverage: 44, people: 38 },
   { group: "1–3 years", coverage: 66, people: 72 },
-  { group: "3+ years", coverage: 73, people: 90 },
+  { group: "3+ years", coverage: 73, people: 89 },
 ];
+/** Only employees who consented to gender-based analysis are counted (124 of 199). */
+export const genderCoverage = [
+  { group: "Women (consented)", coverage: 63, people: 52 },
+  { group: "Men (consented)", coverage: 70, people: 68 },
+  { group: "Other / prefer to self-describe", coverage: 0, people: 4 },
+];
+export const GENDER_CONSENTED = 124;
+/** Groups smaller than this are suppressed so nobody can be identified. */
+export const MIN_GROUP_SIZE = 10;
 
 export const managerSpread = [
-  { manager: "Priya Raman", team: 18, distinct: 15 },
-  { manager: "Arjun Mehta", team: 22, distinct: 9 },
-  { manager: "Kavitha Iyer", team: 14, distinct: 12 },
-  { manager: "Suresh Babu", team: 20, distinct: 6 },
-  { manager: "Meena Pillai", team: 16, distinct: 13 },
+  { manager: "Vikram Rao", teamName: "Sales A", team: 8, distinct: 8 },
+  { manager: "Selvi Murugan", teamName: "Manufacturing A", team: 13, distinct: 11 },
+  { manager: "Karthik Iyer", teamName: "Manufacturing B", team: 12, distinct: 4 },
+  { manager: "Anjali Desai", teamName: "Quality A", team: 13, distinct: 10 },
+  { manager: "Farhan Qureshi", teamName: "Operations A", team: 12, distinct: 5 },
 ];
+
+/** Points-per-person buckets for the distribution chart (AN-05). */
+export function pointsHistogram(values: number[]) {
+  const buckets = [
+    { label: "0", min: 0, max: 0 },
+    { label: "1–500", min: 1, max: 500 },
+    { label: "501–1,000", min: 501, max: 1000 },
+    { label: "1,001–1,500", min: 1001, max: 1500 },
+    { label: "1,501–2,000", min: 1501, max: 2000 },
+    { label: "2,000+", min: 2001, max: Infinity },
+  ];
+  return buckets.map((b) => ({
+    bucket: b.label,
+    people: values.filter((v) => v >= b.min && v <= b.max).length,
+  }));
+}
+
+/** Lorenz curve points (share of people vs share of points) for the concentration chart. */
+export function lorenzCurve(values: number[]) {
+  const sorted = [...values].sort((x, y) => x - y);
+  const total = sorted.reduce((sum, v) => sum + v, 0) || 1;
+  const points = [{ people: 0, points: 0, even: 0 }];
+  for (let decile = 1; decile <= 10; decile++) {
+    const upto = Math.round((sorted.length * decile) / 10);
+    const share = sorted.slice(0, upto).reduce((sum, v) => sum + v, 0) / total;
+    points.push({ people: decile * 10, points: Math.round(share * 100), even: decile * 10 });
+  }
+  return points;
+}
+
+const person = (index: number) => employees[index] ?? employees[0];
 
 export const negativeReport = {
   zeroRecognition: [
-    { name: "Ramesh Kumar", team: "Spinning – night", days: 94 },
-    { name: "Lakshmi Devi", team: "Packing", days: 88 },
-    { name: "Imran Shaikh", team: "Dyeing", days: 76 },
-    { name: "Divya Nair", team: "Accounts", days: 71 },
+    { name: person(81)?.name ?? "", team: person(81)?.team ?? "", days: 94 },
+    { name: person(147)?.name ?? "", team: person(147)?.team ?? "", days: 88 },
+    { name: person(124)?.name ?? "", team: person(124)?.team ?? "", days: 76 },
+    { name: person(171)?.name ?? "", team: person(171)?.team ?? "", days: 71 },
   ],
   noWorkflowTeams: [
-    { team: "Maintenance", people: 12 },
-    { team: "Stores", people: 8 },
+    { team: "Operations D", people: 12 },
+    { team: "Quality D", people: 12 },
   ],
   noWinnerBoards: [{ board: "Night shift output", periods: 3 }],
 };
 
 export const retentionSignals = [
-  { team: "Spinning – night", signal: "Recognition dropped from 11 to 2 per month", people: 14 },
-  { team: "Packing", signal: "No recognition from manager in 60 days", people: 9 },
+  { team: "Manufacturing B", signal: "Recognition dropped from 11 to 2 per month", people: 12 },
+  { team: "Operations A", signal: "No recognition from the manager in 60 days", people: 12 },
+];
+
+/** D-05: recognitions per person (last 6 months) against exits in the same period, per team. */
+export const retentionByTeam = [
+  { team: "Sales A", recognitions: 6.1, exits: 0 },
+  { team: "Manufacturing A", recognitions: 5.4, exits: 1 },
+  { team: "Quality A", recognitions: 4.9, exits: 0 },
+  { team: "Operations B", recognitions: 3.2, exits: 1 },
+  { team: "Operations A", recognitions: 1.4, exits: 3 },
+  { team: "Manufacturing B", recognitions: 1.1, exits: 4 },
 ];
 
 export type GamingAlert = {
   id: string;
-  kind: string;
+  kind:
+    | "Reciprocal loop"
+    | "Spike"
+    | "Self-dealing"
+    | "Bulk entries"
+    | "Late target change"
+    | "Self-approval";
   detail: string;
   evidence: string;
   status: "open" | "cleared" | "held";
@@ -109,52 +169,115 @@ export type GamingAlert = {
 export const gamingAlerts: GamingAlert[] = [
   {
     id: "ga-1",
-    kind: "Reciprocal recognition",
-    detail: "Two people recognised each other 9 times in 14 days",
-    evidence: "18 shoutouts, 2 people, no other givers",
+    kind: "Reciprocal loop",
+    detail: `${person(66)?.name} and ${person(98)?.name} recognised each other 9 times in 14 days`,
+    evidence: "18 shoutouts, 2 people, no other givers · Sales A",
     status: "open",
   },
   {
     id: "ga-2",
-    kind: "Same-minute bulk entries",
+    kind: "Spike",
+    detail: "Quality B recognitions jumped from 6 to 41 in one week",
+    evidence: "35 extra shoutouts on 05/10/2026 · 3 givers · normal week is 4–8",
+    status: "open",
+  },
+  {
+    id: "ga-3",
+    kind: "Self-dealing",
+    detail:
+      "Karthik Iyer submitted capture entries that made him eligible for a reward he approves",
+    evidence: "Form: Daily output · 4 entries · approver = submitter's manager chain",
+    status: "open",
+  },
+  {
+    id: "ga-4",
+    kind: "Bulk entries",
     detail: "Native capture entries submitted 40 at a time at 23:58",
     evidence: "Form: Daily output · 3 nights in a row",
     status: "open",
   },
   {
-    id: "ga-3",
-    kind: "Target edited after period",
+    id: "ga-5",
+    kind: "Late target change",
     detail: "Quarterly target lowered 2 days after the quarter closed",
-    evidence: "Board: Sales – South · changed by Arjun Mehta",
+    evidence: "Board: Sales A · changed by Vikram Rao",
     status: "open",
   },
   {
-    id: "ga-4",
-    kind: "Self-approval attempt",
-    detail: "Manager tried to approve a reward for themself",
-    evidence: "Blocked automatically · logged",
+    id: "ga-6",
+    kind: "Self-approval",
+    detail: "A manager tried to approve a reward for themselves",
+    evidence: "Blocked automatically · logged AU-9087",
     status: "cleared",
   },
 ];
 
 /** Private, manager-only view. Neutral facts only — never reasons or speculation. */
 export const privateFollowUps = [
-  { name: "Ganesh Murthy", metric: "Output vs target", value: "71%", periods: 2 },
-  { name: "Sangeetha R", metric: "Quality pass rate", value: "88%", periods: 1 },
+  { name: person(82)?.name ?? "", metric: "Sales vs target", value: "71%", periods: 2 },
+  { name: person(114)?.name ?? "", metric: "Calls logged", value: "62%", periods: 1 },
 ];
 
 /* ---------- Campaigns ---------- */
 
+export type CampaignType = "festival" | "birthday" | "anniversary" | "long_service";
+
+export const campaignTypeLabel: Record<CampaignType, string> = {
+  festival: "Festival",
+  birthday: "Birthdays",
+  anniversary: "Work anniversaries",
+  long_service: "Long service",
+};
+
 export type Campaign = {
   id: string;
+  type: CampaignType;
   name: string;
   festival: string;
+  /** DD/MM/YYYY; "Always on" campaigns run on each person's own date. */
   start: string;
   end: string;
+  rewardPerPerson: number;
+  recipients: number;
   budget: number;
   status: "draft" | "scheduled" | "live" | "ended";
   audience: string;
+  template: string;
 };
+
+/** Audiences a campaign can target, with active headcount. */
+export const campaignAudiences = [
+  { id: "everyone", label: "Everyone", people: 199 },
+  { id: "manufacturing", label: "Manufacturing", people: 50 },
+  { id: "quality", label: "Quality", people: 50 },
+  { id: "sales", label: "Sales", people: 50 },
+  { id: "operations", label: "Operations", people: 49 },
+  { id: "coimbatore", label: "Coimbatore", people: 50 },
+];
+
+export const campaignTemplates: Record<CampaignType, string[]> = {
+  festival: ["festival_greeting_v2 (Utility)", "festival_bonus_credited (Utility)"],
+  birthday: ["birthday_wish (Utility)"],
+  anniversary: ["work_anniversary_thanks (Utility)"],
+  long_service: ["long_service_award (Utility)"],
+};
+
+/** Milestones for long-service awards and the reward for each. */
+export const longServiceMilestones = [
+  { years: 5, reward: 2000 },
+  { years: 10, reward: 5000 },
+  { years: 15, reward: 7500 },
+  { years: 20, reward: 10000 },
+];
+
+/** People with a birthday, anniversary or milestone in the next 30 days. */
+export const upcomingMoments = [
+  { name: employees[44]?.name ?? "", kind: "Birthday", date: "12/10/2026" },
+  { name: employees[57]?.name ?? "", kind: "3-year work anniversary", date: "15/10/2026" },
+  { name: employees[120]?.name ?? "", kind: "10 years of service", date: "21/10/2026" },
+  { name: employees[133]?.name ?? "", kind: "Birthday", date: "24/10/2026" },
+  { name: employees[162]?.name ?? "", kind: "1-year work anniversary", date: "02/11/2026" },
+];
 
 export const festivals = [
   { name: "Pongal", month: "January" },
@@ -174,33 +297,87 @@ export const festivals = [
 export const campaigns: Campaign[] = [
   {
     id: "c1",
+    type: "festival",
     name: "Diwali thank-you week",
     festival: "Diwali",
     start: "20/10/2026",
     end: "27/10/2026",
-    budget: 250000,
+    rewardPerPerson: 300,
+    recipients: 199,
+    budget: 59700,
     status: "scheduled",
     audience: "Everyone",
+    template: "festival_greeting_v2 (Utility)",
   },
   {
     id: "c2",
+    type: "anniversary",
+    name: "Work anniversaries",
+    festival: "—",
+    start: "Always on",
+    end: "",
+    rewardPerPerson: 500,
+    recipients: 9,
+    budget: 4500,
+    status: "live",
+    audience: "Everyone",
+    template: "work_anniversary_thanks (Utility)",
+  },
+  {
+    id: "c3",
+    type: "birthday",
+    name: "Birthday wishes",
+    festival: "—",
+    start: "Always on",
+    end: "",
+    rewardPerPerson: 250,
+    recipients: 14,
+    budget: 3500,
+    status: "live",
+    audience: "Everyone who shared their birthday",
+    template: "birthday_wish (Utility)",
+  },
+  {
+    id: "c4",
+    type: "long_service",
+    name: "Long service awards",
+    festival: "—",
+    start: "Always on",
+    end: "",
+    rewardPerPerson: 5000,
+    recipients: 2,
+    budget: 10000,
+    status: "live",
+    audience: "5 / 10 / 15 / 20 years",
+    template: "long_service_award (Utility)",
+  },
+  {
+    id: "c5",
+    type: "festival",
     name: "Onam safety stars",
     festival: "Onam",
     start: "25/08/2026",
     end: "05/09/2026",
-    budget: 80000,
+    rewardPerPerson: 400,
+    recipients: 50,
+    budget: 20000,
     status: "ended",
     audience: "Manufacturing",
+    template: "festival_bonus_credited (Utility)",
   },
   {
-    id: "c3",
+    id: "c6",
+    type: "festival",
     name: "Pongal harvest bonus",
     festival: "Pongal",
     start: "13/01/2027",
     end: "16/01/2027",
-    budget: 120000,
+    rewardPerPerson: 500,
+    recipients: 50,
+    budget: 25000,
     status: "draft",
-    audience: "Coimbatore plant",
+    audience: "Coimbatore",
+    template: "festival_greeting_v2 (Utility)",
   },
 ];
 
@@ -218,6 +395,7 @@ export const purposes: { purpose: string; basis: LegalBasis; plain: string }[] =
   { purpose: "WhatsApp messages", basis: "consent", plain: "Only with your yes (Meta rule)" },
   { purpose: "Marketing offers", basis: "consent", plain: "Only with your yes" },
   { purpose: "Payroll export", basis: "legitimate_use_employment", plain: "Needed for salary tax" },
+  { purpose: "Gender-based fairness analysis", basis: "consent", plain: "Only with your yes" },
 ];
 
 /** Privacy notice text per language; Telugu is intentionally missing to show the fallback. */
