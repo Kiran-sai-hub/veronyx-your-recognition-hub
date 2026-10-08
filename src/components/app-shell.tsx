@@ -1,17 +1,22 @@
 import {
+  BarChart3,
   Bell,
   CheckSquare,
+  ClipboardList,
   GitBranch,
+  IndianRupee,
   LayoutDashboard,
   ChevronDown,
   Gift,
   Home,
   Moon,
+  Plug,
   Settings,
   Sparkles,
   Sun,
   Trophy,
   UserRound,
+  Users,
   WalletCards,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -41,8 +46,16 @@ const employeeNavigation = [
 function adminNavigation(persona: Persona) {
   return [
     { to: personaHome[persona], label: "Dashboard", icon: LayoutDashboard },
+    { to: "/boards", label: "Boards", icon: Trophy },
     { to: "/workflows", label: "Workflows", icon: GitBranch },
     { to: "/approvals", label: "Approvals", icon: CheckSquare },
+    { to: "/capture", label: "Native capture", icon: ClipboardList },
+    { to: "/rewards", label: "Rewards", icon: Gift },
+    { to: "/people", label: "People & teams", icon: Users },
+    { to: "/connectors", label: "Connectors", icon: Plug },
+    { to: "/analytics", label: "Analytics", icon: BarChart3 },
+    { to: "/budget", label: "Budget & ledger", icon: IndianRupee },
+    { to: "/payroll", label: "Payroll export", icon: WalletCards },
   ];
 }
 
@@ -50,6 +63,15 @@ function screenFor(pathname: string, persona: Persona): string {
   if (pathname.startsWith("/workflows/")) return "builder";
   if (pathname.startsWith("/workflows")) return "workflows";
   if (pathname.startsWith("/approvals")) return "approvals";
+  if (pathname.startsWith("/boards/")) return "board-config";
+  if (pathname.startsWith("/boards")) return "boards";
+  if (pathname.startsWith("/connectors")) return "connectors";
+  if (pathname.startsWith("/budget")) return "budget";
+  if (pathname.startsWith("/people")) return "people";
+  if (pathname.startsWith("/rewards")) return "rewards-admin";
+  if (pathname.startsWith("/capture")) return "capture";
+  if (pathname.startsWith("/analytics")) return "analytics";
+  if (pathname.startsWith("/payroll")) return "payroll";
   if (pathname.startsWith("/dashboard")) return persona;
   return "default";
 }

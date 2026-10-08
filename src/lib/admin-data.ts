@@ -454,5 +454,50 @@ export const aiSuggestionsByScreen: Record<string, string[]> = {
     "Which approvals cross the tax limit?",
     "Which items are queued for budget?",
   ],
+  boards: [
+    "Suggest a board for the Quality department",
+    "Which board has the fewest active members?",
+    "How do points flow from a board?",
+  ],
+  "board-config": [
+    "Suggest a fair scorecard for this board",
+    "Which behaviour rules should I turn on?",
+    "Explain the comparison policies",
+  ],
+  connectors: [
+    "Which data source failed this week?",
+    "What changed in the last sales file?",
+    "How do I connect Google Sheets?",
+  ],
+  budget: [
+    "Which pools will run out first?",
+    "How much budget is left this quarter?",
+    "Summarise this month's ledger",
+  ],
+  people: [
+    "Who has not been recognised in 30 days?",
+    "Which team is the largest?",
+    "Show employees near the ₹15,000 gift limit",
+  ],
+  "rewards-admin": [
+    "Which rewards are redeemed most?",
+    "Which orders need a retry or refund?",
+    "Suggest a festival reward under ₹500",
+  ],
+  capture: [
+    "Draft a form for shift quality logs",
+    "Which entries are missing evidence?",
+    "How does the WhatsApp form work?",
+  ],
+  analytics: [
+    "Which department had the lowest recognition last month?",
+    "What is our spend per person this year?",
+    "Export the coverage table",
+  ],
+  payroll: [
+    "Which rows will payroll reject?",
+    "Who crossed the ₹15,000 gift limit this year?",
+    "Explain the taxable column",
+  ],
   default: ["What needs my attention today?", "How do I create a workflow?"],
 };
