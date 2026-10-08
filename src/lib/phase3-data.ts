@@ -226,7 +226,7 @@ export type ConsentRecord = {
 
 export const consentRecords: ConsentRecord[] = employees.slice(0, 24).map((e, i) => ({
   employee: e.name,
-  purpose: purposes[i % purposes.length].purpose,
+  purpose: purposes[i % purposes.length]?.purpose ?? "Performance recognition",
   state: i % 7 === 3 ? "withdrawn" : i % 3 === 0 ? "acknowledged" : "granted",
   channel: i % 3 === 0 ? "paper" : i % 2 === 0 ? "WhatsApp" : "web",
   evidence: i % 2 === 0 ? `wamid.HBg${1000 + i}` : `IP 10.0.4.${i + 10}`,
