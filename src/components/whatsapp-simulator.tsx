@@ -225,7 +225,7 @@ export function WhatsappSimulator() {
                 key={q}
                 type="button"
                 onClick={() => send(q)}
-                className="min-h-9 shrink-0 rounded-full border border-border px-3 text-xs"
+                className="min-h-11 shrink-0 rounded-full border border-border px-4 text-sm"
               >
                 {q.length > 16 ? `${q.slice(0, 16)}…` : q}
               </button>

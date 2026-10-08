@@ -264,6 +264,16 @@ export function respond(question: string, persona: string, queriesUsed = 0): Cop
       alternatives: ["Show my team's remaining budget", "Show my team's coverage"],
     };
   }
+  if (q.includes("private") && persona === "hr") {
+    return {
+      kind: "refusal",
+      reason: "permission",
+      text: "You don't have permission to view private follow-ups.",
+      why: "Private follow-ups are only for the Owner and each person's own manager (permission fairness.private_view).",
+      contact: "Ramesh Krishnan (Owner) can change this in Roles & Permissions",
+      alternatives: ["Show coverage by department", "Who hasn't been recognised in 60 days?"],
+    };
+  }
   if (/(approve|pay|send|transfer).*(all|reward|points)|give .* points/.test(q)) {
     return {
       kind: "refusal",

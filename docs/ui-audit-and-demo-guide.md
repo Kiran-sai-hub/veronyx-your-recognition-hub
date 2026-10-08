@@ -2,6 +2,11 @@
 
 Source of truth: `docs/veronyx-recognise-ui-flow-checklist.md`. Every fix below is tied to a checklist section.
 
+- **Line-by-line coverage of every checklist item:** `docs/checklist-coverage-matrix.md`
+- Design documents (Appendix B): `docs/design/` (tokens, icons & illustrations, accessibility audit,
+  responsive/dark/motion, multi-language layout), `docs/engineering-handoff.md`, `docs/open-questions.md`
+- Live design system: `/design-system`
+
 ## How to demo (10 minutes)
 
 1. **Sign in** (`/login`) — pick a role under _Demo: explore as_. You can switch role any time with the **As …** selector in the top bar. The profile menu (bottom-left) has demo controls: _New organisation (empty states)_, _AI available_, _Reset demo data_.
@@ -10,7 +15,9 @@ Source of truth: `docs/veronyx-recognise-ui-flow-checklist.md`. Every fix below 
 4. **Manager** — _My approvals_ with SLA timers → open evidence and decision trace → Modify / Reject / Escalate. Note restricted screens show “You don't have permission…”, and boards/workflows are view-only.
 5. **Employee** (`/me`) — _Rewards_ → _Fuel gift card_ → Redeem → OTP `246810` → see the provider failure (points returned) → Retry → voucher + rating → _Wallet_ shows the status trail. _Preferences → हिन्दी_ translates the app.
 6. **WhatsApp bot** (`/whatsapp`) — _HR: send opt-in link_ → JOIN → _Send a recognition_ → reply 2, 1 → `THANKS @Priya for Diwali rush help` → `LANG hi` → STOP → _Send a recognition_ (logged as `suppressed_no_optin`).
-7. **New organisation** — `/onboarding` walks the full setup wizard (incl. employee import) and lands on the empty-state dashboard. Profile menu → _Reset demo data_ restores the sample company.
+7. **New organisation** — `/onboarding` starts with account creation, then the 5-step setup wizard (incl. employee import) and lands on the empty-state dashboard. Profile menu → _Reset demo data_ restores the sample company.
+8. **Depth screens (HR)** — `/payroll` (5-step export → real CSV), `/compliance` (DPDP status, consent withdrawal, erasure confirmation, audit log with filters), `/budget` (top-ups, allocation, forecast), `/fairness` (Gini, Lorenz curve, anti-gaming alerts), `/campaigns`, `/workflows/templates` (marketplace), `/approvals` → the long-service item (3-level approval chain).
+9. **States** — profile menu → _Simulate offline_, _Simulate an API error_, _Simulate session timeout_; _Preferences_ → high contrast, text size, reduce motion, low-data mode.
 
 ## What was wrong, and what changed
 
@@ -35,11 +42,21 @@ Source of truth: `docs/veronyx-recognise-ui-flow-checklist.md`. Every fix below 
 | WhatsApp (3.5)                         | No “Reply 1/2”, no consent evidence, wrong shoutout format                                                            | Journey matches 3.5, with admin message log incl. `suppressed_no_optin`                                                                                                                                                                                               |
 | Consistency                            | Department names, coverage, budget pools and balances disagreed between screens                                       | One set of figures everywhere                                                                                                                                                                                                                                         |
 | Responsive (8.1)                       | 6 screens overflowed on phones                                                                                        | Fixed; swept every route × role at 390 px and 768 px                                                                                                                                                                                                                  |
+| Depth screens (H-04…H-07, R-, S-)      | Payroll was 3 steps, compliance lacked DPDP workflows, budget had no top-ups/expiries, fairness used invented names   | Payroll §4.13 in 5 steps, DPDP §4.14 complete, budget tree + forecast, fairness with distribution charts and anti-gaming, campaigns for all four types, role assignments and per-locale templates                                                                     |
+| AI UX (5.3)                            | No number cards, no voice, no injection logging, fixed 3-period dry-run                                               | Number cards, hi/ta understanding, voice input, every AI interaction audited, injection attempts logged silently, period selector with failure + retry                                                                                                                |
+| States (§6)                            | No offline, session-expiry or API-error states; no skeletons                                                          | Global offline banner, inactivity warning → session-expired login, error toast with retry, page skeletons, run progress                                                                                                                                               |
+| Components (§7)                        | Missing date range, multi-select, data table, timeline, kanban, JSON/diff viewers, formula editor, circular progress  | Built in `src/components/library` and used on real screens; all shown on `/design-system`                                                                                                                                                                             |
+| Accessibility (§9)                     | Contrast failures on most screens; invalid ARIA; nested buttons                                                       | axe-core: 0 violations on 36 routes in light and dark; high contrast, text size, reduced motion, low-data preferences                                                                                                                                                 |
+| PWA & devices (§8)                     | No manifest or service worker; no tablet layout                                                                       | Installable PWA with offline shell, tablet icon rail, docked Copilot ≥ 1440 px, pull to refresh, WhatsApp deep link                                                                                                                                                   |
+| P3 (Appendix A)                        | Not built                                                                                                             | Multi-step approvals, template marketplace, budget forecasting, voice input; kiosk and shoutouts checked                                                                                                                                                              |
 
 ## Intentionally still mocked / out of scope
 
-- All data is prototype data; nothing is sent, paid or connected. The **Evidence Q&A** tab calls a real model through the Lovable AI gateway, so it only answers when the app runs on Lovable.
-- The workflow “canvas” is a vertical DAG with branch lanes and drag-to-insert, not free-form node wiring.
-- Voice input, offline PWA caching and pull-to-refresh are not built (voice is marked “coming soon”).
-- Languages other than English, Hindi and Tamil fall back to English (checklist 6.5 fallback rule).
-- Figma deliverables in Appendix B are outside this code repository.
+- All data is prototype data; nothing is really sent, paid or connected (SSO, connectors, WhatsApp,
+  voucher providers, payroll upload). The **Evidence Q&A** tab calls a real model through the Lovable
+  AI gateway, so it only answers when the app runs on Lovable.
+- Languages other than English, Hindi and Tamil fall back to English with a notice (agreed scope).
+- The service worker registers only in production builds.
+- Not yet verified: real screen readers (VoiceOver/NVDA) and a low-end Android 8 device.
+- Figma wireframes and files were out of scope for this pass (agreed); the design system lives in
+  code (`/design-system`) and `docs/design/`.

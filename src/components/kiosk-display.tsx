@@ -23,7 +23,9 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.classList.contains("reduce-motion");
     if (reduce) setPaused(true);
   }, []);
 

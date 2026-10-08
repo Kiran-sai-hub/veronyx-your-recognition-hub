@@ -78,3 +78,11 @@ describe("Copilot input handling (checklist 5.3 B, H, I)", () => {
     expect(isSuspicious("Show coverage by department")).toBe(false);
   });
 });
+
+describe("Copilot permission refusals", () => {
+  it("tells HR who can grant access to private follow-ups", () => {
+    const reply = respond("Show me the private follow-ups", "hr");
+    expect(reply.kind).toBe("refusal");
+    if (reply.kind === "refusal") expect(reply.contact).toContain("Owner");
+  });
+});
