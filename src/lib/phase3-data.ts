@@ -726,18 +726,144 @@ export const permissions = [
   { name: "Manage privacy", grants: [true, true, false, false, false] },
 ];
 
-export const notificationTemplates = [
-  { name: "Recognition received", channel: "WhatsApp", locales: ["en", "ta", "hi"] },
-  { name: "Reward approved", channel: "In-app", locales: ["en", "ta", "hi", "te"] },
-  { name: "Redemption OTP", channel: "WhatsApp", locales: ["en", "ta"] },
-  { name: "Weekly summary", channel: "Email", locales: ["en"] },
+export const roleDescriptions: Record<(typeof roles)[number], string> = {
+  Owner: "Everything, including billing. Cannot be removed.",
+  "HR admin": "Runs programmes, people, data, privacy and payroll.",
+  Manager: "Approves and recognises their own team; sees team figures only.",
+  Employee: "Own wallet, rewards, recognitions and boards they are allowed to see.",
+  Finance: "Budget, ledger and payroll exports. No access to performance data.",
+};
+
+export const roleAssignments: {
+  name: string;
+  email: string;
+  role: (typeof roles)[number];
+  scope: string;
+}[] = [
+  {
+    name: "Ramesh Krishnan",
+    email: "ramesh@rkmills.in",
+    role: "Owner",
+    scope: "Whole organisation",
+  },
+  {
+    name: "Lakshmi Menon",
+    email: "lakshmi.hr@rkmills.in",
+    role: "HR admin",
+    scope: "Whole organisation",
+  },
+  { name: "Vikram Rao", email: "vikram@rkmills.in", role: "Manager", scope: "Sales A" },
+  { name: "Selvi Murugan", email: "selvi@rkmills.in", role: "Manager", scope: "Manufacturing A" },
+  { name: "Karthik Iyer", email: "karthik@rkmills.in", role: "Manager", scope: "Manufacturing B" },
+  { name: "Anjali Desai", email: "anjali@rkmills.in", role: "Manager", scope: "Quality A" },
+  { name: "Farhan Qureshi", email: "farhan@rkmills.in", role: "Manager", scope: "Operations A" },
+  {
+    name: "Suresh Babu",
+    email: "accounts@rkmills.in",
+    role: "Finance",
+    scope: "Whole organisation",
+  },
 ];
 
-export const whatsappTemplates = [
-  { name: "recognition_alert_v2", category: "Utility", status: "Approved" },
-  { name: "redeem_otp", category: "Authentication", status: "Approved" },
-  { name: "diwali_campaign", category: "Marketing", status: "Pending" },
-  { name: "balance_reply", category: "Utility", status: "Rejected" },
+export const templateLocales = ["en", "ta", "hi", "te"] as const;
+export const localeName: Record<string, string> = {
+  en: "English",
+  ta: "தமிழ்",
+  hi: "हिन्दी",
+  te: "తెలుగు",
+};
+
+export type NotificationTemplate = {
+  name: string;
+  channel: "WhatsApp" | "Email" | "In-app";
+  body: Partial<Record<(typeof templateLocales)[number], string>>;
+};
+
+export const notificationTemplates: NotificationTemplate[] = [
+  {
+    name: "Recognition received",
+    channel: "WhatsApp",
+    body: {
+      en: "🎉 {{name}}, you were ranked #{{rank}} on {{board}}! {{points}} points credited. Reply 1 to redeem, 2 for details.",
+      ta: "🎉 {{name}}, {{board}}-ல் நீங்கள் #{{rank}}! {{points}} புள்ளிகள் வரவு. பெற 1, விவரங்களுக்கு 2.",
+      hi: "🎉 {{name}}, {{board}} पर आप #{{rank}} रहे! {{points}} पॉइंट जमा। भुनाने के लिए 1, विवरण के लिए 2।",
+    },
+  },
+  {
+    name: "Reward approved",
+    channel: "In-app",
+    body: {
+      en: "Your reward of {{amount}} was approved by {{approver}}.",
+      ta: "உங்கள் {{amount}} வெகுமதி {{approver}} அவர்களால் அங்கீகரிக்கப்பட்டது.",
+      hi: "आपका {{amount}} का इनाम {{approver}} ने मंज़ूर किया।",
+      te: "మీ {{amount}} బహుమతిని {{approver}} ఆమోదించారు.",
+    },
+  },
+  {
+    name: "Redemption OTP",
+    channel: "WhatsApp",
+    body: {
+      en: "{{otp}} is your code to confirm the redemption. Valid for 10 minutes. Do not share it.",
+      ta: "{{otp}} உங்கள் உறுதிப்படுத்தல் குறியீடு. 10 நிமிடம் செல்லும். பகிர வேண்டாம்.",
+    },
+  },
+  {
+    name: "Weekly summary",
+    channel: "Email",
+    body: {
+      en: "This week: {{recognitions}} recognitions, {{rewards}} rewards, {{pending}} approvals waiting.",
+    },
+  },
+];
+
+export type WhatsappTemplate = {
+  name: string;
+  category: "Utility" | "Marketing" | "Authentication";
+  languages: string[];
+  status: "Approved" | "Pending" | "Rejected";
+  note?: string;
+};
+
+export const whatsappTemplates: WhatsappTemplate[] = [
+  {
+    name: "ranked_on_board",
+    category: "Utility",
+    languages: ["en", "ta", "hi"],
+    status: "Approved",
+  },
+  {
+    name: "redeem_otp",
+    category: "Authentication",
+    languages: ["en", "ta", "hi"],
+    status: "Approved",
+  },
+  {
+    name: "voucher_delivered",
+    category: "Utility",
+    languages: ["en", "ta", "hi"],
+    status: "Approved",
+  },
+  { name: "optin_invite", category: "Utility", languages: ["en", "ta", "hi"], status: "Approved" },
+  {
+    name: "festival_greeting_v2",
+    category: "Utility",
+    languages: ["en", "ta", "hi"],
+    status: "Pending",
+  },
+  {
+    name: "diwali_offers",
+    category: "Marketing",
+    languages: ["en"],
+    status: "Pending",
+    note: "Marketing — only sent to people who consented to offers.",
+  },
+  {
+    name: "balance_reply",
+    category: "Utility",
+    languages: ["en"],
+    status: "Rejected",
+    note: "Meta: variable at the start of the message. Move {{balance}} after the greeting and resubmit.",
+  },
 ];
 
 export const invoices = [
