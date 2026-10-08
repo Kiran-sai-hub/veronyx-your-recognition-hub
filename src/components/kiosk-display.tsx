@@ -39,14 +39,21 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
     <div className="flex min-h-screen flex-col bg-background p-8 text-foreground lg:p-12">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="grid size-14 place-items-center rounded-lg bg-reward text-xl font-bold text-reward-foreground">RK</div>
+          <div className="grid size-14 place-items-center rounded-lg bg-reward text-xl font-bold text-reward-foreground">
+            RK
+          </div>
           <div>
             <p className="text-3xl font-bold">Radha Krishna Mills</p>
             <p className="text-sm text-muted-foreground">Coimbatore plant · powered by Veronyx</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="lg" onClick={() => setPaused((p) => !p)} aria-label={paused ? "Play" : "Pause"}>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => setPaused((p) => !p)}
+            aria-label={paused ? "Play" : "Pause"}
+          >
             {paused ? <Play className="size-5" /> : <Pause className="size-5" />}
           </Button>
           <Button variant="ghost" size="lg" onClick={onExit}>
@@ -60,12 +67,24 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
         {index === 0 && (
           <ol className="space-y-4">
             {topTeams.map((t, i) => (
-              <li key={t.team} className="flex items-center justify-between rounded-xl bg-card p-6 text-3xl shadow-sm">
+              <li
+                key={t.team}
+                className="flex items-center justify-between rounded-xl bg-card p-6 text-3xl shadow-sm"
+              >
                 <span className="flex items-center gap-5">
-                  <span className={cn("w-10 font-bold", i === 0 ? "text-reward" : "text-muted-foreground")}>{i + 1}</span>
+                  <span
+                    className={cn(
+                      "w-10 font-bold",
+                      i === 0 ? "text-reward" : "text-muted-foreground",
+                    )}
+                  >
+                    {i + 1}
+                  </span>
                   {t.team}
                 </span>
-                <span className="font-semibold text-reward">{t.points.toLocaleString("en-IN")} pts</span>
+                <span className="font-semibold text-reward">
+                  {t.points.toLocaleString("en-IN")} pts
+                </span>
               </li>
             ))}
           </ol>
@@ -89,7 +108,9 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
             <div className="mt-8 h-6 overflow-hidden rounded-full bg-muted">
               <div className="h-full w-[82%] rounded-full bg-primary" />
             </div>
-            <p className="mt-4 text-2xl text-muted-foreground">4 more days to unlock the Diwali team lunch</p>
+            <p className="mt-4 text-2xl text-muted-foreground">
+              4 more days to unlock the Diwali team lunch
+            </p>
           </div>
         )}
       </main>
@@ -101,7 +122,10 @@ export function KioskDisplay({ onExit }: KioskDisplayProps) {
             type="button"
             aria-label={`Show ${s}`}
             onClick={() => setIndex(i)}
-            className={cn("h-3 rounded-full transition-all", i === index ? "w-10 bg-primary" : "w-3 bg-muted-foreground/40")}
+            className={cn(
+              "h-3 rounded-full transition-all",
+              i === index ? "w-10 bg-primary" : "w-3 bg-muted-foreground/40",
+            )}
           />
         ))}
       </footer>

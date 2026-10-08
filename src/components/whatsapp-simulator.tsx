@@ -4,7 +4,12 @@ import { useState } from "react";
 import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { botReply, initialBotState, recognitionNotification, type BotState } from "@/lib/whatsapp-bot";
+import {
+  botReply,
+  initialBotState,
+  recognitionNotification,
+  type BotState,
+} from "@/lib/whatsapp-bot";
 import { cn } from "@/lib/utils";
 
 type Bubble = { id: number; from: "me" | "bot"; text: string; time: string };
@@ -38,7 +43,10 @@ export function WhatsappSimulator() {
 
   const notify = () => {
     if (!state.joined || state.stopped) return;
-    setBubbles((b) => [...b, { id: nextId, from: "bot", text: recognitionNotification(state.language), time: now() }]);
+    setBubbles((b) => [
+      ...b,
+      { id: nextId, from: "bot", text: recognitionNotification(state.language), time: now() },
+    ]);
     setNextId((n) => n + 1);
   };
 
@@ -57,13 +65,18 @@ export function WhatsappSimulator() {
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="mx-auto w-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-foreground/80 shadow-lg">
           <div className="flex items-center gap-3 bg-success px-4 py-3 text-success-foreground">
-            <div className="grid size-9 place-items-center rounded-full bg-reward font-bold text-reward-foreground">RK</div>
+            <div className="grid size-9 place-items-center rounded-full bg-reward font-bold text-reward-foreground">
+              RK
+            </div>
             <div>
               <p className="text-sm font-semibold">Radha Krishna Mills</p>
               <p className="text-[11px] opacity-80">Business account · powered by Veronyx</p>
             </div>
           </div>
-          <div className="flex h-[480px] flex-col gap-2 overflow-y-auto bg-muted p-3" aria-live="polite">
+          <div
+            className="flex h-[480px] flex-col gap-2 overflow-y-auto bg-muted p-3"
+            aria-live="polite"
+          >
             {bubbles.length === 0 && (
               <p className="m-auto max-w-[80%] text-center text-xs text-muted-foreground">
                 Send JOIN to start. This is a simulation — no real messages are sent.
@@ -78,7 +91,9 @@ export function WhatsappSimulator() {
                 )}
               >
                 {b.text}
-                <span className="ml-2 align-bottom text-[10px] text-muted-foreground">{b.time}</span>
+                <span className="ml-2 align-bottom text-[10px] text-muted-foreground">
+                  {b.time}
+                </span>
               </div>
             ))}
           </div>
@@ -101,7 +116,13 @@ export function WhatsappSimulator() {
               send(input);
             }}
           >
-            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Message" aria-label="Message" maxLength={200} />
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Message"
+              aria-label="Message"
+              maxLength={200}
+            />
             <Button type="submit" size="icon" aria-label="Send">
               <Send className="size-4" />
             </Button>
@@ -110,15 +131,28 @@ export function WhatsappSimulator() {
         <div className="space-y-3 text-sm">
           <h2 className="text-lg font-semibold">What each word does</h2>
           <ul className="space-y-2">
-            <li><b>JOIN</b> — signs up and records WhatsApp consent.</li>
-            <li><b>BALANCE</b> — replies with current points.</li>
-            <li><b>REDEEM</b> — sends a 15-minute secure link to the reward page.</li>
-            <li><b>THANKS name</b> — sends a thank-you to a colleague.</li>
-            <li><b>LANG</b> — switches English → தமிழ் → हिन्दी (or LANG ta / hi).</li>
-            <li><b>STOP</b> — stops all messages immediately.</li>
+            <li>
+              <b>JOIN</b> — signs up and records WhatsApp consent.
+            </li>
+            <li>
+              <b>BALANCE</b> — replies with current points.
+            </li>
+            <li>
+              <b>REDEEM</b> — sends a 15-minute secure link to the reward page.
+            </li>
+            <li>
+              <b>THANKS name</b> — sends a thank-you to a colleague.
+            </li>
+            <li>
+              <b>LANG</b> — switches English → தமிழ் → हिन्दी (or LANG ta / hi).
+            </li>
+            <li>
+              <b>STOP</b> — stops all messages immediately.
+            </li>
           </ul>
           <p className="text-muted-foreground">
-            Status: {state.stopped ? "stopped" : state.joined ? "joined" : "not joined"} · language {state.language.toUpperCase()}
+            Status: {state.stopped ? "stopped" : state.joined ? "joined" : "not joined"} · language{" "}
+            {state.language.toUpperCase()}
           </p>
         </div>
       </div>
